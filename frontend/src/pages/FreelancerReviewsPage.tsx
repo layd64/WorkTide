@@ -17,13 +17,13 @@ const FreelancerReviewsPage: React.FC = () => {
   useEffect(() => {
     const fetchFreelancerData = async () => {
       if (!id) return;
-      
+
       setLoading(true);
       setError('');
-      
+
       try {
         const response = await fetch(API_ENDPOINTS.profile.getById(id));
-        
+
         if (response.ok) {
           const data = await response.json();
           setFreelancer(data);
@@ -72,9 +72,9 @@ const FreelancerReviewsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <AllReviewsComponent 
-          freelancerId={freelancer.id} 
-          freelancerName={freelancer.fullName} 
+        <AllReviewsComponent
+          freelancerId={freelancer.id}
+          freelancerName={freelancer.fullName}
           backToProfile={true}
         />
       </div>

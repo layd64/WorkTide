@@ -38,6 +38,7 @@ let ProfileService = class ProfileService {
                 education: true,
                 experience: true,
                 isHidden: true,
+                isAvatarVisible: true,
             },
         });
         if (!user) {
@@ -65,10 +66,14 @@ let ProfileService = class ProfileService {
                 education: true,
                 experience: true,
                 isHidden: true,
+                isAvatarVisible: true,
             },
         });
         if (!user) {
             throw new common_1.NotFoundException('User not found');
+        }
+        if (!user.isAvatarVisible) {
+            user.imageUrl = null;
         }
         return user;
     }
@@ -103,12 +108,18 @@ let ProfileService = class ProfileService {
                 location: true,
                 imageUrl: true,
                 createdAt: true,
+                isAvatarVisible: true,
             },
             orderBy: {
                 rating: 'desc',
             },
         });
-        return freelancers;
+        return freelancers.map(f => {
+            if (!f.isAvatarVisible) {
+                f.imageUrl = null;
+            }
+            return f;
+        });
     }
     async updateProfile(userId, profileData) {
         const user = await this.prisma.user.findUnique({
@@ -131,6 +142,7 @@ let ProfileService = class ProfileService {
                 languages: profileData.languages || [],
                 education: profileData.education || [],
                 experience: profileData.experience || [],
+                isAvatarVisible: profileData.isAvatarVisible,
                 ...isHiddenUpdate,
             },
             select: {
@@ -151,6 +163,7 @@ let ProfileService = class ProfileService {
                 education: true,
                 experience: true,
                 isHidden: true,
+                isAvatarVisible: true,
             },
         });
         console.log('Profile updated:', {
@@ -159,6 +172,17 @@ let ProfileService = class ProfileService {
             userType: updatedUser.userType
         });
         return updatedUser;
+    }
+    async updateAvatar(userId, imageUrl) {
+        const user = await this.prisma.user.update({
+            where: { id: userId },
+            data: { imageUrl },
+            select: {
+                id: true,
+                imageUrl: true,
+            }
+        });
+        return user;
     }
 };
 exports.ProfileService = ProfileService;

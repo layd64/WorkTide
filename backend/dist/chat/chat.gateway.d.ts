@@ -11,6 +11,7 @@ export declare class ChatGateway implements OnGatewayConnection, OnGatewayDiscon
         senderId: string;
         receiverId: string;
         content: string;
+        attachments?: any[];
     }, client: Socket): Promise<{
         sender: {
             id: string;
@@ -28,5 +29,6 @@ export declare class ChatGateway implements OnGatewayConnection, OnGatewayDiscon
         content: string;
         senderId: string;
         receiverId: string;
+        attachments: import("@prisma/client/runtime/library").JsonValue | null;
     }>;
 }

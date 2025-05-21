@@ -241,8 +241,8 @@ const FindWork: React.FC = () => {
                     key={skill}
                     onClick={() => toggleSkillFilter(skill)}
                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${selectedSkills.includes(skill)
-                        ? 'bg-indigo-100 text-indigo-800'
-                        : 'bg-gray-100 text-gray-800'
+                      ? 'bg-indigo-100 text-indigo-800'
+                      : 'bg-gray-100 text-gray-800'
                       }`}
                   >
                     {skill}

@@ -2,10 +2,15 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
 
+import * as fs from 'fs';
+
 async function bootstrap() {
+  if (!fs.existsSync('./uploads')) {
+    fs.mkdirSync('./uploads');
+  }
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
-  
+
   // Enable CORS
   app.enableCors({
     origin: 'http://localhost:5173', // Vite's default port

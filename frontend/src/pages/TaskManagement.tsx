@@ -46,7 +46,6 @@ const TaskManagement: React.FC = () => {
   const [isViewingApplicationDetails, setIsViewingApplicationDetails] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [freelancerToReview, setFreelancerToReview] = useState<string | null>(null);
-  const [completedTaskId, setCompletedTaskId] = useState<string | null>(null);
 
   // Redirect non-client users
   if (!user || user.userType !== 'client') {
@@ -327,7 +326,6 @@ const TaskManagement: React.FC = () => {
           if (acceptedApplication) {
             // Open review modal
             setFreelancerToReview(acceptedApplication.freelancer.id);
-            setCompletedTaskId(taskId);
             setIsReviewModalOpen(true);
           } else {
             console.warn('No accepted application found for this task.');
@@ -348,7 +346,6 @@ const TaskManagement: React.FC = () => {
   const closeReviewModal = () => {
     setIsReviewModalOpen(false);
     setFreelancerToReview(null);
-    setCompletedTaskId(null);
   };
 
   const handleReviewSuccess = () => {

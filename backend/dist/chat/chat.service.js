@@ -17,12 +17,13 @@ let ChatService = class ChatService {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async sendMessage(senderId, receiverId, content) {
+    async sendMessage(senderId, receiverId, content, attachments) {
         return this.prisma.message.create({
             data: {
                 senderId,
                 receiverId,
                 content,
+                attachments: attachments || [],
             },
             include: {
                 sender: {

@@ -23,7 +23,10 @@ const Chat: React.FC = () => {
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [currentPartner, setCurrentPartner] = useState<{ id: string; fullName: string; imageUrl?: string } | null>(null);
+    const [attachments, setAttachments] = useState<any[]>([]);
+    const [isUploading, setIsUploading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (userId) {
@@ -40,16 +43,19 @@ const Chat: React.FC = () => {
                 setCurrentPartner(existingConv.partner);
             } else {
                 // If not found (new chat), fetch user details
-                fetch(`http://localhost:3000/users/${activeChat}`, {
+                console.log('Fetching user details for:', activeChat);
+                fetch(`http://localhost:3000/api/users/${activeChat}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 })
                     .then(res => {
+                        console.log('User fetch response status:', res.status);
                         if (!res.ok) throw new Error('Failed to fetch user');
                         return res.json();
                     })
                     .then(data => {
+                        console.log('User data received:', data);
                         if (data && data.fullName) {
                             setCurrentPartner(data);
                         } else {
@@ -67,10 +73,11 @@ const Chat: React.FC = () => {
         }
     }, [activeChat, conversations, token]);
 
-    useEffect(() => {
+    // Fetch conversations - use useCallback to make it stable
+    const fetchConversations = React.useCallback(() => {
         if (user && token) {
             console.log('Fetching conversations for user:', user.id);
-            fetch(`http://localhost:3000/chat/conversations/${user.id}`, {
+            fetch(`http://localhost:3000/api/chat/conversations/${user.id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -93,7 +100,11 @@ const Chat: React.FC = () => {
                     setConversations([]);
                 });
         }
-    }, [user, token, messages]); // Refresh conversations when messages change
+    }, [user, token]);
+
+    useEffect(() => {
+        fetchConversations();
+    }, [fetchConversations, messages]); // Refresh conversations when messages change
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -103,11 +114,37 @@ const Chat: React.FC = () => {
         scrollToBottom();
     }, [messages]);
 
+    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setIsUploading(true);
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const res = await fetch('http://localhost:3000/api/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+                const data = await res.json();
+                setAttachments([...attachments, data]);
+            } catch (err) {
+                console.error('Upload failed', err);
+            } finally {
+                setIsUploading(false);
+                if (fileInputRef.current) fileInputRef.current.value = '';
+            }
+        }
+    };
+
     const handleSend = (e: React.FormEvent) => {
         e.preventDefault();
-        if (activeChat && newMessage.trim()) {
-            sendMessage(activeChat, newMessage);
+        if (activeChat && (newMessage.trim() || attachments.length > 0)) {
+            sendMessage(activeChat, newMessage, attachments);
             setNewMessage('');
+            setAttachments([]);
+            // Refresh conversations after sending to ensure the new chat appears
+            setTimeout(() => fetchConversations(), 500);
         }
     };
 
@@ -196,6 +233,22 @@ const Chat: React.FC = () => {
                                                 }`}
                                         >
                                             <p>{msg.content}</p>
+                                            {msg.attachments && msg.attachments.length > 0 && (
+                                                <div className="mt-2 space-y-2">
+                                                    {msg.attachments.map((att: any, idx: number) => (
+                                                        <div key={idx}>
+                                                            {att.type.startsWith('image/') ? (
+                                                                <img src={`http://localhost:3000${att.url}`} alt={att.name} className="max-w-full rounded" />
+                                                            ) : (
+                                                                <a href={`http://localhost:3000${att.url}`} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-2 text-blue-500 hover:underline">
+                                                                    <span className="text-xl">📎</span>
+                                                                    <span className="break-all">{att.name}</span>
+                                                                </a>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
                                             <p className={`text-xs mt-1 ${isMe ? 'text-blue-200' : 'text-gray-400'}`}>
                                                 {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                             </p>
@@ -208,20 +261,55 @@ const Chat: React.FC = () => {
 
                         {/* Input */}
                         <form onSubmit={handleSend} className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-                            <div className="flex space-x-2">
+                            <div className="flex space-x-2 items-end">
                                 <input
-                                    type="text"
-                                    value={newMessage}
-                                    onChange={(e) => setNewMessage(e.target.value)}
-                                    placeholder="Type a message..."
-                                    className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                    type="file"
+                                    ref={fileInputRef}
+                                    onChange={handleFileSelect}
+                                    className="hidden"
+                                    accept="image/png,image/jpeg,application/pdf,application/zip"
                                 />
                                 <button
-                                    type="submit"
-                                    disabled={!newMessage.trim()}
-                                    className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                                    title="Attach file"
                                 >
-                                    Send
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                    </svg>
+                                </button>
+                                <div className="flex-1 flex flex-col">
+                                    {attachments.length > 0 && (
+                                        <div className="flex flex-wrap gap-2 mb-2">
+                                            {attachments.map((att, idx) => (
+                                                <div key={idx} className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-sm flex items-center">
+                                                    <span className="truncate max-w-[100px] text-gray-800 dark:text-gray-200">{att.name}</span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setAttachments(attachments.filter((_, i) => i !== idx))}
+                                                        className="ml-2 text-red-500 hover:text-red-700"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                    <input
+                                        type="text"
+                                        value={newMessage}
+                                        onChange={(e) => setNewMessage(e.target.value)}
+                                        placeholder="Type a message..."
+                                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    disabled={(!newMessage.trim() && attachments.length === 0) || isUploading}
+                                    className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors h-10"
+                                >
+                                    {isUploading ? '...' : 'Send'}
                                 </button>
                             </div>
                         </form>

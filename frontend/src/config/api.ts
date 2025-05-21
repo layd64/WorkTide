@@ -8,20 +8,21 @@ export const API_ENDPOINTS = {
   },
   profile: {
     update: `${API_BASE_URL}/profile/update`,
+    uploadAvatar: `${API_BASE_URL}/profile/upload-avatar`,
     get: `${API_BASE_URL}/profile`,
     getById: (id: string) => `${API_BASE_URL}/profile/${id}`,
     getAllFreelancers: (search?: string, skills?: string[]) => {
       let url = `${API_BASE_URL}/profile/freelancers`;
       const params = new URLSearchParams();
-      
+
       if (search) {
         params.append('search', search);
       }
-      
+
       if (skills && skills.length > 0) {
         params.append('skills', skills.join(','));
       }
-      
+
       const queryString = params.toString();
       return queryString ? `${url}?${queryString}` : url;
     },
@@ -36,19 +37,19 @@ export const API_ENDPOINTS = {
     getAll: (search?: string, skills?: string[], status?: string) => {
       let url = `${API_BASE_URL}/tasks`;
       const params = new URLSearchParams();
-      
+
       if (search) {
         params.append('search', search);
       }
-      
+
       if (skills && skills.length > 0) {
         params.append('skills', skills.join(','));
       }
-      
+
       if (status) {
         params.append('status', status);
       }
-      
+
       const queryString = params.toString();
       return queryString ? `${url}?${queryString}` : url;
     },
@@ -62,6 +63,6 @@ export const API_ENDPOINTS = {
     getByTask: (taskId: string) => `${API_BASE_URL}/task-applications/task/${taskId}`,
     getByFreelancer: `${API_BASE_URL}/task-applications/freelancer`,
     updateStatus: (applicationId: string) => `${API_BASE_URL}/task-applications/${applicationId}/status`,
-    assignFreelancer: (applicationId: string) => `${API_BASE_URL}/task-applications/${applicationId}/assign`, 
+    assignFreelancer: (applicationId: string) => `${API_BASE_URL}/task-applications/${applicationId}/assign`,
   }
-}; 
+};

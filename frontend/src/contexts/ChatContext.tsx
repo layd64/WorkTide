@@ -2,6 +2,12 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 
+interface Attachment {
+    url: string;
+    type: string;
+    name: string;
+}
+
 interface Message {
     id: string;
     content: string;
@@ -13,12 +19,13 @@ interface Message {
         fullName: string;
         imageUrl?: string;
     };
+    attachments?: Attachment[];
 }
 
 interface ChatContextType {
     socket: Socket | null;
     messages: Message[];
-    sendMessage: (receiverId: string, content: string) => void;
+    sendMessage: (receiverId: string, content: string, attachments?: Attachment[]) => void;
     loadHistory: (userId: string) => Promise<void>;
     activeChat: string | null;
     setActiveChat: (userId: string | null) => void;
@@ -34,11 +41,6 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     useEffect(() => {
         if (user?.id && token) {
-            // Prevent multiple connections for the same user
-            if (socket && socket.connected) {
-                return;
-            }
-
             console.log('Initializing socket for user:', user.id);
             const newSocket = io('http://localhost:3000', {
                 query: { userId: user.id },
@@ -56,7 +58,15 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
             newSocket.on('newMessage', (message: Message) => {
                 console.log('New message received:', message);
-                setMessages((prev) => [...prev, message]);
+                // Deduplicate messages by checking if message with this ID already exists
+                setMessages((prev) => {
+                    const exists = prev.find(m => m.id === message.id);
+                    if (exists) {
+                        console.log('Message already exists, skipping:', message.id);
+                        return prev;
+                    }
+                    return [...prev, message];
+                });
             });
 
             return () => {
@@ -66,12 +76,13 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
     }, [user?.id, token]);
 
-    const sendMessage = React.useCallback((receiverId: string, content: string) => {
+    const sendMessage = React.useCallback((receiverId: string, content: string, attachments?: Attachment[]) => {
         if (socket && user) {
             socket.emit('sendMessage', {
                 senderId: user.id,
                 receiverId,
                 content,
+                attachments,
             });
         }
     }, [socket, user]);
@@ -79,7 +90,7 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const loadHistory = React.useCallback(async (otherUserId: string) => {
         if (!user || !token) return;
         try {
-            const response = await fetch(`http://localhost:3000/chat/history/${user.id}/${otherUserId}`, {
+            const response = await fetch(`http://localhost:3000/api/chat/history/${user.id}/${otherUserId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

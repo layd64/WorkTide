@@ -20,6 +20,7 @@ export declare class ProfileService {
         education: import("@prisma/client/runtime/library").JsonValue[];
         experience: import("@prisma/client/runtime/library").JsonValue[];
         isHidden: boolean;
+        isAvatarVisible: boolean;
     }>;
     getPublicProfile(userId: string): Promise<{
         rating: number | null;
@@ -38,6 +39,7 @@ export declare class ProfileService {
         education: import("@prisma/client/runtime/library").JsonValue[];
         experience: import("@prisma/client/runtime/library").JsonValue[];
         isHidden: boolean;
+        isAvatarVisible: boolean;
     }>;
     getAllFreelancers(search?: string, skills?: string[]): Promise<{
         rating: number | null;
@@ -51,6 +53,7 @@ export declare class ProfileService {
         completedJobs: number | null;
         location: string | null;
         imageUrl: string | null;
+        isAvatarVisible: boolean;
     }[]>;
     updateProfile(userId: string, profileData: any): Promise<{
         rating: number | null;
@@ -70,5 +73,10 @@ export declare class ProfileService {
         education: import("@prisma/client/runtime/library").JsonValue[];
         experience: import("@prisma/client/runtime/library").JsonValue[];
         isHidden: boolean;
+        isAvatarVisible: boolean;
+    }>;
+    updateAvatar(userId: string, imageUrl: string): Promise<{
+        id: string;
+        imageUrl: string | null;
     }>;
 }

@@ -5,12 +5,13 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ChatService {
     constructor(private prisma: PrismaService) { }
 
-    async sendMessage(senderId: string, receiverId: string, content: string) {
+    async sendMessage(senderId: string, receiverId: string, content: string, attachments?: any[]) {
         return this.prisma.message.create({
             data: {
                 senderId,
                 receiverId,
                 content,
+                attachments: attachments || [],
             },
             include: {
                 sender: {

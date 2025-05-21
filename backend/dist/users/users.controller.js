@@ -21,7 +21,9 @@ let UsersController = class UsersController {
         this.usersService = usersService;
     }
     async findOne(id) {
+        console.log('UsersController: Fetching user with ID:', id);
         const user = await this.usersService.findOne(id);
+        console.log('UsersController: User found:', user);
         if (!user) {
             throw new common_1.NotFoundException(`User with ID ${id} not found`);
         }

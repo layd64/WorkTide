@@ -8,6 +8,10 @@ import { ProfileModule } from './profile/profile.module';
 import { RatingsModule } from './ratings/ratings.module';
 import { TaskApplicationsModule } from './task-applications/task-applications.module';
 import { ChatModule } from './chat/chat.module';
+import { UsersModule } from './users/users.module';
+import { UploadModule } from './upload/upload.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -19,6 +23,12 @@ import { ChatModule } from './chat/chat.module';
     RatingsModule,
     TaskApplicationsModule,
     ChatModule,
+    UsersModule,
+    UploadModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'uploads'),
+      serveRoot: '/uploads',
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -17,7 +17,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute'
 import { AuthProvider } from './contexts/AuthContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { LanguageProvider } from './contexts/LanguageContext'
-import { DropdownProvider, useDropdown } from './contexts/DropdownContext'
+import { DropdownProvider } from './contexts/DropdownContext'
 import Navbar from './components/layout/Navbar'
 import Footer from './components/layout/Footer'
 
@@ -50,8 +50,6 @@ const OverlayCleanup: React.FC = () => {
 };
 
 function AppContent() {
-  const { isDropdownOpen } = useDropdown();
-
   return (
     <Router>
       <div className="min-h-screen w-full bg-gray-50 dark:bg-gray-900 pt-16 flex flex-col">

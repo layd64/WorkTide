@@ -33,7 +33,7 @@ let ChatGateway = class ChatGateway {
         console.log(`Client disconnected: ${client.id}`);
     }
     async handleSendMessage(data, client) {
-        const message = await this.chatService.sendMessage(data.senderId, data.receiverId, data.content);
+        const message = await this.chatService.sendMessage(data.senderId, data.receiverId, data.content, data.attachments);
         this.server.to(data.receiverId).emit('newMessage', message);
         this.server.to(data.senderId).emit('newMessage', message);
         return message;

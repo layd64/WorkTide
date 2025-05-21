@@ -35,13 +35,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage('sendMessage')
     async handleSendMessage(
-        @MessageBody() data: { senderId: string; receiverId: string; content: string },
+        @MessageBody() data: { senderId: string; receiverId: string; content: string; attachments?: any[] },
         @ConnectedSocket() client: Socket,
     ) {
         const message = await this.chatService.sendMessage(
             data.senderId,
             data.receiverId,
             data.content,
+            data.attachments,
         );
 
         // Emit to receiver

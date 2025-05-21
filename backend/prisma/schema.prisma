@@ -35,6 +35,7 @@ model User {
   education    Json[]   @default([])  // Array of education objects
   experience   Json[]   @default([])  // Array of experience objects
   isHidden     Boolean  @default(false) // Whether the freelancer profile is hidden from search
+  isAvatarVisible Boolean @default(true) // Whether the profile picture is visible to others
   
   // Relations
   tasks        Task[]   // Tasks created by clients
@@ -113,4 +114,5 @@ model Message {
   
   sender    User     @relation("SentMessages", fields: [senderId], references: [id])
   receiver  User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  attachments Json? // Array of { url: string, type: 'image' | 'file', name: string }
 }

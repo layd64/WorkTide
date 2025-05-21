@@ -23,16 +23,16 @@ interface Rating {
   };
 }
 
-const AllReviewsComponent: React.FC<AllReviewsProps> = ({ 
-  freelancerId, 
+const AllReviewsComponent: React.FC<AllReviewsProps> = ({
+  freelancerId,
   freelancerName,
-  backToProfile = false 
+  backToProfile = false
 }) => {
   const navigate = useNavigate();
   const [ratings, setRatings] = useState<Rating[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
+
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRatings, setTotalRatings] = useState(0);
@@ -76,11 +76,11 @@ const AllReviewsComponent: React.FC<AllReviewsProps> = ({
       4: 0,
       5: 0,
     };
-    
+
     ratings.forEach(rating => {
       distribution[rating.score as keyof typeof distribution]++;
     });
-    
+
     return distribution;
   };
 
@@ -110,7 +110,7 @@ const AllReviewsComponent: React.FC<AllReviewsProps> = ({
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
       <div className="p-6">
         {backToProfile && (
-          <button 
+          <button
             onClick={() => navigate(`/freelancer-profile/${freelancerId}`)}
             className="flex items-center text-gray-600 hover:text-blue-600 mb-6"
           >
@@ -122,7 +122,7 @@ const AllReviewsComponent: React.FC<AllReviewsProps> = ({
         <h2 className="text-xl font-semibold text-gray-900 mb-4">
           All Reviews for {freelancerName}
         </h2>
-        
+
         {error ? (
           <div className="text-red-600 py-4">{error}</div>
         ) : (
@@ -134,22 +134,21 @@ const AllReviewsComponent: React.FC<AllReviewsProps> = ({
                   <div className="text-4xl font-bold text-gray-900">{averageRating.toFixed(1)}</div>
                   <div className="flex mt-2">
                     {[...Array(5)].map((_, index) => (
-                      <StarIconSolid 
-                        key={index} 
-                        className={`h-5 w-5 ${
-                          index < Math.round(averageRating) ? 'text-yellow-400' : 'text-gray-300'
-                        }`} 
+                      <StarIconSolid
+                        key={index}
+                        className={`h-5 w-5 ${index < Math.round(averageRating) ? 'text-yellow-400' : 'text-gray-300'
+                          }`}
                       />
                     ))}
                   </div>
                   <div className="text-gray-600 mt-1">{totalRatings} reviews</div>
                 </div>
-                
+
                 <div className="md:w-3/4 mt-6 md:mt-0">
                   {[5, 4, 3, 2, 1].map(score => {
                     const count = distribution[score as keyof typeof distribution];
                     const percentage = totalRatings > 0 ? (count / totalRatings) * 100 : 0;
-                    
+
                     return (
                       <div key={score} className="flex items-center mb-2">
                         <div className="flex items-center w-12">
@@ -157,8 +156,8 @@ const AllReviewsComponent: React.FC<AllReviewsProps> = ({
                           <StarIconSolid className="h-4 w-4 ml-1 text-yellow-400" />
                         </div>
                         <div className="w-full h-2 mx-4 bg-gray-200 rounded-full">
-                          <div 
-                            className="h-2 bg-yellow-400 rounded-full" 
+                          <div
+                            className="h-2 bg-yellow-400 rounded-full"
                             style={{ width: `${percentage}%` }}
                           ></div>
                         </div>
@@ -171,7 +170,7 @@ const AllReviewsComponent: React.FC<AllReviewsProps> = ({
                 </div>
               </div>
             </div>
-            
+
             {/* Reviews List */}
             {totalRatings === 0 ? (
               <p className="text-gray-500 italic text-center py-8">No reviews yet</p>
@@ -180,7 +179,7 @@ const AllReviewsComponent: React.FC<AllReviewsProps> = ({
                 {paginatedRatings.map(rating => (
                   <div key={rating.id} className="border-b border-gray-100 last:border-0 pb-6">
                     <div className="flex items-start">
-                      <Avatar 
+                      <Avatar
                         fullName={rating.client.fullName}
                         className="h-12 w-12 mr-4"
                         textSize="text-sm"
@@ -189,18 +188,17 @@ const AllReviewsComponent: React.FC<AllReviewsProps> = ({
                         <p className="font-medium text-gray-900">{rating.client.fullName}</p>
                         <div className="flex items-center mt-1">
                           {[...Array(5)].map((_, index) => (
-                            <StarIconSolid 
-                              key={index} 
-                              className={`h-5 w-5 ${
-                                index < rating.score ? 'text-yellow-400' : 'text-gray-300'
-                              }`} 
+                            <StarIconSolid
+                              key={index}
+                              className={`h-5 w-5 ${index < rating.score ? 'text-yellow-400' : 'text-gray-300'
+                                }`}
                             />
                           ))}
                         </div>
                         <p className="text-sm text-gray-500 mt-1">
                           {new Date(rating.createdAt).toLocaleDateString('en-US', {
                             year: 'numeric',
-                            month: 'long', 
+                            month: 'long',
                             day: 'numeric'
                           })}
                         </p>
@@ -213,34 +211,32 @@ const AllReviewsComponent: React.FC<AllReviewsProps> = ({
                     </div>
                   </div>
                 ))}
-                
+
                 {/* Pagination */}
                 {pageCount > 1 && (
                   <div className="flex items-center justify-center space-x-4 mt-8">
                     <button
                       onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                       disabled={currentPage === 1}
-                      className={`p-2 rounded-full ${
-                        currentPage === 1 
-                          ? 'text-gray-400 cursor-not-allowed' 
+                      className={`p-2 rounded-full ${currentPage === 1
+                          ? 'text-gray-400 cursor-not-allowed'
                           : 'text-gray-700 hover:bg-gray-100'
-                      }`}
+                        }`}
                     >
                       <ChevronLeftIcon className="h-5 w-5" />
                     </button>
-                    
+
                     <div className="text-sm text-gray-700">
                       Page {currentPage} of {pageCount}
                     </div>
-                    
+
                     <button
                       onClick={() => setCurrentPage(prev => Math.min(prev + 1, pageCount))}
                       disabled={currentPage === pageCount}
-                      className={`p-2 rounded-full ${
-                        currentPage === pageCount 
-                          ? 'text-gray-400 cursor-not-allowed' 
+                      className={`p-2 rounded-full ${currentPage === pageCount
+                          ? 'text-gray-400 cursor-not-allowed'
                           : 'text-gray-700 hover:bg-gray-100'
-                      }`}
+                        }`}
                     >
                       <ChevronRightIcon className="h-5 w-5" />
                     </button>

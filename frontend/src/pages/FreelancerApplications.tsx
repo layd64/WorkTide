@@ -135,8 +135,8 @@ const FreelancerApplications: React.FC = () => {
             <button
               onClick={() => setActiveTab('all')}
               className={`py-4 px-1 text-sm font-medium ${activeTab === 'all'
-                  ? 'border-indigo-500 text-indigo-600 border-b-2'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-indigo-500 text-indigo-600 border-b-2'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
             >
               All Applications
@@ -144,8 +144,8 @@ const FreelancerApplications: React.FC = () => {
             <button
               onClick={() => setActiveTab('pending')}
               className={`py-4 px-1 text-sm font-medium ${activeTab === 'pending'
-                  ? 'border-indigo-500 text-indigo-600 border-b-2'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-indigo-500 text-indigo-600 border-b-2'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
             >
               Pending
@@ -153,8 +153,8 @@ const FreelancerApplications: React.FC = () => {
             <button
               onClick={() => setActiveTab('accepted')}
               className={`py-4 px-1 text-sm font-medium ${activeTab === 'accepted'
-                  ? 'border-indigo-500 text-indigo-600 border-b-2'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-indigo-500 text-indigo-600 border-b-2'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
             >
               In Progress
@@ -162,8 +162,8 @@ const FreelancerApplications: React.FC = () => {
             <button
               onClick={() => setActiveTab('completed')}
               className={`py-4 px-1 text-sm font-medium ${activeTab === 'completed'
-                  ? 'border-indigo-500 text-indigo-600 border-b-2'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-indigo-500 text-indigo-600 border-b-2'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
             >
               Completed

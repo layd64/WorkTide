@@ -2,7 +2,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export declare class ChatService {
     private prisma;
     constructor(prisma: PrismaService);
-    sendMessage(senderId: string, receiverId: string, content: string): Promise<{
+    sendMessage(senderId: string, receiverId: string, content: string, attachments?: any[]): Promise<{
         sender: {
             id: string;
             fullName: string;
@@ -19,6 +19,7 @@ export declare class ChatService {
         content: string;
         senderId: string;
         receiverId: string;
+        attachments: import("@prisma/client/runtime/library").JsonValue | null;
     }>;
     getMessages(userId1: string, userId2: string): Promise<({
         sender: {
@@ -32,6 +33,7 @@ export declare class ChatService {
         content: string;
         senderId: string;
         receiverId: string;
+        attachments: import("@prisma/client/runtime/library").JsonValue | null;
     })[]>;
     getConversations(userId: string): Promise<any[]>;
 }

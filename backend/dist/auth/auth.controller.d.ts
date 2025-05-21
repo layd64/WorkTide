@@ -29,6 +29,7 @@ export declare class AuthController {
             education: import("@prisma/client/runtime/library").JsonValue[];
             experience: import("@prisma/client/runtime/library").JsonValue[];
             isHidden: boolean;
+            isAvatarVisible: boolean;
         };
         token: string;
     }>;

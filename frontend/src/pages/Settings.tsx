@@ -4,8 +4,9 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { SunIcon, MoonIcon, LanguageIcon, XCircleIcon, PlusIcon, EyeIcon } from '@heroicons/react/24/outline';
+import { SunIcon, MoonIcon, XCircleIcon, PlusIcon, EyeIcon, CameraIcon } from '@heroicons/react/24/outline';
 import { useAccessibility } from '../contexts/AccessibilityContext';
+import Avatar from '../components/Avatar';
 
 interface Education {
   institution: string;
@@ -24,7 +25,7 @@ const Settings: React.FC = () => {
   const { t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const { language, changeLanguage } = useLanguage();
-  const { user, updateProfile } = useAuth();
+  const { user, updateProfile, uploadAvatar } = useAuth();
   const {
     fontSize, setFontSize,
     highContrast, setHighContrast,
@@ -52,9 +53,12 @@ const Settings: React.FC = () => {
   const [education, setEducation] = useState<Education[]>([]);
   const [experience, setExperience] = useState<Experience[]>([]);
   const [isHidden, setIsHidden] = useState<boolean>(false);
+  const [isAvatarVisible, setIsAvatarVisible] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
   const [saveError, setSaveError] = useState<string>('');
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
   // Initialize form with user data
   useEffect(() => {
@@ -71,6 +75,10 @@ const Settings: React.FC = () => {
       // Ensure isHidden is properly initialized as a boolean
       const hiddenValue = user.isHidden === true;
       setIsHidden(hiddenValue);
+
+      // Initialize isAvatarVisible
+      const avatarVisibleValue = user.isAvatarVisible !== undefined ? user.isAvatarVisible : true;
+      setIsAvatarVisible(avatarVisibleValue);
 
       setLoading(false);
     } else {
@@ -151,6 +159,26 @@ const Settings: React.FC = () => {
     setIsHidden(newValue);
   };
 
+  // Handle toggle for isAvatarVisible
+  const handleToggleAvatarVisible = () => {
+    setIsAvatarVisible(!isAvatarVisible);
+  };
+
+  // Handle avatar file selection
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setAvatarFile(file);
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -159,6 +187,11 @@ const Settings: React.FC = () => {
     setSaveSuccess(false);
 
     try {
+      // Upload avatar if selected
+      if (avatarFile) {
+        await uploadAvatar(avatarFile);
+      }
+
       const profileData = {
         title,
         bio,
@@ -168,7 +201,8 @@ const Settings: React.FC = () => {
         languages,
         education,
         experience,
-        isHidden
+        isHidden,
+        isAvatarVisible
       };
 
       const success = await updateProfile(profileData);
@@ -202,6 +236,59 @@ const Settings: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
             <form onSubmit={handleSubmit}>
               <div className="space-y-8">
+                {/* Profile Picture Section */}
+                <div>
+                  <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('profilePicture') || 'Profile Picture'}</h2>
+                  <div className="flex flex-col sm:flex-row items-center gap-6">
+                    <div className="relative">
+                      <Avatar
+                        fullName={user?.fullName || 'User'}
+                        imageUrl={avatarPreview || user?.imageUrl}
+                        className="w-24 h-24 text-xl"
+                      />
+                      <label
+                        htmlFor="avatar-upload"
+                        className="absolute bottom-0 right-0 bg-blue-600 text-white p-1.5 rounded-full cursor-pointer hover:bg-blue-700 shadow-sm"
+                      >
+                        <CameraIcon className="w-4 h-4" />
+                        <input
+                          id="avatar-upload"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleAvatarChange}
+                        />
+                      </label>
+                    </div>
+
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between max-w-md">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {t('showAvatarToOthers') || 'Show profile picture to others'}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {t('avatarVisibilityInfo') || 'If disabled, only you will see your profile picture.'}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleToggleAvatarVisible}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${isAvatarVisible ? 'bg-blue-600' : 'bg-gray-200'
+                            }`}
+                          role="switch"
+                          aria-checked={isAvatarVisible}
+                        >
+                          <span
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isAvatarVisible ? 'translate-x-6' : 'translate-x-1'
+                              }`}
+                          />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Profile Section */}
                 <div>
                   <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('profileInformation')}</h2>
@@ -726,8 +813,8 @@ const Settings: React.FC = () => {
                           type="button"
                           onClick={() => setSaturation('normal')}
                           className={`px-3 py-2 border rounded-md text-sm ${saturation === 'normal'
-                              ? 'bg-blue-600 text-white border-blue-600'
-                              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
                             }`}
                         >
                           Normal
@@ -736,8 +823,8 @@ const Settings: React.FC = () => {
                           type="button"
                           onClick={() => setSaturation('low')}
                           className={`px-3 py-2 border rounded-md text-sm ${saturation === 'low'
-                              ? 'bg-blue-600 text-white border-blue-600'
-                              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
                             }`}
                         >
                           Low
@@ -746,8 +833,8 @@ const Settings: React.FC = () => {
                           type="button"
                           onClick={() => setSaturation('high')}
                           className={`px-3 py-2 border rounded-md text-sm ${saturation === 'high'
-                              ? 'bg-blue-600 text-white border-blue-600'
-                              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
                             }`}
                         >
                           High
@@ -756,8 +843,8 @@ const Settings: React.FC = () => {
                           type="button"
                           onClick={() => setSaturation('bw')}
                           className={`px-3 py-2 border rounded-md text-sm ${saturation === 'bw'
-                              ? 'bg-blue-600 text-white border-blue-600'
-                              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
                             }`}
                         >
                           B&W
@@ -798,62 +885,71 @@ const Settings: React.FC = () => {
                   <div>
                     <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">{t('language')}</h3>
                     <div className="space-y-2">
-                      <div className="flex items-center space-x-2">
-                        <input
-                          id="language-en"
-                          name="language"
-                          type="radio"
-                          checked={language === 'en'}
-                          onChange={() => changeLanguage('en')}
-                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                        />
-                        <label htmlFor="language-en" className="text-gray-700 dark:text-gray-300">
-                          {t('english')}
-                        </label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <input
-                          id="language-uk"
-                          name="language"
-                          type="radio"
-                          checked={language === 'uk'}
-                          onChange={() => changeLanguage('uk')}
-                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                        />
-                        <label htmlFor="language-uk" className="text-gray-700 dark:text-gray-300">
-                          {t('ukrainian')}
-                        </label>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => changeLanguage('en')}
+                        className={`w-full flex items-center justify-between p-3 rounded-md border ${language === 'en'
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
+                          : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                          }`}
+                      >
+                        <div className="flex items-center">
+                          <span className="text-2xl mr-3">🇺🇸</span>
+                          <span className="font-medium">English</span>
+                        </div>
+                        {language === 'en' && (
+                          <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => changeLanguage('uk')}
+                        className={`w-full flex items-center justify-between p-3 rounded-md border ${language === 'uk'
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
+                          : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                          }`}
+                      >
+                        <div className="flex items-center">
+                          <span className="text-2xl mr-3">🇺🇦</span>
+                          <span className="font-medium">Українська</span>
+                        </div>
+                        {language === 'uk' && (
+                          <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                        )}
+                      </button>
                     </div>
                   </div>
                 </div>
-
-                {/* Save Button */}
-                <div className="pt-5 border-t border-gray-200 dark:border-gray-700">
-                  <div className="flex justify-end">
-                    {saveError && (
-                      <p className="text-sm text-red-600 mr-4 self-center">{saveError}</p>
-                    )}
-                    {saveSuccess && (
-                      <p className="text-sm text-green-600 mr-4 self-center">{t('profileSavedSuccess')}</p>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => navigate('/profile')}
-                      className="ml-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    >
-                      {t('cancel')}
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={saving}
-                      className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-70"
-                    >
-                      {saving ? t('saving') : t('saveChanges')}
-                    </button>
-                  </div>
-                </div>
               </div>
+
+              <div className="mt-8 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => navigate('/profile')}
+                  className="bg-white dark:bg-gray-800 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-3"
+                >
+                  {t('cancel')}
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                >
+                  {saving ? t('saving') : t('saveChanges')}
+                </button>
+              </div>
+
+              {saveError && (
+                <div className="mt-4 text-sm text-red-600 text-center">
+                  {saveError}
+                </div>
+              )}
+
+              {saveSuccess && (
+                <div className="mt-4 text-sm text-green-600 text-center">
+                  {t('profileSaved')}
+                </div>
+              )}
             </form>
           </div>
         )}

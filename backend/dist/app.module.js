@@ -17,6 +17,10 @@ const profile_module_1 = require("./profile/profile.module");
 const ratings_module_1 = require("./ratings/ratings.module");
 const task_applications_module_1 = require("./task-applications/task-applications.module");
 const chat_module_1 = require("./chat/chat.module");
+const users_module_1 = require("./users/users.module");
+const upload_module_1 = require("./upload/upload.module");
+const serve_static_1 = require("@nestjs/serve-static");
+const path_1 = require("path");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -31,6 +35,12 @@ exports.AppModule = AppModule = __decorate([
             ratings_module_1.RatingsModule,
             task_applications_module_1.TaskApplicationsModule,
             chat_module_1.ChatModule,
+            users_module_1.UsersModule,
+            upload_module_1.UploadModule,
+            serve_static_1.ServeStaticModule.forRoot({
+                rootPath: (0, path_1.join)(process.cwd(), 'uploads'),
+                serveRoot: '/uploads',
+            }),
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

@@ -33,6 +33,7 @@ interface User {
   education?: Education[];
   experience?: Experience[];
   isHidden?: boolean;
+  isAvatarVisible?: boolean;
 }
 
 interface AuthContextType {
@@ -41,6 +42,7 @@ interface AuthContextType {
   login: (token: string) => void;
   logout: () => void;
   updateProfile: (profileData: Partial<User>) => Promise<boolean>;
+  uploadAvatar: (file: File) => Promise<boolean>;
   isLoading: boolean;
 }
 
@@ -77,12 +79,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(prevUser => {
           // If no previous user, just use the userData
           if (!prevUser) return userData;
-          
+
           // If the isHidden value is missing in the response but we have it in state, preserve it
           if (userData.isHidden === undefined && prevUser.isHidden !== undefined) {
             return { ...userData, isHidden: prevUser.isHidden };
           }
-          
+
           return userData;
         });
       } else {
@@ -107,7 +109,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     setIsLoading(true);
     fetchUser();
-    
+
     // Add a retry mechanism for network issues
     const retryTimeout = setTimeout(() => {
       if (!user && token) {
@@ -115,7 +117,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         fetchUser();
       }
     }, 3000); // Retry after 3 seconds
-    
+
     return () => clearTimeout(retryTimeout);
   }, [token]);
 
@@ -142,21 +144,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
         body: JSON.stringify(profileData),
       });
-      
+
       if (response.ok) {
         const updatedUser = await response.json();
         // Make sure we persist isHidden in user state
         setUser(prevUser => {
           if (!prevUser) return null;
-          
+
           // Explicitly ensure isHidden is included from updatedUser or keep existing value
-          return { 
-            ...prevUser, 
+          return {
+            ...prevUser,
             ...updatedUser,
-            isHidden: updatedUser.isHidden !== undefined ? updatedUser.isHidden : prevUser.isHidden
+            isHidden: updatedUser.isHidden !== undefined ? updatedUser.isHidden : prevUser.isHidden,
+            isAvatarVisible: updatedUser.isAvatarVisible !== undefined ? updatedUser.isAvatarVisible : prevUser.isAvatarVisible
           };
         });
-        
+
         // Refetch the user data to ensure we have the most up-to-date information
         setTimeout(() => fetchUser(), 500);
         return true;
@@ -168,9 +171,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const uploadAvatar = async (file: File): Promise<boolean> => {
+    try {
+      if (!user || !token) return false;
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch(API_ENDPOINTS.profile.uploadAvatar, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Update user state with new image URL
+        setUser(prevUser => {
+          if (!prevUser) return null;
+          return { ...prevUser, imageUrl: data.imageUrl };
+        });
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      return false;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, updateProfile, isLoading }}>
+    <AuthContext.Provider value={{ user, token, login, logout, updateProfile, uploadAvatar, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
-}; 
+};
