@@ -146,7 +146,7 @@ const FindWork: React.FC = () => {
         setSuccessMessage(t('applicationSubmittedSuccess'));
         closeApplyModal();
         fetchMyApplications();
-        
+
         // Clear success message after 5 seconds
         setTimeout(() => {
           setSuccessMessage(null);
@@ -184,7 +184,7 @@ const FindWork: React.FC = () => {
           <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
             {t('browseAvailableProjects')}
           </p>
-          
+
           {/* Link to My Applications for freelancer users */}
           {user?.userType === 'freelancer' && (
             <div className="mt-4">
@@ -240,11 +240,10 @@ const FindWork: React.FC = () => {
                   <button
                     key={skill}
                     onClick={() => toggleSkillFilter(skill)}
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      selectedSkills.includes(skill)
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${selectedSkills.includes(skill)
                         ? 'bg-indigo-100 text-indigo-800'
                         : 'bg-gray-100 text-gray-800'
-                    }`}
+                      }`}
                   >
                     {skill}
                   </button>
@@ -341,7 +340,7 @@ const FindWork: React.FC = () => {
             ))}
           </div>
         )}
-        
+
         {/* Application Modal */}
         {isApplying && selectedTaskId && (
           <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" role="dialog">

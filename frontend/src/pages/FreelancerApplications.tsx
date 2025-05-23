@@ -35,7 +35,7 @@ const FreelancerApplications: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'accepted' | 'completed'>('all');
-  
+
   useEffect(() => {
     // Redirect if not a freelancer
     if (!user || user.userType !== 'freelancer') {
@@ -44,12 +44,12 @@ const FreelancerApplications: React.FC = () => {
     }
 
     fetchApplications();
-    
+
     // Set up periodic refresh every 60 seconds to check for task status changes
     const refreshInterval = setInterval(() => {
       fetchApplications(false); // Pass false to avoid showing loading state during refresh
     }, 60000);
-    
+
     // Clean up interval on component unmount
     return () => clearInterval(refreshInterval);
   }, [user, token]);
@@ -103,7 +103,7 @@ const FreelancerApplications: React.FC = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
-  
+
   const getTaskStatusBadgeClass = (status: string) => {
     switch (status) {
       case 'open':
@@ -134,41 +134,37 @@ const FreelancerApplications: React.FC = () => {
           <div className="flex space-x-8" aria-label="Tabs">
             <button
               onClick={() => setActiveTab('all')}
-              className={`py-4 px-1 text-sm font-medium ${
-                activeTab === 'all'
+              className={`py-4 px-1 text-sm font-medium ${activeTab === 'all'
                   ? 'border-indigo-500 text-indigo-600 border-b-2'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+                }`}
             >
               All Applications
             </button>
             <button
               onClick={() => setActiveTab('pending')}
-              className={`py-4 px-1 text-sm font-medium ${
-                activeTab === 'pending'
+              className={`py-4 px-1 text-sm font-medium ${activeTab === 'pending'
                   ? 'border-indigo-500 text-indigo-600 border-b-2'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+                }`}
             >
               Pending
             </button>
             <button
               onClick={() => setActiveTab('accepted')}
-              className={`py-4 px-1 text-sm font-medium ${
-                activeTab === 'accepted'
+              className={`py-4 px-1 text-sm font-medium ${activeTab === 'accepted'
                   ? 'border-indigo-500 text-indigo-600 border-b-2'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+                }`}
             >
               In Progress
             </button>
             <button
               onClick={() => setActiveTab('completed')}
-              className={`py-4 px-1 text-sm font-medium ${
-                activeTab === 'completed'
+              className={`py-4 px-1 text-sm font-medium ${activeTab === 'completed'
                   ? 'border-indigo-500 text-indigo-600 border-b-2'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+                }`}
             >
               Completed
             </button>
@@ -226,7 +222,7 @@ const FreelancerApplications: React.FC = () => {
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(application.status)}`}>
                       {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
                     </span>
-                    
+
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTaskStatusBadgeClass(application.task.status)}`}>
                       Task: {application.task.status.charAt(0).toUpperCase() + application.task.status.slice(1).replace('_', ' ')}
                     </span>

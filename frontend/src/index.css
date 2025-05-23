@@ -24,3 +24,50 @@ body {
 }
 
 /* Remove all other styles that were overriding Tailwind's dark mode */
+
+/* Accessibility Styles */
+.high-contrast {
+  filter: contrast(125%);
+}
+
+.motion-reduce *,
+.motion-reduce *::before,
+.motion-reduce *::after {
+  transition: none !important;
+  animation: none !important;
+  scroll-behavior: auto !important;
+}
+
+/* Highlight Links */
+.highlight-links a,
+.highlight-links button {
+  background-color: #fbbf24 !important;
+  /* yellow-400 */
+  color: #000000 !important;
+  text-decoration: underline !important;
+  font-weight: bold !important;
+}
+
+/* Big Cursor */
+.big-cursor,
+.big-cursor * {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewport="0 0 48 48" style="fill:black;stroke:white;stroke-width:2px;"><path d="M10 10 L30 30 L20 30 L25 40 L20 42 L15 32 L10 38 Z" /></svg>'), auto !important;
+}
+
+/* Saturation Controls */
+.saturation-bw {
+  filter: grayscale(100%);
+}
+
+.saturation-low {
+  filter: saturate(50%);
+}
+
+.saturation-high {
+  filter: saturate(150%);
+}
+
+/* Invert Colors */
+.invert-colors {
+  filter: invert(100%);
+}

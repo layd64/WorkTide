@@ -12,6 +12,7 @@ import FreelancerProfile from './pages/FreelancerProfile'
 import FreelancerReviewsPage from './pages/FreelancerReviewsPage'
 import FreelancerApplications from './pages/FreelancerApplications'
 import TaskManagement from './pages/TaskManagement'
+import Chat from './pages/Chat'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import { AuthProvider } from './contexts/AuthContext'
 import { ThemeProvider } from './contexts/ThemeContext'
@@ -26,12 +27,12 @@ const OverlayCleanup: React.FC = () => {
     const cleanup = () => {
       // Find and remove any fixed position elements that might be blocking interactions
       const fixedElements = document.querySelectorAll('.fixed.inset-0');
-      
+
       fixedElements.forEach(el => {
         // Only remove elements that might be blocking interactions but are not part of active modals
-        const isPartOfActiveModal = el.closest('[role="dialog"]') || 
-                                    el.parentElement?.classList.contains('z-50');
-        
+        const isPartOfActiveModal = el.closest('[role="dialog"]') ||
+          el.parentElement?.classList.contains('z-50');
+
         if (!isPartOfActiveModal) {
           el.remove();
         }
@@ -41,7 +42,7 @@ const OverlayCleanup: React.FC = () => {
     // Run cleanup on mount and set interval to check periodically
     cleanup();
     const interval = setInterval(cleanup, 1000);
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -50,7 +51,7 @@ const OverlayCleanup: React.FC = () => {
 
 function AppContent() {
   const { isDropdownOpen } = useDropdown();
-  
+
   return (
     <Router>
       <div className="min-h-screen w-full bg-gray-50 dark:bg-gray-900 pt-16 flex flex-col">
@@ -97,6 +98,30 @@ function AppContent() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/my-applications"
+              element={
+                <ProtectedRoute>
+                  <FreelancerApplications />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/chat"
+              element={
+                <ProtectedRoute>
+                  <Chat />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/chat/:userId"
+              element={
+                <ProtectedRoute>
+                  <Chat />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </div>
         <Footer />
@@ -105,13 +130,27 @@ function AppContent() {
   );
 }
 
+import { AccessibilityProvider } from './contexts/AccessibilityContext'
+import { ChatProvider } from './contexts/ChatContext'
+
+// ... existing imports
+
+import ReadingGuide from './components/accessibility/ReadingGuide'
+
+// ... existing imports
+
 function App() {
   return (
     <LanguageProvider>
       <ThemeProvider>
         <AuthProvider>
           <DropdownProvider>
-            <AppContent />
+            <AccessibilityProvider>
+              <ChatProvider>
+                <ReadingGuide />
+                <AppContent />
+              </ChatProvider>
+            </AccessibilityProvider>
           </DropdownProvider>
         </AuthProvider>
       </ThemeProvider>

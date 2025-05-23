@@ -13,7 +13,7 @@ const Profile: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-        setLoading(false);
+      setLoading(false);
     }
   }, [user]);
 
@@ -52,14 +52,14 @@ const Profile: React.FC = () => {
         <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
           <div className="p-6 sm:p-8">
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-              <Avatar 
+              <Avatar
                 fullName={user.fullName}
                 className="w-24 h-24 sm:w-32 sm:h-32 text-xl"
               />
               <div className="flex-1 text-center sm:text-left">
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{user.fullName}</h1>
                 <p className="text-xl text-gray-600 mt-1">{user.title || t('noTitle')}</p>
-                
+
                 <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-3">
                   {user.rating && (
                     <>
@@ -67,7 +67,7 @@ const Profile: React.FC = () => {
                         <StarIcon className="h-5 w-5 text-yellow-400" />
                         <span className="ml-1 text-gray-700">{user.rating}</span>
                         {user.userType === 'freelancer' && (
-                          <Link 
+                          <Link
                             to={`/freelancer-reviews/${user.id}`}
                             className="ml-1 text-blue-600 hover:text-blue-800 hover:underline"
                           >
@@ -161,7 +161,7 @@ const Profile: React.FC = () => {
                 <div className="p-6">
                   <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-semibold text-gray-900">{t('ratingsReviews')}</h2>
-                    <Link 
+                    <Link
                       to={`/freelancer-reviews/${user.id}`}
                       className="flex items-center text-blue-600 hover:text-blue-700"
                     >
@@ -169,9 +169,9 @@ const Profile: React.FC = () => {
                       <ArrowRightIcon className="h-4 w-4 ml-1" />
                     </Link>
                   </div>
-                  
+
                   {/* Show a preview of reviews */}
-                  <RatingComponent 
+                  <RatingComponent
                     freelancerId={user.id}
                     previewMode={true}
                     maxReviews={3}
@@ -236,7 +236,7 @@ const Profile: React.FC = () => {
                   <div className="flex items-center text-gray-700">
                     <GlobeAltIcon className="h-5 w-5 mr-2" />
                     <span>{t('memberSince')}: {new Date(user.createdAt || '').toLocaleDateString()}</span>
-                </div>
+                  </div>
                 </div>
               </div>
             </div>

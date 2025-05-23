@@ -16,6 +16,7 @@ const tasks_module_1 = require("./tasks/tasks.module");
 const profile_module_1 = require("./profile/profile.module");
 const ratings_module_1 = require("./ratings/ratings.module");
 const task_applications_module_1 = require("./task-applications/task-applications.module");
+const chat_module_1 = require("./chat/chat.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -27,7 +28,9 @@ exports.AppModule = AppModule = __decorate([
             tasks_module_1.TasksModule,
             profile_module_1.ProfileModule,
             ratings_module_1.RatingsModule,
+            ratings_module_1.RatingsModule,
             task_applications_module_1.TaskApplicationsModule,
+            chat_module_1.ChatModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

@@ -3,6 +3,7 @@ export declare class ProfileController {
     private readonly profileService;
     constructor(profileService: ProfileService);
     getMyProfile(req: any): Promise<{
+        rating: number | null;
         id: string;
         email: string;
         fullName: string;
@@ -12,7 +13,6 @@ export declare class ProfileController {
         bio: string | null;
         skills: string[];
         hourlyRate: number | null;
-        rating: number | null;
         completedJobs: number | null;
         location: string | null;
         imageUrl: string | null;
@@ -22,6 +22,7 @@ export declare class ProfileController {
         isHidden: boolean;
     }>;
     getAllFreelancers(search?: string, skills?: string): Promise<{
+        rating: number | null;
         id: string;
         fullName: string;
         userType: string;
@@ -29,12 +30,12 @@ export declare class ProfileController {
         title: string | null;
         skills: string[];
         hourlyRate: number | null;
-        rating: number | null;
         completedJobs: number | null;
         location: string | null;
         imageUrl: string | null;
     }[]>;
     getPublicProfile(id: string): Promise<{
+        rating: number | null;
         id: string;
         fullName: string;
         userType: string;
@@ -43,7 +44,6 @@ export declare class ProfileController {
         bio: string | null;
         skills: string[];
         hourlyRate: number | null;
-        rating: number | null;
         completedJobs: number | null;
         location: string | null;
         imageUrl: string | null;
@@ -53,6 +53,7 @@ export declare class ProfileController {
         isHidden: boolean;
     }>;
     updateProfile(req: any, profileData: any): Promise<{
+        rating: number | null;
         id: string;
         email: string;
         fullName: string;
@@ -62,7 +63,6 @@ export declare class ProfileController {
         bio: string | null;
         skills: string[];
         hourlyRate: number | null;
-        rating: number | null;
         completedJobs: number | null;
         location: string | null;
         imageUrl: string | null;

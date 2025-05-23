@@ -42,13 +42,13 @@ const FreelancerProfile: React.FC = () => {
 
   const fetchFreelancerData = async () => {
     if (!id) return;
-    
+
     setLoading(true);
     setError('');
-    
+
     try {
       const response = await fetch(API_ENDPOINTS.profile.getById(id));
-      
+
       if (response.ok) {
         const data = await response.json();
         setFreelancer(data);
@@ -95,7 +95,7 @@ const FreelancerProfile: React.FC = () => {
           <div className="text-center py-12">
             <h2 className="text-2xl font-bold text-gray-900">Freelancer not found</h2>
             <p className="mt-2 text-gray-600">The freelancer you're looking for doesn't exist or has been removed.</p>
-            <button 
+            <button
               onClick={() => navigate('/find-freelancers')}
               className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
             >
@@ -113,7 +113,7 @@ const FreelancerProfile: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <button 
+        <button
           onClick={() => navigate('/find-freelancers')}
           className="flex items-center text-gray-600 hover:text-blue-600 mb-6"
         >
@@ -132,13 +132,13 @@ const FreelancerProfile: React.FC = () => {
               <div className="flex-1 text-center sm:text-left">
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{displayName}</h1>
                 <p className="text-xl text-gray-600 mt-1">{freelancer.title || 'Freelancer'}</p>
-                
+
                 <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-3">
                   {freelancer.rating && (
                     <div className="flex items-center">
                       <StarIcon className="h-5 w-5 text-yellow-400" />
                       <span className="ml-1 text-gray-700">{freelancer.rating.toFixed(1)}</span>
-                      <Link 
+                      <Link
                         to={`/freelancer-reviews/${freelancer.id}`}
                         className="ml-1 text-blue-600 hover:text-blue-800 hover:underline"
                       >
@@ -161,7 +161,10 @@ const FreelancerProfile: React.FC = () => {
                 </div>
               </div>
               <div className="mt-4 sm:mt-0">
-                <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <button
+                  onClick={() => navigate(`/chat/${freelancer.id}`)}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
                   Contact Me
                 </button>
               </div>
@@ -229,7 +232,7 @@ const FreelancerProfile: React.FC = () => {
               <div className="p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl font-semibold text-gray-900">Ratings & Reviews</h2>
-                  <Link 
+                  <Link
                     to={`/freelancer-reviews/${freelancer.id}`}
                     className="flex items-center text-blue-600 hover:text-blue-700"
                   >
@@ -237,11 +240,11 @@ const FreelancerProfile: React.FC = () => {
                     <ArrowRightIcon className="h-4 w-4 ml-1" />
                   </Link>
                 </div>
-                
+
                 {/* RatingComponent will display a preview of reviews */}
                 {freelancer.id && (
-                  <RatingComponent 
-                    freelancerId={freelancer.id} 
+                  <RatingComponent
+                    freelancerId={freelancer.id}
                     onRatingSuccess={handleRatingSuccess}
                     previewMode={true}
                     maxReviews={3}
@@ -295,10 +298,13 @@ const FreelancerProfile: React.FC = () => {
               <div className="p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Contact</h2>
                 <div className="space-y-3">
-                  <a href="#" className="flex items-center text-gray-700 hover:text-blue-600">
+                  <button
+                    onClick={() => navigate(`/chat/${freelancer.id}`)}
+                    className="flex items-center text-gray-700 hover:text-blue-600 w-full text-left"
+                  >
                     <EnvelopeIcon className="h-5 w-5 mr-2" />
                     <span>Send a message</span>
-                  </a>
+                  </button>
                   <a href="#" className="flex items-center text-gray-700 hover:text-blue-600">
                     <PhoneIcon className="h-5 w-5 mr-2" />
                     <span>Schedule a call</span>
@@ -317,4 +323,4 @@ const FreelancerProfile: React.FC = () => {
   );
 };
 
-export default FreelancerProfile; 
+export default FreelancerProfile;

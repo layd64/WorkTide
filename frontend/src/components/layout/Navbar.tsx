@@ -46,8 +46,8 @@ const Navbar: React.FC = () => {
   const dropdownStyle = theme === 'light' ? { backgroundColor: 'white' } : {};
 
   return (
-    <nav 
-      className="bg-white dark:bg-gray-800 shadow fixed top-0 w-full z-10" 
+    <nav
+      className="bg-white dark:bg-gray-800 shadow fixed top-0 w-full z-10"
       style={navbarStyle}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -77,6 +77,12 @@ const Navbar: React.FC = () => {
               >
                 {t('findFreelancers')}
               </Link>
+              <Link
+                to="/chat"
+                className="border-transparent text-gray-500 dark:text-gray-300 hover:border-gray-300 hover:text-gray-700 dark:hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+              >
+                {t('nav.chat', 'Chat')}
+              </Link>
             </div>
           </div>
 
@@ -85,7 +91,6 @@ const Navbar: React.FC = () => {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                // Always close if open, only open if closed
                 if (isMobileMenuOpen) {
                   setIsMobileMenuOpen(false);
                   setDropdownOpen(false);
@@ -99,24 +104,21 @@ const Navbar: React.FC = () => {
             >
               <span className="sr-only">Open main menu</span>
               <div className="w-6 h-6 relative flex justify-center items-center">
-                <span 
-                  className={`absolute block h-0.5 w-5 bg-current transform transition duration-300 ease-in-out ${
-                    isMobileMenuOpen ? 'rotate-45' : '-translate-y-1.5'
-                  }`}
+                <span
+                  className={`absolute block h-0.5 w-5 bg-current transform transition duration-300 ease-in-out ${isMobileMenuOpen ? 'rotate-45' : '-translate-y-1.5'
+                    }`}
                 />
-                <span 
-                  className={`absolute block h-0.5 w-5 bg-current transform transition duration-300 ease-in-out ${
-                    isMobileMenuOpen ? 'opacity-0' : 'opacity-100'
-                  }`}
+                <span
+                  className={`absolute block h-0.5 w-5 bg-current transform transition duration-300 ease-in-out ${isMobileMenuOpen ? 'opacity-0' : 'opacity-100'
+                    }`}
                 />
-                <span 
-                  className={`absolute block h-0.5 w-5 bg-current transform transition duration-300 ease-in-out ${
-                    isMobileMenuOpen ? '-rotate-45' : 'translate-y-1.5'
-                  }`}
+                <span
+                  className={`absolute block h-0.5 w-5 bg-current transform transition duration-300 ease-in-out ${isMobileMenuOpen ? '-rotate-45' : 'translate-y-1.5'
+                    }`}
                 />
               </div>
             </button>
-            
+
             {/* Mobile menu */}
             <div
               className={`${isMobileMenuOpen ? 'block' : 'hidden'} absolute right-0 mt-8 w-60 top-10 origin-top-right rounded-md shadow-xl bg-white dark:bg-gray-800 z-50`}
@@ -155,7 +157,17 @@ const Navbar: React.FC = () => {
                 >
                   {t('findFreelancers')}
                 </Link>
-                
+                <Link
+                  to="/chat"
+                  className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-black dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 hover:text-gray-800 dark:hover:text-white"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    setDropdownOpen(false);
+                  }}
+                >
+                  {t('nav.chat', 'Chat')}
+                </Link>
+
                 {user ? (
                   <>
                     <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
@@ -254,7 +266,7 @@ const Navbar: React.FC = () => {
                   }}
                   className="flex items-center space-x-2 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white focus:outline-none"
                 >
-                  <Avatar 
+                  <Avatar
                     fullName={user.fullName}
                     className="h-8 w-8"
                     textSize="text-xs"
@@ -262,8 +274,8 @@ const Navbar: React.FC = () => {
                   <span className="text-sm font-medium">{user.fullName}</span>
                 </button>
                 {isDropdownOpen && (
-                  <div 
-                    className="origin-top-right absolute right-0 mt-8 w-60 rounded-md shadow-xl py-1 bg-white dark:bg-gray-800 z-50" 
+                  <div
+                    className="origin-top-right absolute right-0 mt-8 w-60 rounded-md shadow-xl py-1 bg-white dark:bg-gray-800 z-50"
                     style={dropdownStyle}
                     onClick={(e) => e.stopPropagation()}
                   >
@@ -338,4 +350,4 @@ const Navbar: React.FC = () => {
   );
 };
 
-export default Navbar; 
+export default Navbar;

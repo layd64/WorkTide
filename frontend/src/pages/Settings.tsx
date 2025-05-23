@@ -4,7 +4,8 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { SunIcon, MoonIcon, LanguageIcon, XCircleIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { SunIcon, MoonIcon, LanguageIcon, XCircleIcon, PlusIcon, EyeIcon } from '@heroicons/react/24/outline';
+import { useAccessibility } from '../contexts/AccessibilityContext';
 
 interface Education {
   institution: string;
@@ -24,6 +25,16 @@ const Settings: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const { language, changeLanguage } = useLanguage();
   const { user, updateProfile } = useAuth();
+  const {
+    fontSize, setFontSize,
+    highContrast, setHighContrast,
+    reducedMotion, setReducedMotion,
+    highlightLinks, setHighlightLinks,
+    bigCursor, setBigCursor,
+    readingGuide, setReadingGuide,
+    saturation, setSaturation,
+    invertColors, setInvertColors
+  } = useAccessibility();
   const navigate = useNavigate();
 
   // Add loading state
@@ -48,11 +59,6 @@ const Settings: React.FC = () => {
   // Initialize form with user data
   useEffect(() => {
     if (user) {
-      console.log("Initializing form with user data:", { 
-        userType: user.userType,
-        isHidden: user.isHidden 
-      });
-      
       setTitle(user.title || '');
       setBio(user.bio || '');
       setLocation(user.location || '');
@@ -61,12 +67,11 @@ const Settings: React.FC = () => {
       setLanguages(user.languages || []);
       setEducation(user.education || []);
       setExperience(user.experience || []);
-      
+
       // Ensure isHidden is properly initialized as a boolean
       const hiddenValue = user.isHidden === true;
-      console.log("Setting isHidden value to:", hiddenValue);
       setIsHidden(hiddenValue);
-      
+
       setLoading(false);
     } else {
       // If no user data is available after a short timeout, redirect to profile
@@ -75,7 +80,7 @@ const Settings: React.FC = () => {
           navigate('/profile');
         }
       }, 2000);
-      
+
       return () => clearTimeout(timer);
     }
   }, [user, navigate]);
@@ -143,7 +148,6 @@ const Settings: React.FC = () => {
   // Handle toggle for isHidden
   const handleToggleHidden = () => {
     const newValue = !isHidden;
-    console.log("Toggling isHidden:", { current: isHidden, new: newValue });
     setIsHidden(newValue);
   };
 
@@ -153,8 +157,6 @@ const Settings: React.FC = () => {
     setSaving(true);
     setSaveError('');
     setSaveSuccess(false);
-
-    console.log("Submitting profile with isHidden value:", isHidden);
 
     try {
       const profileData = {
@@ -169,11 +171,9 @@ const Settings: React.FC = () => {
         isHidden
       };
 
-      console.log("Profile data being sent:", profileData);
       const success = await updateProfile(profileData);
-      
+
       if (success) {
-        console.log("Profile updated successfully, current isHidden:", isHidden);
         setSaveSuccess(true);
         // Navigate to profile page after 1.5 seconds
         setTimeout(() => {
@@ -193,7 +193,7 @@ const Settings: React.FC = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('settings')}</h1>
-        
+
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
@@ -525,7 +525,7 @@ const Settings: React.FC = () => {
                 {/* App Settings */}
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
                   <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('appSettings')}</h2>
-                  
+
                   {/* Freelancer Profile Visibility (only for freelancers) */}
                   {user?.userType === 'freelancer' && (
                     <div className="mb-6">
@@ -538,21 +538,233 @@ const Settings: React.FC = () => {
                         <button
                           type="button"
                           onClick={handleToggleHidden}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                            isHidden ? 'bg-blue-600' : 'bg-gray-200'
-                          }`}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${isHidden ? 'bg-blue-600' : 'bg-gray-200'
+                            }`}
                           role="switch"
                           aria-checked={isHidden}
                         >
                           <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                              isHidden ? 'translate-x-6' : 'translate-x-1'
-                            }`}
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isHidden ? 'translate-x-6' : 'translate-x-1'
+                              }`}
                           />
                         </button>
                       </div>
                     </div>
                   )}
+
+                  {/* Accessibility Settings */}
+                  <div className="mb-6 border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">{t('accessibility') || 'Accessibility'}</h3>
+
+                    {/* Font Size */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {t('fontSize') || 'Font Size'}
+                      </label>
+                      <div className="flex space-x-4">
+                        <button
+                          type="button"
+                          onClick={() => setFontSize('normal')}
+                          className={`px-3 py-2 border rounded-md text-sm ${fontSize === 'normal'
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
+                            }`}
+                        >
+                          Normal
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setFontSize('large')}
+                          className={`px-3 py-2 border rounded-md text-base ${fontSize === 'large'
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
+                            }`}
+                        >
+                          Large
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setFontSize('xlarge')}
+                          className={`px-3 py-2 border rounded-md text-lg ${fontSize === 'xlarge'
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
+                            }`}
+                        >
+                          Extra Large
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* High Contrast */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-3">
+                        <EyeIcon className="h-6 w-6 text-gray-500" />
+                        <span className="text-gray-700 dark:text-gray-300">{t('highContrast') || 'High Contrast'}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setHighContrast(!highContrast)}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${highContrast ? 'bg-blue-600' : 'bg-gray-200'
+                          }`}
+                        role="switch"
+                        aria-checked={highContrast}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${highContrast ? 'translate-x-6' : 'translate-x-1'
+                            }`}
+                        />
+                      </button>
+                    </div>
+
+                    {/* Reduced Motion */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-gray-700 dark:text-gray-300">{t('reducedMotion') || 'Reduced Motion'}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setReducedMotion(!reducedMotion)}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${reducedMotion ? 'bg-blue-600' : 'bg-gray-200'
+                          }`}
+                        role="switch"
+                        aria-checked={reducedMotion}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${reducedMotion ? 'translate-x-6' : 'translate-x-1'
+                            }`}
+                        />
+                      </button>
+                    </div>
+
+                    {/* Highlight Links */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-gray-700 dark:text-gray-300">{t('highlightLinks') || 'Highlight Links'}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setHighlightLinks(!highlightLinks)}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${highlightLinks ? 'bg-blue-600' : 'bg-gray-200'
+                          }`}
+                        role="switch"
+                        aria-checked={highlightLinks}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${highlightLinks ? 'translate-x-6' : 'translate-x-1'
+                            }`}
+                        />
+                      </button>
+                    </div>
+
+                    {/* Big Cursor */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-gray-700 dark:text-gray-300">{t('bigCursor') || 'Big Cursor'}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setBigCursor(!bigCursor)}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${bigCursor ? 'bg-blue-600' : 'bg-gray-200'
+                          }`}
+                        role="switch"
+                        aria-checked={bigCursor}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${bigCursor ? 'translate-x-6' : 'translate-x-1'
+                            }`}
+                        />
+                      </button>
+                    </div>
+
+                    {/* Reading Guide */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-gray-700 dark:text-gray-300">{t('readingGuide') || 'Reading Guide'}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setReadingGuide(!readingGuide)}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${readingGuide ? 'bg-blue-600' : 'bg-gray-200'
+                          }`}
+                        role="switch"
+                        aria-checked={readingGuide}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${readingGuide ? 'translate-x-6' : 'translate-x-1'
+                            }`}
+                        />
+                      </button>
+                    </div>
+
+                    {/* Invert Colors */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-gray-700 dark:text-gray-300">{t('invertColors') || 'Invert Colors'}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setInvertColors(!invertColors)}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${invertColors ? 'bg-blue-600' : 'bg-gray-200'
+                          }`}
+                        role="switch"
+                        aria-checked={invertColors}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${invertColors ? 'translate-x-6' : 'translate-x-1'
+                            }`}
+                        />
+                      </button>
+                    </div>
+
+                    {/* Saturation */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {t('saturation') || 'Saturation'}
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setSaturation('normal')}
+                          className={`px-3 py-2 border rounded-md text-sm ${saturation === 'normal'
+                              ? 'bg-blue-600 text-white border-blue-600'
+                              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
+                            }`}
+                        >
+                          Normal
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSaturation('low')}
+                          className={`px-3 py-2 border rounded-md text-sm ${saturation === 'low'
+                              ? 'bg-blue-600 text-white border-blue-600'
+                              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
+                            }`}
+                        >
+                          Low
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSaturation('high')}
+                          className={`px-3 py-2 border rounded-md text-sm ${saturation === 'high'
+                              ? 'bg-blue-600 text-white border-blue-600'
+                              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
+                            }`}
+                        >
+                          High
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSaturation('bw')}
+                          className={`px-3 py-2 border rounded-md text-sm ${saturation === 'bw'
+                              ? 'bg-blue-600 text-white border-blue-600'
+                              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
+                            }`}
+                        >
+                          B&W
+                        </button>
+                      </div>
+                    </div>
+                  </div>
 
                   {/* Theme Settings */}
                   <div className="mb-6">
@@ -569,16 +781,14 @@ const Settings: React.FC = () => {
                       <button
                         type="button"
                         onClick={toggleTheme}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                          theme === 'dark' ? 'bg-blue-600' : 'bg-gray-200'
-                        }`}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${theme === 'dark' ? 'bg-blue-600' : 'bg-gray-200'
+                          }`}
                         role="switch"
                         aria-checked={theme === 'dark'}
                       >
                         <span
-                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                            theme === 'dark' ? 'translate-x-6' : 'translate-x-1'
-                          }`}
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${theme === 'dark' ? 'translate-x-6' : 'translate-x-1'
+                            }`}
                         />
                       </button>
                     </div>
@@ -652,4 +862,4 @@ const Settings: React.FC = () => {
   );
 };
 
-export default Settings; 
+export default Settings;

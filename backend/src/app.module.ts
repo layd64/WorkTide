@@ -7,6 +7,7 @@ import { TasksModule } from './tasks/tasks.module';
 import { ProfileModule } from './profile/profile.module';
 import { RatingsModule } from './ratings/ratings.module';
 import { TaskApplicationsModule } from './task-applications/task-applications.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -15,9 +16,11 @@ import { TaskApplicationsModule } from './task-applications/task-applications.mo
     TasksModule,
     ProfileModule,
     RatingsModule,
+    RatingsModule,
     TaskApplicationsModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

@@ -84,7 +84,7 @@ const HomePage: React.FC = () => {
                   </p>
                 </div>
               </div>
-              
+
               {/* Feature 3 */}
               <div className="relative">
                 <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
@@ -99,7 +99,7 @@ const HomePage: React.FC = () => {
                   </p>
                 </div>
               </div>
-              
+
               {/* Feature 4 */}
               <div className="relative">
                 <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
@@ -118,7 +118,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       {/* How it works section */}
       <div className={`py-16 w-full bg-indigo-700`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -131,7 +131,7 @@ const HomePage: React.FC = () => {
               {t('followSimpleSteps')}
             </p>
           </div>
-          
+
           <div className="mt-16">
             <div className="space-y-10 md:space-y-0 md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-10">
               {/* Step 1 */}
@@ -144,7 +144,7 @@ const HomePage: React.FC = () => {
                   {t('createProfileDesc')}
                 </p>
               </div>
-              
+
               {/* Step 2 */}
               <div className="text-center">
                 <div className="flex items-center justify-center h-16 w-16 rounded-full mx-auto bg-indigo-200 text-indigo-800">
@@ -155,7 +155,7 @@ const HomePage: React.FC = () => {
                   {t('findOpportunitiesDesc')}
                 </p>
               </div>
-              
+
               {/* Step 3 */}
               <div className="text-center">
                 <div className="flex items-center justify-center h-16 w-16 rounded-full mx-auto bg-indigo-200 text-indigo-800">
@@ -170,7 +170,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Testimonials section */}
       <div className={`py-16 w-full ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -180,12 +180,12 @@ const HomePage: React.FC = () => {
               {t('whatUsersSay')}
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             {/* Testimonial 1 */}
             <div className={`p-6 rounded-lg shadow-sm ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
               <div className="flex items-center mb-4">
-                <img 
+                <img
                   className="h-12 w-12 rounded-full object-cover mr-4"
                   src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                   alt="User profile"
@@ -199,11 +199,11 @@ const HomePage: React.FC = () => {
                 {t('testimonial1Text')}
               </p>
             </div>
-            
+
             {/* Testimonial 2 */}
             <div className={`p-6 rounded-lg shadow-sm ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
               <div className="flex items-center mb-4">
-                <img 
+                <img
                   className="h-12 w-12 rounded-full object-cover mr-4"
                   src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                   alt="User profile"
@@ -217,11 +217,11 @@ const HomePage: React.FC = () => {
                 {t('testimonial2Text')}
               </p>
             </div>
-            
+
             {/* Testimonial 3 */}
             <div className={`p-6 rounded-lg shadow-sm ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
               <div className="flex items-center mb-4">
-                <img 
+                <img
                   className="h-12 w-12 rounded-full object-cover mr-4"
                   src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                   alt="User profile"
@@ -238,7 +238,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       {/* CTA section */}
       <div className="bg-indigo-700 w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">

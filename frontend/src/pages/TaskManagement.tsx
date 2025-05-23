@@ -210,26 +210,26 @@ const TaskManagement: React.FC = () => {
 
       if (response.ok) {
         const result = await response.json();
-        
+
         // Update the task status in the task list
         setTasks((prevTasks) =>
           prevTasks.map((task) =>
             task.id === result.task.id ? { ...task, status: 'in_progress' } : task
           )
         );
-        
+
         // Update the application status
         setApplications((prevApplications) =>
           prevApplications.map((app) =>
             app.id === applicationId ? { ...app, status: 'accepted' } : app
           )
         );
-        
+
         // If this is the currently selected application, update it
         if (selectedApplication && selectedApplication.id === applicationId) {
           setSelectedApplication(prev => prev ? { ...prev, status: 'accepted' } : null);
         }
-        
+
         setSuccessMessage('Freelancer assigned to task and application accepted');
         closeApplicationDetailsModal();
       } else {
@@ -287,7 +287,7 @@ const TaskManagement: React.FC = () => {
       // First, find the assigned freelancer for this task
       const task = tasks.find(t => t.id === taskId);
       if (!task) return;
-      
+
       if (task.status !== 'in_progress') {
         setError('Only tasks that are in progress can be marked as completed');
         return;
@@ -305,25 +305,25 @@ const TaskManagement: React.FC = () => {
 
       if (response.ok) {
         setSuccessMessage('Task marked as completed successfully');
-        
+
         // Update task in state
         setTasks((prevTasks) =>
           prevTasks.map((task) =>
             task.id === taskId ? { ...task, status: 'completed' } : task
           )
         );
-        
+
         // Fetch applications to find the assigned freelancer
         const applicationsResponse = await fetch(API_ENDPOINTS.taskApplications.getByTask(taskId), {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        
+
         if (applicationsResponse.ok) {
           const applications = await applicationsResponse.json();
           const acceptedApplication = applications.find((app: TaskApplication) => app.status === 'accepted');
-          
+
           if (acceptedApplication) {
             // Open review modal
             setFreelancerToReview(acceptedApplication.freelancer.id);
@@ -468,7 +468,7 @@ const TaskManagement: React.FC = () => {
                         >
                           View Applications
                         </button>
-                        
+
                         {task.status === 'in_progress' && (
                           <button
                             onClick={() => handleCompleteTask(task.id)}
@@ -477,7 +477,7 @@ const TaskManagement: React.FC = () => {
                             Set as Completed
                           </button>
                         )}
-                        
+
                         <select
                           value={task.status}
                           onChange={(e) =>
@@ -517,7 +517,7 @@ const TaskManagement: React.FC = () => {
                       <h3 className="text-lg leading-6 font-medium text-gray-900">
                         Applications for: {getSelectedTask()?.title}
                       </h3>
-                      
+
                       {applications.length === 0 ? (
                         <div className="mt-4 text-center py-8">
                           <p className="text-gray-500">No applications yet for this task.</p>
@@ -547,7 +547,7 @@ const TaskManagement: React.FC = () => {
                                         {application.freelancer.fullName}
                                       </h4>
                                       <p className="text-xs text-gray-500">
-                                        {application.freelancer.title || 'Freelancer'} 
+                                        {application.freelancer.title || 'Freelancer'}
                                         {application.freelancer.location && ` • ${application.freelancer.location}`}
                                       </p>
                                       <div className="mt-1">
@@ -641,7 +641,7 @@ const TaskManagement: React.FC = () => {
                           </div>
                         </div>
                       </div>
-                      
+
                       {selectedApplication.coverLetter && (
                         <div className="mt-4">
                           <h4 className="text-sm font-medium text-gray-700 mb-2">Cover Letter:</h4>
@@ -650,7 +650,7 @@ const TaskManagement: React.FC = () => {
                           </p>
                         </div>
                       )}
-                      
+
                       <div className="mt-4">
                         <h4 className="text-sm font-medium text-gray-700 mb-2">Applied on:</h4>
                         <p className="text-sm text-gray-600">
@@ -710,10 +710,10 @@ const TaskManagement: React.FC = () => {
                           Thank you for completing this task. Please take a moment to rate the freelancer and provide feedback.
                         </p>
                       </div>
-                      
+
                       <div className="mt-4">
-                        <RatingComponent 
-                          freelancerId={freelancerToReview} 
+                        <RatingComponent
+                          freelancerId={freelancerToReview}
                           onRatingSuccess={handleReviewSuccess}
                         />
                       </div>

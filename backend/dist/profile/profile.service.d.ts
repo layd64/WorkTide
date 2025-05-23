@@ -3,6 +3,7 @@ export declare class ProfileService {
     private prisma;
     constructor(prisma: PrismaService);
     getProfile(userId: string): Promise<{
+        rating: number | null;
         id: string;
         email: string;
         fullName: string;
@@ -12,7 +13,6 @@ export declare class ProfileService {
         bio: string | null;
         skills: string[];
         hourlyRate: number | null;
-        rating: number | null;
         completedJobs: number | null;
         location: string | null;
         imageUrl: string | null;
@@ -22,6 +22,7 @@ export declare class ProfileService {
         isHidden: boolean;
     }>;
     getPublicProfile(userId: string): Promise<{
+        rating: number | null;
         id: string;
         fullName: string;
         userType: string;
@@ -30,7 +31,6 @@ export declare class ProfileService {
         bio: string | null;
         skills: string[];
         hourlyRate: number | null;
-        rating: number | null;
         completedJobs: number | null;
         location: string | null;
         imageUrl: string | null;
@@ -40,6 +40,7 @@ export declare class ProfileService {
         isHidden: boolean;
     }>;
     getAllFreelancers(search?: string, skills?: string[]): Promise<{
+        rating: number | null;
         id: string;
         fullName: string;
         userType: string;
@@ -47,12 +48,12 @@ export declare class ProfileService {
         title: string | null;
         skills: string[];
         hourlyRate: number | null;
-        rating: number | null;
         completedJobs: number | null;
         location: string | null;
         imageUrl: string | null;
     }[]>;
     updateProfile(userId: string, profileData: any): Promise<{
+        rating: number | null;
         id: string;
         email: string;
         fullName: string;
@@ -62,7 +63,6 @@ export declare class ProfileService {
         bio: string | null;
         skills: string[];
         hourlyRate: number | null;
-        rating: number | null;
         completedJobs: number | null;
         location: string | null;
         imageUrl: string | null;
