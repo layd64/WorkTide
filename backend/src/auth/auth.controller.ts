@@ -8,7 +8,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly prisma: PrismaService
-  ) {}
+  ) { }
 
   @Post('signup')
   async signup(
@@ -53,9 +53,12 @@ export class AuthController {
         languages: true,
         education: true,
         experience: true,
+        imageUrl: true,
+        isHidden: true,
+        isAvatarVisible: true,
       },
     });
-    
+
     return user;
   }
 } 

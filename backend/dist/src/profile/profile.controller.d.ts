@@ -1,0 +1,82 @@
+import { ProfileService } from './profile.service';
+export declare class ProfileController {
+    private readonly profileService;
+    constructor(profileService: ProfileService);
+    getMyProfile(req: any): Promise<{
+        id: string;
+        email: string;
+        fullName: string;
+        userType: string;
+        createdAt: Date;
+        title: string | null;
+        bio: string | null;
+        skills: string[];
+        hourlyRate: number | null;
+        rating: number | null;
+        completedJobs: number | null;
+        location: string | null;
+        imageUrl: string | null;
+        languages: string[];
+        education: import("@prisma/client/runtime/library").JsonValue[];
+        experience: import("@prisma/client/runtime/library").JsonValue[];
+        isHidden: boolean;
+        isAvatarVisible: boolean;
+    }>;
+    getAllFreelancers(search?: string, skills?: string): Promise<{
+        id: string;
+        fullName: string;
+        userType: string;
+        createdAt: Date;
+        title: string | null;
+        skills: string[];
+        hourlyRate: number | null;
+        rating: number | null;
+        completedJobs: number | null;
+        location: string | null;
+        imageUrl: string | null;
+        isAvatarVisible: boolean;
+    }[]>;
+    getPublicProfile(id: string): Promise<{
+        id: string;
+        fullName: string;
+        userType: string;
+        createdAt: Date;
+        title: string | null;
+        bio: string | null;
+        skills: string[];
+        hourlyRate: number | null;
+        rating: number | null;
+        completedJobs: number | null;
+        location: string | null;
+        imageUrl: string | null;
+        languages: string[];
+        education: import("@prisma/client/runtime/library").JsonValue[];
+        experience: import("@prisma/client/runtime/library").JsonValue[];
+        isHidden: boolean;
+        isAvatarVisible: boolean;
+    }>;
+    updateProfile(req: any, profileData: any): Promise<{
+        id: string;
+        email: string;
+        fullName: string;
+        userType: string;
+        createdAt: Date;
+        title: string | null;
+        bio: string | null;
+        skills: string[];
+        hourlyRate: number | null;
+        rating: number | null;
+        completedJobs: number | null;
+        location: string | null;
+        imageUrl: string | null;
+        languages: string[];
+        education: import("@prisma/client/runtime/library").JsonValue[];
+        experience: import("@prisma/client/runtime/library").JsonValue[];
+        isHidden: boolean;
+        isAvatarVisible: boolean;
+    }>;
+    uploadAvatar(req: any, file: Express.Multer.File): Promise<{
+        id: string;
+        imageUrl: string | null;
+    }>;
+}

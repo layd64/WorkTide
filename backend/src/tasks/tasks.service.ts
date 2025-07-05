@@ -1,10 +1,14 @@
 import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
+import { LoggingService } from '../logging/logging.service';
 
 @Injectable()
 export class TasksService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private loggingService: LoggingService
+  ) { }
 
   async createTask(
     userId: string,
@@ -25,12 +29,16 @@ export class TasksService {
     }
 
     // Create the task
-    return this.prisma.task.create({
+    const task = await this.prisma.task.create({
       data: {
         ...data,
         clientId: userId,
       },
     });
+
+    await this.loggingService.logAction(userId, 'TASK_CREATE', task.id, `Task created: ${task.title}`);
+
+    return task;
   }
 
   async getAllTasks(filters?: {
@@ -134,10 +142,16 @@ export class TasksService {
     }
 
     // Update the task
-    return this.prisma.task.update({
+    const updatedTask = await this.prisma.task.update({
       where: { id: taskId },
       data,
     });
+
+    if (data.status) {
+      await this.loggingService.logAction(updatedTask.clientId, 'TASK_STATUS_UPDATE', updatedTask.id, `Task status updated to ${data.status}: ${updatedTask.title}`);
+    }
+
+    return updatedTask;
   }
 
   async deleteTask(taskId: string, userId: string) {

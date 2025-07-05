@@ -5,6 +5,9 @@ export default {
     'profile': 'Profile',
     'signOut': 'Sign out',
     'yourProfile': 'Your Profile',
+    'login': 'Log In',
+    'logout': 'Log Out',
+    'signup': 'Sign Up',
     'signIn': 'Sign In',
     'signUp': 'Sign Up',
     'email': 'Email',
@@ -14,12 +17,14 @@ export default {
     'memberSince': 'Member Since',
     'loading': 'Loading...',
     'error': 'An error occurred',
-    
+
     // Navigation
     'home': 'Home',
     'findWork': 'Find Work',
     'findFreelancers': 'Find Freelancers',
-    
+    'myTasks': 'My Tasks',
+    'myApplications': 'My Applications',
+
     // Settings page
     'appearance': 'Appearance',
     'darkMode': 'Dark Mode',
@@ -64,7 +69,7 @@ export default {
     'profileVisibility': 'Profile Visibility',
     'makeProfileHidden': 'Make my account hidden',
     'hiddenProfileInfo': 'Your profile will not appear on the Find Freelancers page',
-    
+
     // Homepage
     'hero': {
       'title': 'Find Work or Hire Talent with WorkTide',
@@ -101,7 +106,7 @@ export default {
       'step3': 'Start Working',
       'step3Desc': 'Collaborate, deliver, and get paid securely through our platform.'
     },
-    
+
     // Additional Homepage translations for hardcoded text
     'hireTalent': 'Hire Talent',
     'hireTalentDesc': 'Post your projects and find skilled professionals to help you achieve your goals.',
@@ -109,38 +114,38 @@ export default {
     'workOnYourScheduleDesc': 'Choose projects that fit your timeline and work whenever it\'s convenient for you.',
     'securePayments': 'Secure Payments',
     'securePaymentsDesc': 'Our platform ensures safe and timely payments for all completed work.',
-    
+
     'gettingStarted': 'Getting Started',
     'howWorkTideWorks': 'How WorkTide Works',
     'followSimpleSteps': 'Follow these simple steps to get started on your freelancing journey.',
-    
+
     'createYourProfile': 'Create Your Profile',
     'createProfileDesc': 'Sign up and build your professional profile highlighting your skills and experience.',
     'findOpportunities': 'Find Opportunities',
     'findOpportunitiesDesc': 'Browse available projects or submit proposals for jobs that match your expertise.',
     'getPaid': 'Get Paid',
     'getPaidDesc': 'Complete your work and receive payment directly through our secure platform.',
-    
+
     'testimonials': 'Testimonials',
     'whatUsersSay': 'What Our Users Say',
-    
+
     'testimonial1Name': 'Sarah Johnson',
     'testimonial1Role': 'UX Designer',
     'testimonial1Text': '"WorkTide has transformed my freelancing career. I\'ve connected with amazing clients and have a steady stream of projects."',
-    
+
     'testimonial2Name': 'Michael Chen',
     'testimonial2Role': 'Web Developer',
     'testimonial2Text': '"The platform is intuitive and makes it easy to showcase my portfolio. I\'ve increased my client base by 200% since joining."',
-    
+
     'testimonial3Name': 'Emily Rodriguez',
     'testimonial3Role': 'Content Writer',
     'testimonial3Text': '"As a business owner, WorkTide helps me find qualified freelancers quickly. The quality of work has been exceptional."',
-    
+
     'readyToBoost': 'Ready to boost your career?',
     'startUsingWorkTide': 'Start using WorkTide today.',
     'joinCommunity': 'Join thousands of freelancers and businesses already using our platform to connect and collaborate.',
     'getStartedNow': 'Get Started Now',
-    
+
     // FindWork page
     'findYourNextProject': 'Find Your Next Project',
     'browseAvailableProjects': 'Browse through available projects and find the perfect match for your skills.',
@@ -163,7 +168,7 @@ export default {
     'tellClientWhyYoureGoodFit': 'Tell the client why you\'re a good fit for this project...',
     'submit': 'Submit',
     'applicationSubmittedSuccess': 'Application submitted successfully!',
-    
+
     // FindFreelancers page
     'findFreelancersTitle': 'Find Freelancers',
     'connectWithTalentedProfessionals': 'Connect with talented professionals for your projects',
@@ -175,6 +180,30 @@ export default {
     'jobsCompleted': 'jobs completed',
     'remote': 'Remote',
     'viewProfile': 'View Profile',
-    'perHour': 'hr'
+    'perHour': 'hr',
+
+    // Accessibility
+    'accessibility': 'Accessibility',
+    'highContrast': 'High Contrast',
+    'reducedMotion': 'Reduced Motion',
+    'highlightLinks': 'Highlight Links',
+    'bigCursor': 'Big Cursor',
+    'readingGuide': 'Reading Guide',
+    'invertColors': 'Invert Colors',
+    'fontSize': 'Font Size',
+
+    // Profile
+    'noTitle': 'No Title',
+    'noExperienceProvided': 'No Experience Provided',
+    'noEducationProvided': 'No Education Provided',
+    'noSkillsProvided': 'No Skills Provided',
+    'noLanguagesProvided': 'No Languages Provided',
+    'profileNotFound': 'Profile Not Found',
+    'pleaseLogin': 'Please log in to view your profile',
+    'ratingsReviews': 'Ratings & Reviews',
+    'viewAllReviews': 'View All Reviews',
+    'profilePicture': 'Profile Picture',
+    'showAvatarToOthers': 'Show profile picture to others',
+    'avatarVisibilityInfo': 'If disabled, only you will see your profile picture.'
   }
 }; 

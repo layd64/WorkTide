@@ -54,6 +54,7 @@ const Profile: React.FC = () => {
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
               <Avatar
                 fullName={user.fullName}
+                imageUrl={user.imageUrl}
                 className="w-24 h-24 sm:w-32 sm:h-32 text-xl"
               />
               <div className="flex-1 text-center sm:text-left">

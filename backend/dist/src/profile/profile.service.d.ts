@@ -1,0 +1,82 @@
+import { PrismaService } from '../prisma/prisma.service';
+export declare class ProfileService {
+    private prisma;
+    constructor(prisma: PrismaService);
+    getProfile(userId: string): Promise<{
+        id: string;
+        email: string;
+        fullName: string;
+        userType: string;
+        createdAt: Date;
+        title: string | null;
+        bio: string | null;
+        skills: string[];
+        hourlyRate: number | null;
+        rating: number | null;
+        completedJobs: number | null;
+        location: string | null;
+        imageUrl: string | null;
+        languages: string[];
+        education: import("@prisma/client/runtime/library").JsonValue[];
+        experience: import("@prisma/client/runtime/library").JsonValue[];
+        isHidden: boolean;
+        isAvatarVisible: boolean;
+    }>;
+    getPublicProfile(userId: string): Promise<{
+        id: string;
+        fullName: string;
+        userType: string;
+        createdAt: Date;
+        title: string | null;
+        bio: string | null;
+        skills: string[];
+        hourlyRate: number | null;
+        rating: number | null;
+        completedJobs: number | null;
+        location: string | null;
+        imageUrl: string | null;
+        languages: string[];
+        education: import("@prisma/client/runtime/library").JsonValue[];
+        experience: import("@prisma/client/runtime/library").JsonValue[];
+        isHidden: boolean;
+        isAvatarVisible: boolean;
+    }>;
+    getAllFreelancers(search?: string, skills?: string[]): Promise<{
+        id: string;
+        fullName: string;
+        userType: string;
+        createdAt: Date;
+        title: string | null;
+        skills: string[];
+        hourlyRate: number | null;
+        rating: number | null;
+        completedJobs: number | null;
+        location: string | null;
+        imageUrl: string | null;
+        isAvatarVisible: boolean;
+    }[]>;
+    updateProfile(userId: string, profileData: any): Promise<{
+        id: string;
+        email: string;
+        fullName: string;
+        userType: string;
+        createdAt: Date;
+        title: string | null;
+        bio: string | null;
+        skills: string[];
+        hourlyRate: number | null;
+        rating: number | null;
+        completedJobs: number | null;
+        location: string | null;
+        imageUrl: string | null;
+        languages: string[];
+        education: import("@prisma/client/runtime/library").JsonValue[];
+        experience: import("@prisma/client/runtime/library").JsonValue[];
+        isHidden: boolean;
+        isAvatarVisible: boolean;
+    }>;
+    updateAvatar(userId: string, imageUrl: string): Promise<{
+        id: string;
+        imageUrl: string | null;
+    }>;
+}

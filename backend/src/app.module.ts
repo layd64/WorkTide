@@ -12,19 +12,22 @@ import { UsersModule } from './users/users.module';
 import { UploadModule } from './upload/upload.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { AdminModule } from './admin/admin.module';
+import { LoggingModule } from './logging/logging.module';
 
 @Module({
   imports: [
     PrismaModule,
     AuthModule,
+    UsersModule,
+    ChatModule,
     TasksModule,
     ProfileModule,
     RatingsModule,
-    RatingsModule,
     TaskApplicationsModule,
-    ChatModule,
-    UsersModule,
     UploadModule,
+    AdminModule,
+    LoggingModule,
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads',

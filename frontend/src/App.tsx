@@ -20,6 +20,11 @@ import { LanguageProvider } from './contexts/LanguageContext'
 import { DropdownProvider } from './contexts/DropdownContext'
 import Navbar from './components/layout/Navbar'
 import Footer from './components/layout/Footer'
+import AdminLayout from './components/layout/AdminLayout'
+import AdminDashboard from './pages/admin/AdminDashboard'
+import AdminUsers from './pages/admin/AdminUsers'
+import AdminLogs from './pages/admin/AdminLogs'
+import AdminRoute from './components/auth/AdminRoute'
 
 // Component to detect and cleanup any lingering overlay elements
 const OverlayCleanup: React.FC = () => {
@@ -120,6 +125,14 @@ function AppContent() {
                 </ProtectedRoute>
               }
             />
+            {/* Admin Routes */}
+            <Route element={<AdminRoute />}>
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="users" element={<AdminUsers />} />
+                <Route path="logs" element={<AdminLogs />} />
+              </Route>
+            </Route>
           </Routes>
         </div>
         <Footer />

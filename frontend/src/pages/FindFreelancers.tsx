@@ -31,19 +31,19 @@ const FindFreelancers: React.FC = () => {
     const fetchFreelancers = async () => {
       setLoading(true);
       setError(null);
-      
+
       try {
         const url = API_ENDPOINTS.profile.getAllFreelancers(
           searchQuery || undefined,
           selectedSkills.length > 0 ? selectedSkills : undefined
         );
-        
+
         const response = await fetch(url);
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch freelancers');
         }
-        
+
         const data = await response.json();
         setFreelancers(data);
       } catch (err) {
@@ -53,20 +53,20 @@ const FindFreelancers: React.FC = () => {
         setLoading(false);
       }
     };
-    
+
     // Debounce the API call when typing in search
     const timeoutId = setTimeout(() => {
       fetchFreelancers();
     }, 500);
-    
+
     return () => clearTimeout(timeoutId);
   }, [searchQuery, selectedSkills]);
 
   const allSkills = Array.from(new Set(freelancers.flatMap(f => f.skills).filter(Boolean)));
 
   const toggleSkill = (skill: string) => {
-    setSelectedSkills(prev => 
-      prev.includes(skill) 
+    setSelectedSkills(prev =>
+      prev.includes(skill)
         ? prev.filter(s => s !== skill)
         : [...prev, skill]
     );
@@ -111,11 +111,10 @@ const FindFreelancers: React.FC = () => {
               <button
                 key={skill}
                 onClick={() => toggleSkill(skill)}
-                className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  selectedSkills.includes(skill)
+                className={`px-3 py-1 rounded-full text-sm font-medium ${selectedSkills.includes(skill)
                     ? 'bg-blue-100 text-blue-800'
                     : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                }`}
+                  }`}
               >
                 {skill}
               </button>
@@ -153,8 +152,8 @@ const FindFreelancers: React.FC = () => {
         {!loading && !error && freelancers.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {freelancers.map(freelancer => (
-              <div 
-                key={freelancer.id} 
+              <div
+                key={freelancer.id}
                 className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
                 onClick={() => handleViewProfile(freelancer.id)}
               >
@@ -162,6 +161,7 @@ const FindFreelancers: React.FC = () => {
                   <div className="flex items-center gap-4">
                     <Avatar
                       fullName={freelancer.fullName}
+                      imageUrl={freelancer.imageUrl}
                       className="w-16 h-16"
                       textSize="text-base"
                     />
@@ -198,7 +198,7 @@ const FindFreelancers: React.FC = () => {
                     <span className="text-lg font-semibold text-gray-900">
                       ${freelancer.hourlyRate || 0}/{t('perHour')}
                     </span>
-                    <button 
+                    <button
                       className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                       onClick={(e) => {
                         e.stopPropagation();

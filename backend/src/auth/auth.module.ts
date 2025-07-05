@@ -6,10 +6,12 @@ import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PrismaService } from '../prisma/prisma.service';
 import { PrismaModule } from '../prisma/prisma.module';
+import { LoggingModule } from '../logging/logging.module';
 
 @Module({
   imports: [
     PrismaModule,
+    LoggingModule,
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'your-secret-key', // In production, use environment variable
@@ -20,4 +22,4 @@ import { PrismaModule } from '../prisma/prisma.module';
   controllers: [AuthController],
   exports: [AuthService],
 })
-export class AuthModule {} 
+export class AuthModule { } 

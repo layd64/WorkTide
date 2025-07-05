@@ -134,6 +134,18 @@ const Navbar: React.FC = () => {
                                                 <p className="text-sm text-gray-900 dark:text-white font-medium truncate">{user.fullName}</p>
                                                 <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
                                             </div>
+                                            {user.userType === 'admin' && (
+                                                <Link
+                                                    to="/admin"
+                                                    className="block px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center font-semibold"
+                                                    role="menuitem"
+                                                    tabIndex={-1}
+                                                    id="user-menu-item-admin"
+                                                >
+                                                    <ArrowRightOnRectangleIcon className="mr-2 h-4 w-4" />
+                                                    {t('adminPanel') || 'Admin Panel'}
+                                                </Link>
+                                            )}
                                             <Link
                                                 to="/profile"
                                                 className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"

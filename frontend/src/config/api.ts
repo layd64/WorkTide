@@ -64,5 +64,12 @@ export const API_ENDPOINTS = {
     getByFreelancer: `${API_BASE_URL}/task-applications/freelancer`,
     updateStatus: (applicationId: string) => `${API_BASE_URL}/task-applications/${applicationId}/status`,
     assignFreelancer: (applicationId: string) => `${API_BASE_URL}/task-applications/${applicationId}/assign`,
+  },
+  admin: {
+    users: `${API_BASE_URL}/admin/users`,
+    banUser: (id: string) => `${API_BASE_URL}/admin/users/${id}/ban`,
+    unbanUser: (id: string) => `${API_BASE_URL}/admin/users/${id}/unban`,
+    analytics: `${API_BASE_URL}/admin/analytics`,
+    logs: `${API_BASE_URL}/admin/logs`,
   }
 };

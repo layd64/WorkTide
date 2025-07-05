@@ -5,6 +5,9 @@ export default {
     'profile': 'Профіль',
     'signOut': 'Вийти',
     'yourProfile': 'Ваш профіль',
+    'login': 'Увійти',
+    'logout': 'Вийти',
+    'signup': 'Зареєструватися',
     'signIn': 'Увійти',
     'signUp': 'Зареєструватися',
     'email': 'Електронна пошта',
@@ -14,12 +17,14 @@ export default {
     'memberSince': 'Учасник з',
     'loading': 'Завантаження...',
     'error': 'Сталася помилка',
-    
+
     // Navigation
     'home': 'Головна',
     'findWork': 'Знайти роботу',
     'findFreelancers': 'Знайти фрілансерів',
-    
+    'myTasks': 'Мої завдання',
+    'myApplications': 'Мої заявки',
+
     // Settings page
     'appearance': 'Зовнішній вигляд',
     'darkMode': 'Темний режим',
@@ -64,7 +69,7 @@ export default {
     'profileVisibility': 'Видимість профілю',
     'makeProfileHidden': 'Зробити мій обліковий запис прихованим',
     'hiddenProfileInfo': 'Ваш профіль не з\'явиться на сторінці пошуку фрілансерів',
-    
+
     // Homepage
     'hero': {
       'title': 'Знаходьте роботу або наймайте таланти з WorkTide',
@@ -101,7 +106,7 @@ export default {
       'step3': 'Почніть працювати',
       'step3Desc': 'Співпрацюйте, доставляйте та отримуйте оплату безпечно через нашу платформу.'
     },
-    
+
     // Additional Homepage translations for hardcoded text
     'hireTalent': 'Найняти талант',
     'hireTalentDesc': 'Розміщуйте свої проєкти та знаходьте кваліфікованих професіоналів, щоб допомогти вам досягти ваших цілей.',
@@ -109,38 +114,38 @@ export default {
     'workOnYourScheduleDesc': 'Обирайте проєкти, які відповідають вашому розкладу, і працюйте, коли вам зручно.',
     'securePayments': 'Безпечні платежі',
     'securePaymentsDesc': 'Наша платформа забезпечує безпечні та своєчасні платежі за всю виконану роботу.',
-    
+
     'gettingStarted': 'Початок роботи',
     'howWorkTideWorks': 'Як працює WorkTide',
     'followSimpleSteps': 'Дотримуйтесь цих простих кроків, щоб розпочати свій шлях у фрілансі.',
-    
+
     'createYourProfile': 'Створіть свій профіль',
     'createProfileDesc': 'Зареєструйтесь і створіть свій професійний профіль, висвітлюючи свої навички та досвід.',
     'findOpportunities': 'Знайдіть можливості',
     'findOpportunitiesDesc': 'Переглядайте доступні проєкти або надсилайте пропозиції для робіт, які відповідають вашому досвіду.',
     'getPaid': 'Отримуйте оплату',
     'getPaidDesc': 'Виконуйте свою роботу і отримуйте оплату безпосередньо через нашу безпечну платформу.',
-    
+
     'testimonials': 'Відгуки',
     'whatUsersSay': 'Що кажуть наші користувачі',
-    
+
     'testimonial1Name': 'Сара Джонсон',
     'testimonial1Role': 'UX Дизайнер',
     'testimonial1Text': '"WorkTide змінив мою фрілансерську кар\'єру. Я познайомилася з неймовірними клієнтами і маю постійний потік проєктів."',
-    
+
     'testimonial2Name': 'Майкл Чен',
     'testimonial2Role': 'Веб-розробник',
     'testimonial2Text': '"Платформа інтуїтивно зрозуміла і дозволяє легко демонструвати моє портфоліо. Після приєднання я збільшив свою клієнтську базу на 200%."',
-    
+
     'testimonial3Name': 'Емілі Родрігес',
     'testimonial3Role': 'Контент-райтер',
     'testimonial3Text': '"Як власник бізнесу, WorkTide допомагає мені швидко знаходити кваліфікованих фрілансерів. Якість роботи була винятковою."',
-    
+
     'readyToBoost': 'Готові підвищити свою кар\'єру?',
     'startUsingWorkTide': 'Почніть користуватися WorkTide сьогодні.',
     'joinCommunity': 'Приєднуйтесь до нашої спільноти фрілансерів та клієнтів.',
     'getStartedNow': 'Почати зараз',
-    
+
     // FindWork page
     'findYourNextProject': 'Знайдіть свій наступний проєкт',
     'browseAvailableProjects': 'Переглядайте доступні проєкти і знаходьте ідеальний варіант для ваших навичок.',
@@ -163,7 +168,7 @@ export default {
     'tellClientWhyYoureGoodFit': 'Розкажіть клієнту, чому ви підходите для цього проєкту...',
     'submit': 'Подати',
     'applicationSubmittedSuccess': 'Заявка успішно подана!',
-    
+
     // FindFreelancers page
     'findFreelancersTitle': 'Знайти фрілансерів',
     'connectWithTalentedProfessionals': 'Зв\'яжіться з талановитими професіоналами для ваших проєктів',
@@ -175,6 +180,30 @@ export default {
     'jobsCompleted': 'робіт виконано',
     'remote': 'Віддалено',
     'viewProfile': 'Переглянути профіль',
-    'perHour': 'за годину'
+    'perHour': 'за годину',
+
+    // Accessibility
+    'accessibility': 'Доступність',
+    'highContrast': 'Висока контрастність',
+    'reducedMotion': 'Зменшення руху',
+    'highlightLinks': 'Підсвічування посилань',
+    'bigCursor': 'Великий курсор',
+    'readingGuide': 'Посібник для читання',
+    'invertColors': 'Інвертувати кольори',
+    'fontSize': 'Розмір шрифту',
+
+    // Profile
+    'noTitle': 'Без назви',
+    'noExperienceProvided': 'Досвід не вказано',
+    'noEducationProvided': 'Освіта не вказана',
+    'noSkillsProvided': 'Навички не вказані',
+    'noLanguagesProvided': 'Мови не вказані',
+    'profileNotFound': 'Профіль не знайдено',
+    'pleaseLogin': 'Будь ласка, увійдіть, щоб переглянути свій профіль',
+    'ratingsReviews': 'Рейтинги та відгуки',
+    'viewAllReviews': 'Переглянути всі відгуки',
+    'profilePicture': 'Зображення профілю',
+    'showAvatarToOthers': 'Показувати зображення профілю іншим',
+    'avatarVisibilityInfo': 'Якщо вимкнено, лише ви бачитимете своє зображення профілю.'
   }
 }; 

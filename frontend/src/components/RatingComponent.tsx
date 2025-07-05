@@ -24,8 +24,8 @@ interface Rating {
   };
 }
 
-const RatingComponent: React.FC<RatingProps> = ({ 
-  freelancerId, 
+const RatingComponent: React.FC<RatingProps> = ({
+  freelancerId,
   onRatingSuccess,
   previewMode = false,
   maxReviews = 3
@@ -69,7 +69,7 @@ const RatingComponent: React.FC<RatingProps> = ({
           'Authorization': `Bearer ${token}`,
         },
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         if (data.exists && data.rating) {
@@ -85,11 +85,11 @@ const RatingComponent: React.FC<RatingProps> = ({
 
   const handleSubmitRating = async () => {
     if (!userRating) return;
-    
+
     setLoading(true);
     setError('');
     setSuccess(false);
-    
+
     try {
       const response = await fetch(API_ENDPOINTS.ratings.create, {
         method: 'POST',
@@ -103,7 +103,7 @@ const RatingComponent: React.FC<RatingProps> = ({
           comment,
         }),
       });
-      
+
       if (response.ok) {
         setSuccess(true);
         setHasRated(true);
@@ -127,7 +127,7 @@ const RatingComponent: React.FC<RatingProps> = ({
   const renderStars = () => {
     return [1, 2, 3, 4, 5].map((star) => {
       const isFilled = (hoverRating !== null ? hoverRating >= star : userRating !== null && userRating >= star);
-      
+
       return (
         <button
           key={star}
@@ -152,8 +152,9 @@ const RatingComponent: React.FC<RatingProps> = ({
     return (
       <div key={rating.id} className="border-b border-gray-100 last:border-0 py-4">
         <div className="flex items-start">
-          <Avatar 
+          <Avatar
             fullName={rating.client.fullName}
+            imageUrl={rating.client.imageUrl}
             className="h-10 w-10 mr-4"
             textSize="text-xs"
           />
@@ -161,11 +162,10 @@ const RatingComponent: React.FC<RatingProps> = ({
             <p className="font-medium">{rating.client.fullName}</p>
             <div className="flex items-center mt-1">
               {[...Array(5)].map((_, index) => (
-                <StarIconSolid 
-                  key={index} 
-                  className={`h-4 w-4 ${
-                    index < rating.score ? 'text-yellow-400' : 'text-gray-300'
-                  }`} 
+                <StarIconSolid
+                  key={index}
+                  className={`h-4 w-4 ${index < rating.score ? 'text-yellow-400' : 'text-gray-300'
+                    }`}
                 />
               ))}
               <span className="ml-2 text-sm text-gray-500">
@@ -190,18 +190,18 @@ const RatingComponent: React.FC<RatingProps> = ({
         {!previewMode && (
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Ratings & Reviews</h2>
         )}
-        
+
         {/* Client rating form - only show when a client is viewing another freelancer's profile */}
         {isClient && user?.id !== freelancerId && (
           <div className="mb-8 border-b border-gray-200 pb-6">
             <h3 className="text-lg font-medium text-gray-900 mb-3">
               {hasRated ? 'Your Rating' : 'Rate This Freelancer'}
             </h3>
-            
+
             <div className="flex mb-4">
               {renderStars()}
             </div>
-            
+
             <div className="mb-4">
               <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-1">
                 Your Review (Optional)
@@ -215,31 +215,30 @@ const RatingComponent: React.FC<RatingProps> = ({
                 placeholder="Share your experience working with this freelancer..."
               />
             </div>
-            
+
             {error && (
               <div className="mb-4 text-red-600 text-sm">{error}</div>
             )}
-            
+
             {success && (
               <div className="mb-4 text-green-600 text-sm">
                 Your rating has been submitted successfully!
               </div>
             )}
-            
+
             <button
               onClick={handleSubmitRating}
               disabled={loading || !userRating}
-              className={`px-4 py-2 rounded-md ${
-                loading || !userRating
+              className={`px-4 py-2 rounded-md ${loading || !userRating
                   ? 'bg-gray-300 cursor-not-allowed'
                   : 'bg-blue-600 hover:bg-blue-700 text-white'
-              }`}
+                }`}
             >
               {loading ? 'Submitting...' : hasRated ? 'Update Rating' : 'Submit Rating'}
             </button>
           </div>
         )}
-        
+
         {/* Ratings list - always show ratings regardless of user type */}
         <div>
           {!previewMode && (
@@ -247,7 +246,7 @@ const RatingComponent: React.FC<RatingProps> = ({
               Client Reviews ({ratings.length})
             </h3>
           )}
-          
+
           {ratings.length === 0 ? (
             <p className="text-gray-500 italic">No reviews yet</p>
           ) : (

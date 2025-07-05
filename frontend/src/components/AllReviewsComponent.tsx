@@ -181,6 +181,7 @@ const AllReviewsComponent: React.FC<AllReviewsProps> = ({
                     <div className="flex items-start">
                       <Avatar
                         fullName={rating.client.fullName}
+                        imageUrl={rating.client.imageUrl}
                         className="h-12 w-12 mr-4"
                         textSize="text-sm"
                       />
@@ -219,8 +220,8 @@ const AllReviewsComponent: React.FC<AllReviewsProps> = ({
                       onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                       disabled={currentPage === 1}
                       className={`p-2 rounded-full ${currentPage === 1
-                          ? 'text-gray-400 cursor-not-allowed'
-                          : 'text-gray-700 hover:bg-gray-100'
+                        ? 'text-gray-400 cursor-not-allowed'
+                        : 'text-gray-700 hover:bg-gray-100'
                         }`}
                     >
                       <ChevronLeftIcon className="h-5 w-5" />
@@ -234,8 +235,8 @@ const AllReviewsComponent: React.FC<AllReviewsProps> = ({
                       onClick={() => setCurrentPage(prev => Math.min(prev + 1, pageCount))}
                       disabled={currentPage === pageCount}
                       className={`p-2 rounded-full ${currentPage === pageCount
-                          ? 'text-gray-400 cursor-not-allowed'
-                          : 'text-gray-700 hover:bg-gray-100'
+                        ? 'text-gray-400 cursor-not-allowed'
+                        : 'text-gray-700 hover:bg-gray-100'
                         }`}
                     >
                       <ChevronRightIcon className="h-5 w-5" />

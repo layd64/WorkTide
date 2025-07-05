@@ -44,6 +44,8 @@ model User {
   applications TaskApplication[] // Applications submitted by freelancers
   sentMessages Message[] @relation("SentMessages")
   receivedMessages Message[] @relation("ReceivedMessages")
+  actionLogs   ActionLog[] // Logs of actions performed by this user
+  isBanned     Boolean  @default(false)
 }
 
 model Project {
@@ -115,4 +117,15 @@ model Message {
   sender    User     @relation("SentMessages", fields: [senderId], references: [id])
   receiver  User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
   attachments Json? // Array of { url: string, type: 'image' | 'file', name: string }
+}
+
+model ActionLog {
+  id        String   @id @default(uuid())
+  userId    String
+  action    String
+  targetId  String?
+  details   String?  // JSON string or text details
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
 }

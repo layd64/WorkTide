@@ -56,122 +56,141 @@ const SignUp: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                    Create a new account
-                </h2>
-                <p className="mt-2 text-center text-sm text-gray-600">
-                    Or{' '}
-                    <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-                        sign in to your existing account
-                    </Link>
-                </p>
+        <div className="min-h-screen flex">
+            {/* Left Half - Image */}
+            <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-600 relative overflow-hidden">
+                <div className="absolute inset-0 flex items-center justify-center p-12">
+                    <img
+                        src="/src/assets/auth-hero.png"
+                        alt="WorkTide Platform"
+                        className="w-full h-full object-cover rounded-2xl shadow-2xl"
+                    />
+                </div>
+                {/* Overlay with branding */}
+                <div className="absolute bottom-0 left-0 right-0 p-12 bg-gradient-to-t from-black/60 to-transparent">
+                    <h1 className="text-4xl font-bold text-white mb-4">Join WorkTide</h1>
+                    <p className="text-lg text-white/90">Start your journey as a freelancer or find the perfect talent</p>
+                </div>
             </div>
 
-            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-                    <form className="space-y-6" onSubmit={handleSubmit}>
-                        {error && (
-                            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
-                                {error}
-                            </div>
-                        )}
+            {/* Right Half - Form */}
+            <div className="flex-1 lg:w-1/2 bg-white flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24">
+                <div className="mx-auto w-full max-w-md">
+                    <div>
+                        <h2 className="text-3xl font-extrabold text-gray-900">
+                            Create a new account
+                        </h2>
+                        <p className="mt-2 text-sm text-gray-600">
+                            Or{' '}
+                            <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors">
+                                sign in to your existing account
+                            </Link>
+                        </p>
+                    </div>
 
-                        <div>
-                            <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
-                                Full Name
-                            </label>
-                            <div className="mt-1 relative rounded-md shadow-sm">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <UserIcon className="h-5 w-5 text-gray-400" />
+                    <div className="mt-8">
+                        <form className="space-y-6" onSubmit={handleSubmit}>
+                            {error && (
+                                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
+                                    {error}
                                 </div>
-                                <input
-                                    id="fullName"
-                                    name="fullName"
-                                    type="text"
-                                    required
-                                    value={formData.fullName}
-                                    onChange={handleChange}
-                                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                    placeholder="John Doe"
-                                />
-                            </div>
-                        </div>
+                            )}
 
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                                Email address
-                            </label>
-                            <div className="mt-1 relative rounded-md shadow-sm">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <EnvelopeIcon className="h-5 w-5 text-gray-400" />
+                            <div>
+                                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
+                                    Full Name
+                                </label>
+                                <div className="mt-1 relative rounded-md shadow-sm">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <UserIcon className="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        id="fullName"
+                                        name="fullName"
+                                        type="text"
+                                        required
+                                        value={formData.fullName}
+                                        onChange={handleChange}
+                                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors"
+                                        placeholder="John Doe"
+                                    />
                                 </div>
-                                <input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    autoComplete="email"
-                                    required
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                    placeholder="you@example.com"
-                                />
                             </div>
-                        </div>
 
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                Password
-                            </label>
-                            <div className="mt-1 relative rounded-md shadow-sm">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <LockClosedIcon className="h-5 w-5 text-gray-400" />
+                            <div>
+                                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                                    Email address
+                                </label>
+                                <div className="mt-1 relative rounded-md shadow-sm">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <EnvelopeIcon className="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        autoComplete="email"
+                                        required
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors"
+                                        placeholder="you@example.com"
+                                    />
                                 </div>
-                                <input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    autoComplete="new-password"
-                                    required
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                />
                             </div>
-                        </div>
 
-                        <div>
-                            <label htmlFor="userType" className="block text-sm font-medium text-gray-700">
-                                I am a
-                            </label>
-                            <div className="mt-1 relative rounded-md shadow-sm">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <BriefcaseIcon className="h-5 w-5 text-gray-400" />
+                            <div>
+                                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                                    Password
+                                </label>
+                                <div className="mt-1 relative rounded-md shadow-sm">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <LockClosedIcon className="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <input
+                                        id="password"
+                                        name="password"
+                                        type="password"
+                                        autoComplete="new-password"
+                                        required
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors"
+                                    />
                                 </div>
-                                <select
-                                    id="userType"
-                                    name="userType"
-                                    value={formData.userType}
-                                    onChange={handleChange}
-                                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            </div>
+
+                            <div>
+                                <label htmlFor="userType" className="block text-sm font-medium text-gray-700">
+                                    I am a
+                                </label>
+                                <div className="mt-1 relative rounded-md shadow-sm">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <BriefcaseIcon className="h-5 w-5 text-gray-400" />
+                                    </div>
+                                    <select
+                                        id="userType"
+                                        name="userType"
+                                        value={formData.userType}
+                                        onChange={handleChange}
+                                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors"
+                                    >
+                                        <option value="freelancer">Freelancer (I want to work)</option>
+                                        <option value="client">Client (I want to hire)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <button
+                                    type="submit"
+                                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 hover:shadow-lg"
                                 >
-                                    <option value="freelancer">Freelancer (I want to work)</option>
-                                    <option value="client">Client (I want to hire)</option>
-                                </select>
+                                    Sign up
+                                </button>
                             </div>
-                        </div>
-
-                        <div>
-                            <button
-                                type="submit"
-                                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                            >
-                                Sign up
-                            </button>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
