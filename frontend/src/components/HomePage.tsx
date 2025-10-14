@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRightIcon, UserGroupIcon, BriefcaseIcon, CurrencyDollarIcon, ChartBarIcon } from '@heroicons/react/24/outline';
+import { ArrowRightIcon, UserGroupIcon, BriefcaseIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
 
 const HomePage: React.FC = () => {
   return (

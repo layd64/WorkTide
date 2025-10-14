@@ -14,6 +14,7 @@ export declare class ChatController {
         content: string;
         senderId: string;
         receiverId: string;
+        isSystem: boolean;
         attachments: import("@prisma/client/runtime/library").JsonValue | null;
     })[]>;
     getConversations(userId: string): Promise<any[]>;

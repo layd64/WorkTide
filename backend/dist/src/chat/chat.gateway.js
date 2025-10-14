@@ -38,6 +38,9 @@ let ChatGateway = class ChatGateway {
         this.server.to(data.senderId).emit('newMessage', message);
         return message;
     }
+    sendNotification(userId, notification) {
+        this.server.to(userId).emit('notification', notification);
+    }
 };
 exports.ChatGateway = ChatGateway;
 __decorate([

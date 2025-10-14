@@ -20,6 +20,7 @@ exports.ChatModule = ChatModule = __decorate([
         imports: [prisma_module_1.PrismaModule],
         providers: [chat_gateway_1.ChatGateway, chat_service_1.ChatService],
         controllers: [chat_controller_1.ChatController],
+        exports: [chat_gateway_1.ChatGateway, chat_service_1.ChatService],
     })
 ], ChatModule);
 //# sourceMappingURL=chat.module.js.map

@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
-import { useTheme } from '../../contexts/ThemeContext';
 import { useDropdown } from '../../contexts/DropdownContext';
 import Avatar from '../Avatar';
 import {
@@ -12,14 +11,12 @@ import {
     UserCircleIcon,
     Cog6ToothIcon,
     ArrowRightOnRectangleIcon,
-    SunIcon,
-    MoonIcon
 } from '@heroicons/react/24/outline';
+import NotificationMenu from './NotificationMenu';
 
 const Navbar: React.FC = () => {
     const { t } = useTranslation();
     const { user, logout } = useAuth();
-    const { theme, toggleTheme } = useTheme();
     const { isDropdownOpen, setDropdownOpen, toggleDropdown } = useDropdown();
     const navigate = useNavigate();
     const location = useLocation();
@@ -80,19 +77,16 @@ const Navbar: React.FC = () => {
                                     <Link to="/my-applications" className={`inline-flex items-center px-1 pt-1 text-sm font-medium ${isActive('/my-applications')}`}>
                                         {t('myApplications') || 'My Applications'}
                                     </Link>
+                                    <Link to="/requests" className={`inline-flex items-center px-1 pt-1 text-sm font-medium ${isActive('/requests')}`}>
+                                        {t('requests') || 'Requests'}
+                                    </Link>
                                 </>
                             )}
                         </div>
                     </div>
 
                     <div className="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
-                        <button
-                            onClick={toggleTheme}
-                            className="p-1 rounded-full text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none"
-                            aria-label="Toggle theme"
-                        >
-                            {theme === 'dark' ? <SunIcon className="h-6 w-6" /> : <MoonIcon className="h-6 w-6" />}
-                        </button>
+                        {user && <NotificationMenu />}
 
                         {user ? (
                             <>
@@ -259,6 +253,15 @@ const Navbar: React.FC = () => {
                                 >
                                     {t('myApplications') || 'My Applications'}
                                 </Link>
+                                <Link
+                                    to="/requests"
+                                    className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${location.pathname === '/requests'
+                                        ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-500 text-blue-700 dark:text-blue-300'
+                                        : 'border-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 hover:text-gray-800 dark:hover:text-white'
+                                        }`}
+                                >
+                                    {t('requests') || 'Requests'}
+                                </Link>
                             </>
                         )}
                     </div>
@@ -277,12 +280,6 @@ const Navbar: React.FC = () => {
                                         <div className="text-base font-medium text-gray-800 dark:text-white">{user.fullName}</div>
                                         <div className="text-sm font-medium text-gray-500 dark:text-gray-400">{user.email}</div>
                                     </div>
-                                    <button
-                                        onClick={toggleTheme}
-                                        className="ml-auto flex-shrink-0 bg-white dark:bg-gray-800 p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                    >
-                                        {theme === 'dark' ? <SunIcon className="h-6 w-6" /> : <MoonIcon className="h-6 w-6" />}
-                                    </button>
                                 </div>
                                 <div className="mt-3 space-y-1">
                                     <Link
@@ -325,14 +322,7 @@ const Navbar: React.FC = () => {
                 </div>
             )}
 
-            {/* Debug Breakpoint Indicator */}
-            <div className="fixed bottom-0 right-0 bg-red-500 text-white p-2 z-[9999] opacity-75 pointer-events-none">
-                <span className="block sm:hidden">XS (Mobile)</span>
-                <span className="hidden sm:block md:hidden">SM</span>
-                <span className="hidden md:block lg:hidden">MD</span>
-                <span className="hidden lg:block xl:hidden">LG</span>
-                <span className="hidden xl:block">XL</span>
-            </div>
+
         </nav>
     );
 };

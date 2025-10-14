@@ -1,4 +1,4 @@
-import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { Injectable, ForbiddenException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { LoggingService } from '../logging/logging.service';
@@ -17,15 +17,21 @@ export class TasksService {
       description: string;
       budget: number;
       skills: string[];
+      imageUrl: string;
     },
   ) {
-    // Verify user is a client
+    // Verify user exists
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
 
-    if (!user || user.userType !== 'client') {
-      throw new ForbiddenException('Only clients can create tasks');
+    if (!user) {
+      throw new ForbiddenException('User not found');
+    }
+
+    // Validate imageUrl is provided
+    if (!data.imageUrl) {
+      throw new BadRequestException('Task image is required');
     }
 
     // Create the task
@@ -36,7 +42,7 @@ export class TasksService {
       },
     });
 
-    await this.loggingService.logAction(userId, 'TASK_CREATE', task.id, `Task created: ${task.title}`);
+    await this.loggingService.logAction(userId, 'TASK_CREATE', task.id, `Task created: ${task.title} `);
 
     return task;
   }
@@ -96,6 +102,21 @@ export class TasksService {
             rating: true,
           },
         },
+        taskRequests: {
+          where: {
+            status: 'pending',
+          },
+          include: {
+            freelancer: {
+              select: {
+                id: true,
+                fullName: true,
+                imageUrl: true,
+                title: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -148,7 +169,7 @@ export class TasksService {
     });
 
     if (data.status) {
-      await this.loggingService.logAction(updatedTask.clientId, 'TASK_STATUS_UPDATE', updatedTask.id, `Task status updated to ${data.status}: ${updatedTask.title}`);
+      await this.loggingService.logAction(updatedTask.clientId, 'TASK_STATUS_UPDATE', updatedTask.id, `Task status updated to ${data.status}: ${updatedTask.title} `);
     }
 
     return updatedTask;
@@ -168,9 +189,23 @@ export class TasksService {
       throw new ForbiddenException('You can only delete your own tasks');
     }
 
-    // Delete the task
-    return this.prisma.task.delete({
+    // Only allow deletion of tasks with 'open' status
+    if (task.status !== 'open') {
+      throw new ForbiddenException('Only tasks with "open" status can be deleted');
+    }
+
+    // Delete all related TaskApplications first to avoid foreign key constraint violation
+    await this.prisma.taskApplication.deleteMany({
+      where: { taskId },
+    });
+
+    // Now delete the task
+    const deletedTask = await this.prisma.task.delete({
       where: { id: taskId },
     });
+
+    await this.loggingService.logAction(userId, 'TASK_DELETE', taskId, `Task deleted: ${task.title} `);
+
+    return deletedTask;
   }
 } 

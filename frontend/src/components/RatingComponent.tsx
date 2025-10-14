@@ -3,6 +3,7 @@ import { StarIcon } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import { API_ENDPOINTS } from '../config/api';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import Avatar from '../components/Avatar';
 
 interface RatingProps {
@@ -10,6 +11,8 @@ interface RatingProps {
   onRatingSuccess?: () => void;
   previewMode?: boolean;
   maxReviews?: number;
+  forceShowRatingForm?: boolean; // Force show the rating input form, useful for modal contexts
+  readOnly?: boolean; // If true, never show the rating form
 }
 
 interface Rating {
@@ -28,9 +31,12 @@ const RatingComponent: React.FC<RatingProps> = ({
   freelancerId,
   onRatingSuccess,
   previewMode = false,
-  maxReviews = 3
+  maxReviews = 3,
+  forceShowRatingForm = false,
+  readOnly = false
 }) => {
   const { user, token } = useAuth();
+  const navigate = useNavigate();
   const [ratings, setRatings] = useState<Rating[]>([]);
   const [userRating, setUserRating] = useState<number | null>(null);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
@@ -40,15 +46,12 @@ const RatingComponent: React.FC<RatingProps> = ({
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  // Check if the user is a client
-  const isClient = user?.userType === 'client';
-
   useEffect(() => {
     fetchRatings();
-    if (isClient && token) {
+    if (token) {
       checkExistingRating();
     }
-  }, [freelancerId, token, isClient]);
+  }, [freelancerId, token]);
 
   const fetchRatings = async () => {
     try {
@@ -157,9 +160,13 @@ const RatingComponent: React.FC<RatingProps> = ({
             imageUrl={rating.client.imageUrl}
             className="h-10 w-10 mr-4"
             textSize="text-xs"
+            onClick={() => navigate(`/profile/${rating.client.id}`)}
           />
           <div className="flex-1">
-            <p className="font-medium">{rating.client.fullName}</p>
+            <p
+              className="font-medium cursor-pointer hover:text-blue-600"
+              onClick={() => navigate(`/profile/${rating.client.id}`)}
+            >{rating.client.fullName}</p>
             <div className="flex items-center mt-1">
               {[...Array(5)].map((_, index) => (
                 <StarIconSolid
@@ -191,8 +198,9 @@ const RatingComponent: React.FC<RatingProps> = ({
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Ratings & Reviews</h2>
         )}
 
-        {/* Client rating form - only show when a client is viewing another freelancer's profile */}
-        {isClient && user?.id !== freelancerId && (
+        {/* Client rating form - show when forceShowRatingForm is true OR when a user is viewing another user's profile */}
+        {/* AND readOnly is false */}
+        {!readOnly && (forceShowRatingForm || (user && user.id !== freelancerId)) && (
           <div className="mb-8 border-b border-gray-200 pb-6">
             <h3 className="text-lg font-medium text-gray-900 mb-3">
               {hasRated ? 'Your Rating' : 'Rate This Freelancer'}
@@ -230,8 +238,8 @@ const RatingComponent: React.FC<RatingProps> = ({
               onClick={handleSubmitRating}
               disabled={loading || !userRating}
               className={`px-4 py-2 rounded-md ${loading || !userRating
-                  ? 'bg-gray-300 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700 text-white'
+                ? 'bg-gray-300 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 text-white'
                 }`}
             >
               {loading ? 'Submitting...' : hasRated ? 'Update Rating' : 'Submit Rating'}

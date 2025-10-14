@@ -1,11 +1,29 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const HomePage: React.FC = () => {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const { user } = useAuth();
+  const location = useLocation();
+
+  const toastShownRef = React.useRef(false);
+
+  React.useEffect(() => {
+    if (location.state?.welcomeMessage && !toastShownRef.current) {
+      toast.success(location.state.welcomeMessage, {
+        duration: 5000,
+      });
+      toastShownRef.current = true;
+
+      // Clear the state to prevent showing it again on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   return (
     <div className="bg-white dark:bg-gray-900">
@@ -21,24 +39,43 @@ const HomePage: React.FC = () => {
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
           <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
-            {t('hero.title')}
+            {user ? 'Welcome!' : t('hero.title')}
           </h1>
           <p className="mt-6 text-xl text-indigo-100 max-w-3xl mx-auto">
             {t('hero.subtitle')}
           </p>
           <div className="mt-10 flex justify-center space-x-4">
-            <Link
-              to="/signup"
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-white hover:bg-indigo-50"
-            >
-              {t('hero.cta')}
-            </Link>
-            <Link
-              to="/find-work"
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-            >
-              {t('findWork')}
-            </Link>
+            {user ? (
+              <>
+                <Link
+                  to="/find-freelancers"
+                  className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-white hover:bg-indigo-50"
+                >
+                  {t('findFreelancers')}
+                </Link>
+                <Link
+                  to="/find-work"
+                  className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+                >
+                  {t('findWork')}
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/signup"
+                  className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-white hover:bg-indigo-50"
+                >
+                  {t('hero.cta')}
+                </Link>
+                <Link
+                  to="/find-work"
+                  className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+                >
+                  {t('findWork')}
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -252,9 +289,15 @@ const HomePage: React.FC = () => {
             </p>
             <div className="mt-8 flex justify-center">
               <div className="inline-flex rounded-md shadow">
-                <Link to="/signup" className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-white hover:bg-indigo-50">
-                  {t('getStartedNow')}
-                </Link>
+                {user ? (
+                  <Link to="/find-freelancers" className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-white hover:bg-indigo-50">
+                    {t('findFreelancers')}
+                  </Link>
+                ) : (
+                  <Link to="/signup" className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-white hover:bg-indigo-50">
+                    {t('getStartedNow')}
+                  </Link>
+                )}
               </div>
             </div>
           </div>

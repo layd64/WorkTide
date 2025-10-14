@@ -13,7 +13,7 @@ export default {
     'email': 'Електронна пошта',
     'password': 'Пароль',
     'fullName': 'Повне ім\'я',
-    'accountType': 'Тип облікового запису',
+    'accountPreference': 'Перевага облікового запису',
     'memberSince': 'Учасник з',
     'loading': 'Завантаження...',
     'error': 'Сталася помилка',

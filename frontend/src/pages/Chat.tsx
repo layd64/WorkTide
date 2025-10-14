@@ -9,6 +9,7 @@ interface Conversation {
         id: string;
         fullName: string;
         imageUrl?: string;
+        userType?: string;
     };
     lastMessage: {
         content: string;
@@ -23,7 +24,7 @@ const Chat: React.FC = () => {
     const navigate = useNavigate();
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [newMessage, setNewMessage] = useState('');
-    const [currentPartner, setCurrentPartner] = useState<{ id: string; fullName: string; imageUrl?: string } | null>(null);
+    const [currentPartner, setCurrentPartner] = useState<{ id: string; fullName: string; imageUrl?: string; userType?: string } | null>(null);
     const [attachments, setAttachments] = useState<any[]>([]);
     const [isUploading, setIsUploading] = useState(false);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -116,6 +117,26 @@ const Chat: React.FC = () => {
         scrollToBottom();
     }, [messages]);
 
+    // Close emoji picker when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as HTMLElement;
+            // Check if click is outside the emoji picker and emoji button
+            if (showEmojiPicker && !target.closest('.emoji-picker-container') && !target.closest('button[title="Add emoji"]')) {
+                setShowEmojiPicker(false);
+            }
+        };
+
+        if (showEmojiPicker) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showEmojiPicker]);
+
+
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
@@ -159,6 +180,11 @@ const Chat: React.FC = () => {
         navigate(`/chat/${partnerId}`);
     };
 
+    const handleNavigateToProfile = (partnerId: string) => {
+        // Unified profile route for all user types
+        navigate(`/profile/${partnerId}`);
+    };
+
     if (!user) return <div>Please login to chat.</div>;
 
     return (
@@ -177,7 +203,13 @@ const Chat: React.FC = () => {
                                 }`}
                         >
                             <div className="flex items-center space-x-3">
-                                <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden">
+                                <div
+                                    className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden cursor-pointer"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleNavigateToProfile(conv.partner.id);
+                                    }}
+                                >
                                     {conv.partner.imageUrl ? (
                                         <img src={conv.partner.imageUrl} alt={conv.partner.fullName} className="w-full h-full object-cover" />
                                     ) : (
@@ -187,7 +219,13 @@ const Chat: React.FC = () => {
                                     )}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                    <p
+                                        className="text-sm font-medium text-gray-900 dark:text-white truncate cursor-pointer hover:text-blue-600"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleNavigateToProfile(conv.partner.id);
+                                        }}
+                                    >
                                         {conv.partner.fullName}
                                     </p>
                                     <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
@@ -208,7 +246,10 @@ const Chat: React.FC = () => {
                         <div className="p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center space-x-3">
                             {currentPartner ? (
                                 <>
-                                    <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden">
+                                    <div
+                                        className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden cursor-pointer"
+                                        onClick={() => handleNavigateToProfile(currentPartner.id)}
+                                    >
                                         {currentPartner.imageUrl ? (
                                             <img src={currentPartner.imageUrl} alt={currentPartner.fullName || 'User'} className="w-full h-full object-cover" />
                                         ) : (
@@ -217,7 +258,10 @@ const Chat: React.FC = () => {
                                             </div>
                                         )}
                                     </div>
-                                    <h3 className="text-lg font-medium text-gray-800 dark:text-white">{currentPartner.fullName || 'Unknown User'}</h3>
+                                    <h3
+                                        className="text-lg font-medium text-gray-800 dark:text-white cursor-pointer hover:text-blue-600"
+                                        onClick={() => handleNavigateToProfile(currentPartner.id)}
+                                    >{currentPartner.fullName || 'Unknown User'}</h3>
                                 </>
                             ) : (
                                 <h3 className="text-lg font-medium text-gray-800 dark:text-white">Chat</h3>
@@ -228,6 +272,23 @@ const Chat: React.FC = () => {
                         <div className="flex-1 overflow-y-auto p-4 space-y-4">
                             {messages.map((msg) => {
                                 const isMe = msg.senderId === user.id;
+                                const isSystemMessage = msg.isSystem;
+
+                                // Render system messages differently (centered)
+                                if (isSystemMessage) {
+                                    return (
+                                        <div key={msg.id} className="flex justify-center my-4">
+                                            <div className="max-w-md px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg text-center text-sm">
+                                                <p>{msg.content}</p>
+                                                <p className="text-xs mt-1 text-gray-400">
+                                                    {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    );
+                                }
+
+                                // Regular messages
                                 return (
                                     <div
                                         key={msg.id}
@@ -301,12 +362,9 @@ const Chat: React.FC = () => {
                                         </svg>
                                     </button>
                                     {showEmojiPicker && (
-                                        <>
-                                            <div className="fixed inset-0 bg-transparent z-40" onClick={() => setShowEmojiPicker(false)}></div>
-                                            <div className="absolute bottom-12 left-0 z-50">
-                                                <EmojiPicker onEmojiClick={onEmojiClick} theme={Theme.AUTO} />
-                                            </div>
-                                        </>
+                                        <div className="absolute bottom-12 left-0 z-50 emoji-picker-container">
+                                            <EmojiPicker onEmojiClick={onEmojiClick} theme={Theme.AUTO} />
+                                        </div>
                                     )}
                                 </div>
                                 <div className="flex-1 flex flex-col">

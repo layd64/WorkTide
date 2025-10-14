@@ -17,7 +17,7 @@ export declare class AuthService {
             updatedAt: Date;
             title: string | null;
             bio: string | null;
-            skills: string[];
+            legacySkills: string[];
             hourlyRate: number | null;
             rating: number | null;
             completedJobs: number | null;

@@ -8,25 +8,8 @@ export class ProfileService {
     async getProfile(userId: string) {
         const user = await this.prisma.user.findUnique({
             where: { id: userId },
-            select: {
-                id: true,
-                email: true,
-                fullName: true,
-                userType: true,
-                createdAt: true,
-                title: true,
-                bio: true,
+            include: {
                 skills: true,
-                hourlyRate: true,
-                rating: true,
-                completedJobs: true,
-                location: true,
-                imageUrl: true,
-                languages: true,
-                education: true,
-                experience: true,
-                isHidden: true,
-                isAvatarVisible: true,
             },
         });
 
@@ -34,31 +17,21 @@ export class ProfileService {
             throw new NotFoundException('User not found');
         }
 
-        return user;
+        // Map skills relation to string array for frontend compatibility
+        const userWithSkills = {
+            ...user,
+            skills: user.skills.map(s => s.name),
+        };
+
+        return userWithSkills;
     }
 
     async getPublicProfile(userId: string) {
         // This is for retrieving profiles of other users - same info but no email
         const user = await this.prisma.user.findUnique({
             where: { id: userId },
-            select: {
-                id: true,
-                fullName: true,
-                userType: true,
-                createdAt: true,
-                title: true,
-                bio: true,
+            include: {
                 skills: true,
-                hourlyRate: true,
-                rating: true,
-                completedJobs: true,
-                location: true,
-                imageUrl: true,
-                languages: true,
-                education: true,
-                experience: true,
-                isHidden: true,
-                isAvatarVisible: true,
             },
         });
 
@@ -71,7 +44,13 @@ export class ProfileService {
             user.imageUrl = null;
         }
 
-        return user;
+        // Map skills relation to string array for frontend compatibility
+        const userWithSkills = {
+            ...user,
+            skills: user.skills.map(s => s.name),
+        };
+
+        return userWithSkills;
     }
 
     async getAllFreelancers(search?: string, skills: string[] = []) {
@@ -88,36 +67,33 @@ export class ProfileService {
                     } : {},
                     skills.length > 0 ? {
                         skills: {
-                            hasSome: skills,
+                            some: {
+                                name: {
+                                    in: skills,
+                                    mode: 'insensitive',
+                                },
+                            },
                         },
                     } : {},
                 ],
             },
-            select: {
-                id: true,
-                fullName: true,
-                userType: true,
-                title: true,
+            include: {
                 skills: true,
-                hourlyRate: true,
-                rating: true,
-                completedJobs: true,
-                location: true,
-                imageUrl: true,
-                createdAt: true,
-                isAvatarVisible: true,
             },
             orderBy: {
                 rating: 'desc',
             },
         });
 
-        // Filter avatars
+        // Filter avatars and map skills
         return freelancers.map(f => {
             if (!f.isAvatarVisible) {
                 f.imageUrl = null;
             }
-            return f;
+            return {
+                ...f,
+                skills: f.skills.map(s => s.name),
+            };
         });
     }
 
@@ -136,13 +112,45 @@ export class ProfileService {
             ? { isHidden: profileData.isHidden }
             : {};
 
+        // Handle skills update
+        let skillsUpdate = {};
+        if (profileData.skills) {
+            // Disconnect all existing skills and connect new ones
+            // We need to find the Skill entities first
+            const skillNames = profileData.skills as string[];
+
+            // Upsert skills to ensure they exist (optional, but requested "predetermined tags", 
+            // so maybe we should only connect existing ones? 
+            // The requirement says "predetermined tags that user chooses instead of typing them out".
+            // But if we want to allow new skills to be added by admin only, we should just connect.
+            // If we want to allow users to add new skills to the "huge list", we should upsert.
+            // Given "huge list for all kinds of skills", it implies a fixed set.
+            // However, for robustness, I will just connect to existing skills.
+            // But wait, if the user sends a skill that doesn't exist, it will fail.
+            // So I should probably find the skills first.
+
+            const skills = await this.prisma.skill.findMany({
+                where: {
+                    name: {
+                        in: skillNames,
+                        mode: 'insensitive',
+                    },
+                },
+            });
+
+            skillsUpdate = {
+                skills: {
+                    set: skills.map(s => ({ id: s.id })),
+                },
+            };
+        }
+
         // Update the user profile fields
         const updatedUser = await this.prisma.user.update({
             where: { id: userId },
             data: {
                 title: profileData.title,
                 bio: profileData.bio,
-                skills: profileData.skills || [],
                 hourlyRate: profileData.hourlyRate,
                 location: profileData.location,
                 languages: profileData.languages || [],
@@ -150,26 +158,10 @@ export class ProfileService {
                 experience: profileData.experience || [],
                 isAvatarVisible: profileData.isAvatarVisible,
                 ...isHiddenUpdate,
+                ...skillsUpdate,
             },
-            select: {
-                id: true,
-                email: true,
-                fullName: true,
-                userType: true,
-                createdAt: true,
-                title: true,
-                bio: true,
+            include: {
                 skills: true,
-                hourlyRate: true,
-                rating: true,
-                completedJobs: true,
-                location: true,
-                imageUrl: true,
-                languages: true,
-                education: true,
-                experience: true,
-                isHidden: true,
-                isAvatarVisible: true,
             },
         });
 
@@ -180,7 +172,10 @@ export class ProfileService {
             userType: updatedUser.userType
         });
 
-        return updatedUser;
+        return {
+            ...updatedUser,
+            skills: updatedUser.skills.map(s => s.name),
+        };
     }
 
     async updateAvatar(userId: string, imageUrl: string) {

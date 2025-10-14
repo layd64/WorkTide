@@ -52,4 +52,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         return message;
     }
+
+    sendNotification(userId: string, notification: any) {
+        this.server.to(userId).emit('notification', notification);
+    }
 }

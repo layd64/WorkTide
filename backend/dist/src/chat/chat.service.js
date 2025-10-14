@@ -17,13 +17,14 @@ let ChatService = class ChatService {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async sendMessage(senderId, receiverId, content, attachments) {
+    async sendMessage(senderId, receiverId, content, attachments, isSystem = false) {
         return this.prisma.message.create({
             data: {
                 senderId,
                 receiverId,
                 content,
                 attachments: attachments || [],
+                isSystem,
             },
             include: {
                 sender: {
@@ -101,6 +102,9 @@ let ChatService = class ChatService {
             }
         });
         return Array.from(conversations.values());
+    }
+    async createInitialChatMessage(freelancerId, clientId) {
+        return this.sendMessage(freelancerId, clientId, 'This chat has been started since both participants decided to work together.', [], true);
     }
 };
 exports.ChatService = ChatService;

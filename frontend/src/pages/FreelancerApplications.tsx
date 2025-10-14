@@ -10,6 +10,7 @@ interface Task {
   budget: number;
   skills: string[];
   status: string;
+  imageUrl?: string;
   createdAt: string;
   client: {
     id: string;
@@ -37,9 +38,8 @@ const FreelancerApplications: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'accepted' | 'completed'>('all');
 
   useEffect(() => {
-    // Redirect if not a freelancer
-    if (!user || user.userType !== 'freelancer') {
-      navigate('/');
+    if (!user) {
+      navigate('/login');
       return;
     }
 
@@ -232,21 +232,35 @@ const FreelancerApplications: React.FC = () => {
                   <dl>
                     <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">Client</dt>
-                      <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 flex items-center">
-                        {application.task.client.imageUrl ? (
-                          <img
-                            src={application.task.client.imageUrl}
-                            alt={application.task.client.fullName}
-                            className="h-6 w-6 rounded-full mr-2"
-                          />
-                        ) : (
-                          <div className="h-6 w-6 rounded-full bg-gray-300 mr-2 flex items-center justify-center">
-                            <span className="text-xs font-medium text-gray-600">
-                              {application.task.client.fullName.charAt(0)}
-                            </span>
-                          </div>
-                        )}
-                        {application.task.client.fullName}
+                      <dd
+                        className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 flex items-center cursor-pointer hover:opacity-80"
+                        onClick={() => navigate(`/profile/${application.task.client.id}`)}
+                      >
+                        <div className="flex items-center -space-x-2 mr-3">
+                          {application.task.imageUrl && (
+                            <img
+                              src={application.task.imageUrl}
+                              alt={application.task.title}
+                              className="h-10 w-10 rounded-md object-cover ring-2 ring-white z-10"
+                            />
+                          )}
+                          {application.task.client.imageUrl ? (
+                            <img
+                              src={application.task.client.imageUrl}
+                              alt={application.task.client.fullName}
+                              className="h-10 w-10 rounded-full object-cover ring-2 ring-white z-20"
+                            />
+                          ) : (
+                            <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center ring-2 ring-white z-20">
+                              <span className="text-xs font-medium text-gray-600">
+                                {application.task.client.fullName.charAt(0)}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-medium hover:text-blue-600">{application.task.client.fullName}</span>
+                        </div>
                       </dd>
                     </div>
                     <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">

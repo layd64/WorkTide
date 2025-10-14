@@ -20,53 +20,24 @@ let ProfileService = class ProfileService {
     async getProfile(userId) {
         const user = await this.prisma.user.findUnique({
             where: { id: userId },
-            select: {
-                id: true,
-                email: true,
-                fullName: true,
-                userType: true,
-                createdAt: true,
-                title: true,
-                bio: true,
+            include: {
                 skills: true,
-                hourlyRate: true,
-                rating: true,
-                completedJobs: true,
-                location: true,
-                imageUrl: true,
-                languages: true,
-                education: true,
-                experience: true,
-                isHidden: true,
-                isAvatarVisible: true,
             },
         });
         if (!user) {
             throw new common_1.NotFoundException('User not found');
         }
-        return user;
+        const userWithSkills = {
+            ...user,
+            skills: user.skills.map(s => s.name),
+        };
+        return userWithSkills;
     }
     async getPublicProfile(userId) {
         const user = await this.prisma.user.findUnique({
             where: { id: userId },
-            select: {
-                id: true,
-                fullName: true,
-                userType: true,
-                createdAt: true,
-                title: true,
-                bio: true,
+            include: {
                 skills: true,
-                hourlyRate: true,
-                rating: true,
-                completedJobs: true,
-                location: true,
-                imageUrl: true,
-                languages: true,
-                education: true,
-                experience: true,
-                isHidden: true,
-                isAvatarVisible: true,
             },
         });
         if (!user) {
@@ -75,7 +46,11 @@ let ProfileService = class ProfileService {
         if (!user.isAvatarVisible) {
             user.imageUrl = null;
         }
-        return user;
+        const userWithSkills = {
+            ...user,
+            skills: user.skills.map(s => s.name),
+        };
+        return userWithSkills;
     }
     async getAllFreelancers(search, skills = []) {
         const freelancers = await this.prisma.user.findMany({
@@ -91,24 +66,18 @@ let ProfileService = class ProfileService {
                     } : {},
                     skills.length > 0 ? {
                         skills: {
-                            hasSome: skills,
+                            some: {
+                                name: {
+                                    in: skills,
+                                    mode: 'insensitive',
+                                },
+                            },
                         },
                     } : {},
                 ],
             },
-            select: {
-                id: true,
-                fullName: true,
-                userType: true,
-                title: true,
+            include: {
                 skills: true,
-                hourlyRate: true,
-                rating: true,
-                completedJobs: true,
-                location: true,
-                imageUrl: true,
-                createdAt: true,
-                isAvatarVisible: true,
             },
             orderBy: {
                 rating: 'desc',
@@ -118,7 +87,10 @@ let ProfileService = class ProfileService {
             if (!f.isAvatarVisible) {
                 f.imageUrl = null;
             }
-            return f;
+            return {
+                ...f,
+                skills: f.skills.map(s => s.name),
+            };
         });
     }
     async updateProfile(userId, profileData) {
@@ -131,12 +103,28 @@ let ProfileService = class ProfileService {
         const isHiddenUpdate = user.userType === 'freelancer' && profileData.isHidden !== undefined
             ? { isHidden: profileData.isHidden }
             : {};
+        let skillsUpdate = {};
+        if (profileData.skills) {
+            const skillNames = profileData.skills;
+            const skills = await this.prisma.skill.findMany({
+                where: {
+                    name: {
+                        in: skillNames,
+                        mode: 'insensitive',
+                    },
+                },
+            });
+            skillsUpdate = {
+                skills: {
+                    set: skills.map(s => ({ id: s.id })),
+                },
+            };
+        }
         const updatedUser = await this.prisma.user.update({
             where: { id: userId },
             data: {
                 title: profileData.title,
                 bio: profileData.bio,
-                skills: profileData.skills || [],
                 hourlyRate: profileData.hourlyRate,
                 location: profileData.location,
                 languages: profileData.languages || [],
@@ -144,26 +132,10 @@ let ProfileService = class ProfileService {
                 experience: profileData.experience || [],
                 isAvatarVisible: profileData.isAvatarVisible,
                 ...isHiddenUpdate,
+                ...skillsUpdate,
             },
-            select: {
-                id: true,
-                email: true,
-                fullName: true,
-                userType: true,
-                createdAt: true,
-                title: true,
-                bio: true,
+            include: {
                 skills: true,
-                hourlyRate: true,
-                rating: true,
-                completedJobs: true,
-                location: true,
-                imageUrl: true,
-                languages: true,
-                education: true,
-                experience: true,
-                isHidden: true,
-                isAvatarVisible: true,
             },
         });
         console.log('Profile updated:', {
@@ -171,7 +143,10 @@ let ProfileService = class ProfileService {
             isHidden: updatedUser.isHidden,
             userType: updatedUser.userType
         });
-        return updatedUser;
+        return {
+            ...updatedUser,
+            skills: updatedUser.skills.map(s => s.name),
+        };
     }
     async updateAvatar(userId, imageUrl) {
         const user = await this.prisma.user.update({

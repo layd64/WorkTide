@@ -12,17 +12,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TaskApplicationsService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const chat_service_1 = require("../chat/chat.service");
+const notifications_service_1 = require("../notifications/notifications.service");
 let TaskApplicationsService = class TaskApplicationsService {
     prisma;
-    constructor(prisma) {
+    chatService;
+    notificationsService;
+    constructor(prisma, chatService, notificationsService) {
         this.prisma = prisma;
+        this.chatService = chatService;
+        this.notificationsService = notificationsService;
     }
     async applyToTask(freelancerId, taskId, coverLetter) {
         const user = await this.prisma.user.findUnique({
             where: { id: freelancerId },
         });
-        if (!user || user.userType !== 'freelancer') {
-            throw new common_1.ForbiddenException('Only freelancers can apply to tasks');
+        if (!user) {
+            throw new common_1.ForbiddenException('User not found');
         }
         const task = await this.prisma.task.findUnique({
             where: { id: taskId },
@@ -51,7 +57,9 @@ let TaskApplicationsService = class TaskApplicationsService {
         if (coverLetter) {
             data.coverLetter = coverLetter;
         }
-        return this.prisma.taskApplication.create({ data });
+        const application = await this.prisma.taskApplication.create({ data });
+        await this.notificationsService.createNotification(task.clientId, 'APPLICATION_RECEIVED', 'New Application', `You have received a new application for your task: ${task.title}`, application.id);
+        return application;
     }
     async getTaskApplications(taskId, clientId) {
         const task = await this.prisma.task.findUnique({
@@ -116,6 +124,13 @@ let TaskApplicationsService = class TaskApplicationsService {
         if (application.task.clientId !== clientId) {
             throw new common_1.ForbiddenException('You can only update applications for your own tasks');
         }
+        if (application) {
+            const title = status === 'accepted' ? 'Application Accepted' : 'Application Declined';
+            const message = status === 'accepted'
+                ? `Your application for "${application.task.title}" has been accepted!`
+                : `Your application for "${application.task.title}" has been declined.`;
+            await this.notificationsService.createNotification(application.freelancerId, status === 'accepted' ? 'APPLICATION_ACCEPTED' : 'APPLICATION_DECLINED', title, message, application.id);
+        }
         return this.prisma.taskApplication.update({
             where: { id: applicationId },
             data: { status },
@@ -132,7 +147,7 @@ let TaskApplicationsService = class TaskApplicationsService {
         if (application.task.clientId !== clientId) {
             throw new common_1.ForbiddenException('You can only assign freelancers to your own tasks');
         }
-        return this.prisma.$transaction(async (prisma) => {
+        const result = await this.prisma.$transaction(async (prisma) => {
             const updatedApplication = await prisma.taskApplication.update({
                 where: { id: applicationId },
                 data: { status: 'accepted' },
@@ -146,11 +161,19 @@ let TaskApplicationsService = class TaskApplicationsService {
                 task: updatedTask
             };
         });
+        await this.chatService.createInitialChatMessage(application.freelancerId, clientId);
+        await this.notificationsService.createNotification(application.freelancerId, 'APPLICATION_ACCEPTED', 'Application Accepted', `You have been assigned to the task: ${application.task.title}`, application.id);
+        return {
+            ...result,
+            freelancerId: application.freelancerId,
+        };
     }
 };
 exports.TaskApplicationsService = TaskApplicationsService;
 exports.TaskApplicationsService = TaskApplicationsService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        chat_service_1.ChatService,
+        notifications_service_1.NotificationsService])
 ], TaskApplicationsService);
 //# sourceMappingURL=task-applications.service.js.map

@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MagnifyingGlassIcon, FunnelIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, FunnelIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { API_ENDPOINTS } from '../config/api';
 import Avatar from '../components/Avatar';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../contexts/AuthContext';
+
 
 interface Freelancer {
   id: string;
   fullName: string;
   title?: string;
+  bio?: string;
   skills: string[];
   hourlyRate?: number;
   rating?: number;
@@ -17,14 +20,33 @@ interface Freelancer {
   imageUrl?: string;
 }
 
+interface Task {
+  id: string;
+  title: string;
+  description: string;
+  budget: number;
+  status: string;
+  skills: string[];
+}
+
 const FindFreelancers: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user, token } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [freelancers, setFreelancers] = useState<Freelancer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Assignment modal state
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [selectedFreelancer, setSelectedFreelancer] = useState<Freelancer | null>(null);
+  const [clientTasks, setClientTasks] = useState<Task[]>([]);
+  const [loadingTasks, setLoadingTasks] = useState(false);
+  const [assigningTask, setAssigningTask] = useState(false);
+  const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
 
   // Fetch freelancers when component mounts or filters change
   useEffect(() => {
@@ -73,8 +95,87 @@ const FindFreelancers: React.FC = () => {
   };
 
   const handleViewProfile = (freelancerId: string) => {
-    navigate(`/freelancer-profile/${freelancerId}`);
+    navigate(`/profile/${freelancerId}`);
   };
+
+  const handleOpenAssignModal = async (freelancer: Freelancer) => {
+    // Check auth first before opening modal
+    if (!user || !token) {
+      setNotification({ type: 'error', message: 'Please log in to assign tasks' });
+      setTimeout(() => setNotification(null), 3000);
+      return;
+    }
+
+    setSelectedFreelancer(freelancer);
+    setIsAssignModalOpen(true);
+    setLoadingTasks(true);
+
+    try {
+      const response = await fetch(API_ENDPOINTS.tasks.getByClient(user.id), {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch tasks');
+      }
+
+      const tasks = await response.json();
+      // Only show open (non-pending) tasks
+      setClientTasks(tasks.filter((task: Task) => task.status === 'open'));
+    } catch (err) {
+      console.error('Error fetching tasks:', err);
+      setNotification({ type: 'error', message: 'Failed to load your tasks' });
+      setIsAssignModalOpen(false);
+      setSelectedFreelancer(null);
+    } finally {
+      setLoadingTasks(false);
+    }
+  };
+
+  const handleAssignTask = async (taskId: string) => {
+    if (!selectedFreelancer || !token) return;
+
+    setAssigningTask(true);
+    try {
+      const response = await fetch(API_ENDPOINTS.taskRequests.create, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          taskId,
+          freelancerId: selectedFreelancer.id,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to send assignment request');
+      }
+
+      setNotification({
+        type: 'success',
+        message: `Assignment request sent to ${selectedFreelancer.fullName}!`,
+      });
+      setIsAssignModalOpen(false);
+      setSelectedFreelancer(null);
+
+      // Auto-hide notification after 3 seconds
+      setTimeout(() => setNotification(null), 3000);
+    } catch (err: any) {
+      console.error('Error assigning task:', err);
+      setNotification({
+        type: 'error',
+        message: err.message || 'Failed to send assignment request',
+      });
+    } finally {
+      setAssigningTask(false);
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -112,8 +213,8 @@ const FindFreelancers: React.FC = () => {
                 key={skill}
                 onClick={() => toggleSkill(skill)}
                 className={`px-3 py-1 rounded-full text-sm font-medium ${selectedSkills.includes(skill)
-                    ? 'bg-blue-100 text-blue-800'
-                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                  ? 'bg-blue-100 text-blue-800'
+                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                   }`}
               >
                 {skill}
@@ -154,52 +255,67 @@ const FindFreelancers: React.FC = () => {
             {freelancers.map(freelancer => (
               <div
                 key={freelancer.id}
-                className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => handleViewProfile(freelancer.id)}
+                className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
               >
                 <div className="p-6">
-                  <div className="flex items-center gap-4">
-                    <Avatar
-                      fullName={freelancer.fullName}
-                      imageUrl={freelancer.imageUrl}
-                      className="w-16 h-16"
-                      textSize="text-base"
-                    />
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">{freelancer.fullName}</h3>
-                      <p className="text-gray-600">{freelancer.title || t('freelancer')}</p>
+                  <div
+                    className="cursor-pointer"
+                    onClick={() => handleViewProfile(freelancer.id)}
+                  >
+                    <div className="flex items-center gap-4">
+                      <Avatar
+                        fullName={freelancer.fullName}
+                        imageUrl={freelancer.imageUrl}
+                        className="w-16 h-16"
+                        textSize="text-base"
+                      />
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">{freelancer.fullName}</h3>
+                        <p className="text-gray-600">{freelancer.title || t('freelancer')}</p>
+                      </div>
+                    </div>
+
+                    <div className="mt-4">
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <span>⭐ {freelancer.rating || 'N/A'}</span>
+                        <span>•</span>
+                        <span>{freelancer.completedJobs || 0} {t('jobsCompleted')}</span>
+                        <span>•</span>
+                        <span>{freelancer.location || t('remote')}</span>
+                      </div>
+                    </div>
+
+                    {/* Profile Visibility for all users */}
+                    <div className="mb-6">
+                      <p className="text-sm text-gray-700 line-clamp-3">
+                        {freelancer.bio}
+                      </p>
+                    </div>
+
+                    <div className="mt-4">
+                      <div className="flex flex-wrap gap-2">
+                        {freelancer.skills && freelancer.skills.map(skill => (
+                          <span
+                            key={skill}
+                            className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-sm"
+                          >
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="mt-4">
+                      <span className="text-lg font-semibold text-gray-900">
+                        ${freelancer.hourlyRate || 0}/{t('perHour')}
+                      </span>
                     </div>
                   </div>
 
-                  <div className="mt-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <span>⭐ {freelancer.rating || 'N/A'}</span>
-                      <span>•</span>
-                      <span>{freelancer.completedJobs || 0} {t('jobsCompleted')}</span>
-                      <span>•</span>
-                      <span>{freelancer.location || t('remote')}</span>
-                    </div>
-                  </div>
-
-                  <div className="mt-4">
-                    <div className="flex flex-wrap gap-2">
-                      {freelancer.skills && freelancer.skills.map(skill => (
-                        <span
-                          key={skill}
-                          className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-sm"
-                        >
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="mt-4 flex items-center justify-between">
-                    <span className="text-lg font-semibold text-gray-900">
-                      ${freelancer.hourlyRate || 0}/{t('perHour')}
-                    </span>
+                  {/* Action Buttons */}
+                  <div className="mt-4 flex gap-2">
                     <button
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleViewProfile(freelancer.id);
@@ -207,10 +323,116 @@ const FindFreelancers: React.FC = () => {
                     >
                       {t('viewProfile')}
                     </button>
+                    {user && user.id !== freelancer.id && (
+                      <button
+                        className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenAssignModal(freelancer);
+                        }}
+                      >
+                        Send A Request
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Notification Banner */}
+        {notification && (
+          <div
+            className={`fixed top-20 right-4 px-6 py-4 rounded-lg shadow-lg z-50 ${notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+              } text-white`}
+          >
+            {notification.message}
+          </div>
+        )}
+
+        {/* Assignment Modal */}
+        {isAssignModalOpen && selectedFreelancer && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" role="dialog">
+            <div className="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    Assign Task to {selectedFreelancer.fullName}
+                  </h2>
+                  <button
+                    onClick={() => {
+                      setIsAssignModalOpen(false);
+                      setSelectedFreelancer(null);
+                    }}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <XMarkIcon className="h-6 w-6" />
+                  </button>
+                </div>
+
+                <p className="text-gray-600 mb-6">
+                  Select one of your available tasks to assign to this freelancer:
+                </p>
+
+                {loadingTasks ? (
+                  <div className="text-center py-12">
+                    <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent" role="status">
+                      <span className="sr-only">Loading...</span>
+                    </div>
+                    <p className="mt-4 text-gray-600">Loading your tasks...</p>
+                  </div>
+                ) : clientTasks.length === 0 ? (
+                  <div className="text-center py-12">
+                    <p className="text-gray-600">You don't have any available tasks to assign.</p>
+                    <p className="text-sm text-gray-500 mt-2">Create a new task in the "My Tasks" section.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {clientTasks.map(task => (
+                      <div
+                        key={task.id}
+                        className="border border-gray-200 rounded-lg p-4 hover:border-blue-500 transition-colors"
+                      >
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-gray-900">{task.title}</h3>
+                            <p className="text-sm text-gray-600 mt-1 line-clamp-2">{task.description}</p>
+                            <div className="flex items-center gap-4 mt-2">
+                              <span className="text-sm font-medium text-gray-900">
+                                ${task.budget}
+                              </span>
+                              <div className="flex flex-wrap gap-1">
+                                {task.skills.slice(0, 3).map(skill => (
+                                  <span
+                                    key={skill}
+                                    className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs"
+                                  >
+                                    {skill}
+                                  </span>
+                                ))}
+                                {task.skills.length > 3 && (
+                                  <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs">
+                                    +{task.skills.length - 3} more
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handleAssignTask(task.id)}
+                            disabled={assigningTask}
+                            className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                          >
+                            {assigningTask ? 'Assigning...' : 'Assign'}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -218,4 +440,4 @@ const FindFreelancers: React.FC = () => {
   );
 };
 
-export default FindFreelancers; 
+export default FindFreelancers;

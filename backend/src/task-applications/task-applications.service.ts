@@ -1,18 +1,25 @@
 import { Injectable, NotFoundException, ForbiddenException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { ChatService } from '../chat/chat.service';
+
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class TaskApplicationsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private chatService: ChatService,
+    private notificationsService: NotificationsService,
+  ) { }
 
   async applyToTask(freelancerId: string, taskId: string, coverLetter?: string) {
-    // Verify user is a freelancer
+    // Verify user exists
     const user = await this.prisma.user.findUnique({
       where: { id: freelancerId },
     });
 
-    if (!user || user.userType !== 'freelancer') {
-      throw new ForbiddenException('Only freelancers can apply to tasks');
+    if (!user) {
+      throw new ForbiddenException('User not found');
     }
 
     // Verify task exists and is open
@@ -53,7 +60,18 @@ export class TaskApplicationsService {
       data.coverLetter = coverLetter;
     }
 
-    return this.prisma.taskApplication.create({ data });
+    const application = await this.prisma.taskApplication.create({ data });
+
+    // Notify the client
+    await this.notificationsService.createNotification(
+      task.clientId,
+      'APPLICATION_RECEIVED',
+      'New Application',
+      `You have received a new application for your task: ${task.title}`,
+      application.id,
+    );
+
+    return application;
   }
 
   async getTaskApplications(taskId: string, clientId: string) {
@@ -116,8 +134,8 @@ export class TaskApplicationsService {
   }
 
   async updateApplicationStatus(
-    applicationId: string, 
-    clientId: string, 
+    applicationId: string,
+    clientId: string,
     status: 'accepted' | 'rejected'
   ) {
     // Find the application
@@ -135,6 +153,22 @@ export class TaskApplicationsService {
       throw new ForbiddenException('You can only update applications for your own tasks');
     }
 
+    // Notify the freelancer
+    if (application) {
+      const title = status === 'accepted' ? 'Application Accepted' : 'Application Declined';
+      const message = status === 'accepted'
+        ? `Your application for "${application.task.title}" has been accepted!`
+        : `Your application for "${application.task.title}" has been declined.`;
+
+      await this.notificationsService.createNotification(
+        application.freelancerId,
+        status === 'accepted' ? 'APPLICATION_ACCEPTED' : 'APPLICATION_DECLINED',
+        title,
+        message,
+        application.id,
+      );
+    }
+
     // Update the application status
     return this.prisma.taskApplication.update({
       where: { id: applicationId },
@@ -143,7 +177,7 @@ export class TaskApplicationsService {
   }
 
   async assignFreelancerToTask(
-    applicationId: string, 
+    applicationId: string,
     clientId: string
   ) {
     // Find the application
@@ -163,7 +197,7 @@ export class TaskApplicationsService {
 
     // Update the application status to 'accepted' and the task status to 'in_progress'
     // Use a transaction to ensure both updates succeed or fail together
-    return this.prisma.$transaction(async (prisma) => {
+    const result = await this.prisma.$transaction(async (prisma) => {
       // Update the application status
       const updatedApplication = await prisma.taskApplication.update({
         where: { id: applicationId },
@@ -181,5 +215,26 @@ export class TaskApplicationsService {
         task: updatedTask
       };
     });
+
+    // Create initial chat message between client and freelancer
+    await this.chatService.createInitialChatMessage(
+      application.freelancerId,
+      clientId
+    );
+
+    // Notify the freelancer
+    await this.notificationsService.createNotification(
+      application.freelancerId,
+      'APPLICATION_ACCEPTED',
+      'Application Accepted',
+      `You have been assigned to the task: ${application.task.title}`,
+      application.id,
+    );
+
+    // Return result with freelancer ID for frontend navigation
+    return {
+      ...result,
+      freelancerId: application.freelancerId,
+    };
   }
 } 

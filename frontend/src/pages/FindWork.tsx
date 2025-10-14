@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { API_ENDPOINTS } from '../config/api';
-import CreateTaskForm from '../components/CreateTaskForm';
-import { Link } from 'react-router-dom';
+
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 interface Task {
@@ -12,6 +12,7 @@ interface Task {
   budget: number;
   skills: string[];
   status: string;
+  imageUrl?: string;
   createdAt: string;
   client: {
     id: string;
@@ -30,6 +31,7 @@ interface TaskApplication {
 const FindWork: React.FC = () => {
   const { t } = useTranslation();
   const { user, token } = useAuth();
+  const navigate = useNavigate();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -77,7 +79,7 @@ const FindWork: React.FC = () => {
   };
 
   const fetchMyApplications = async () => {
-    if (!user || user.userType !== 'freelancer') return;
+    if (!user) return;
 
     try {
       const response = await fetch(API_ENDPOINTS.taskApplications.getByFreelancer, {
@@ -97,15 +99,10 @@ const FindWork: React.FC = () => {
 
   useEffect(() => {
     fetchTasks();
-    if (user && user.userType === 'freelancer') {
+    if (user) {
       fetchMyApplications();
     }
   }, [searchQuery, selectedSkills, user?.id]);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    fetchTasks();
-  };
 
   const toggleSkillFilter = (skill: string) => {
     setSelectedSkills((prev) =>
@@ -177,164 +174,171 @@ const FindWork: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-            {t('findYourNextProject')}
-          </h2>
-          <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
-            {t('browseAvailableProjects')}
-          </p>
-
-          {/* Link to My Applications for freelancer users */}
-          {user?.userType === 'freelancer' && (
-            <div className="mt-4">
-              <Link
-                to="/my-applications"
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
-              >
-                {t('viewMyApplications')}
-              </Link>
-            </div>
-          )}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">{t('findYourNextProject')}</h1>
+          <p className="mt-2 text-gray-600">{t('browseAvailableProjects')}</p>
         </div>
 
-        {/* Task creation form for clients only */}
-        {user?.userType === 'client' && (
-          <CreateTaskForm onTaskCreated={fetchTasks} />
-        )}
-
-        {/* Success message */}
-        {successMessage && (
-          <div className="text-center py-4">
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-              <p>{successMessage}</p>
+        {/* Search and Filter Section */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <svg className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input
+                  type="text"
+                  placeholder={t('searchTasks') || 'Search tasks...'}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
             </div>
+            <div className="flex items-center gap-2">
+              <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+              <span className="text-gray-600">{t('filterBySkillsLabel')}</span>
+            </div>
+          </div>
+
+          {/* Skills Filter */}
+          <div className="mt-4 flex flex-wrap gap-2">
+            {availableSkills.map(skill => (
+              <button
+                key={skill}
+                onClick={() => toggleSkillFilter(skill)}
+                className={`px-3 py-1 rounded-full text-sm font-medium ${selectedSkills.includes(skill)
+                  ? 'bg-blue-100 text-blue-800'
+                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                  }`}
+              >
+                {skill}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Success Message */}
+        {successMessage && (
+          <div className="mb-6 px-6 py-4 rounded-lg shadow-lg bg-green-500 text-white">
+            {successMessage}
           </div>
         )}
 
-        {/* Search and filter */}
-        <div className="mt-8 mb-8">
-          <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search tasks..."
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              />
-            </div>
-            <button
-              type="submit"
-              className="inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Search
-            </button>
-          </form>
-
-          {availableSkills.length > 0 && (
-            <div className="mt-4">
-              <h3 className="text-sm font-medium text-gray-700 mb-2">Filter by skills:</h3>
-              <div className="flex flex-wrap gap-2">
-                {availableSkills.map((skill) => (
-                  <button
-                    key={skill}
-                    onClick={() => toggleSkillFilter(skill)}
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${selectedSkills.includes(skill)
-                      ? 'bg-indigo-100 text-indigo-800'
-                      : 'bg-gray-100 text-gray-800'
-                      }`}
-                  >
-                    {skill}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Show loading state */}
+        {/* Loading State */}
         {isLoading && (
           <div className="text-center py-12">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent" role="status">
+              <span className="sr-only">{t('loading')}</span>
+            </div>
             <p className="mt-4 text-gray-600">{t('loadingTasks')}</p>
           </div>
         )}
 
-        {/* Show error message if any */}
+        {/* Error State */}
         {error && !isLoading && (
-          <div className="text-center py-8">
+          <div className="text-center py-12">
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
               <p>{error}</p>
             </div>
           </div>
         )}
 
-        {/* No tasks state */}
+        {/* Empty State */}
         {!isLoading && !error && tasks.length === 0 && (
           <div className="text-center py-12">
             <p className="text-gray-600">{t('noTasksFound')}</p>
           </div>
         )}
 
-        {/* Task list */}
+        {/* Tasks Grid */}
         {!isLoading && !error && tasks.length > 0 && (
-          <div className="mt-8 grid gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {tasks.map((task) => (
-              <div
-                key={task.id}
-                className="bg-white shadow overflow-hidden rounded-md"
-              >
-                <div className="px-6 py-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">{task.title}</h3>
-                      <p className="mt-1 text-sm text-gray-600">{t('jobPosted')} {new Date(task.createdAt).toLocaleDateString()}</p>
-                    </div>
-                    <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+              <div key={task.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                {/* Task Image */}
+                {task.imageUrl && (
+                  <div className="w-full h-48 overflow-hidden">
+                    <img
+                      src={task.imageUrl}
+                      alt={task.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900 flex-1">{task.title}</h3>
+                    <span className="ml-2 text-lg font-semibold text-green-600">
                       ${task.budget}
-                    </div>
+                    </span>
                   </div>
-                  <div className="mt-3">
-                    <p className="text-gray-700">{task.description}</p>
-                  </div>
-                  <div className="mt-3">
+
+                  <p className="text-sm text-gray-600 mb-4 line-clamp-3">{task.description}</p>
+
+                  {/* Skills */}
+                  <div className="mb-4">
                     <div className="flex flex-wrap gap-2">
                       {task.skills.map((skill) => (
-                        <span key={skill} className="bg-gray-100 px-2 py-1 rounded-full text-xs text-gray-800">
+                        <span
+                          key={skill}
+                          className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-sm"
+                        >
                           {skill}
                         </span>
                       ))}
                     </div>
                   </div>
-                  <div className="mt-4 flex justify-between items-center">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <div className="h-8 w-8 rounded-full bg-gradient-to-r from-purple-400 to-indigo-500 flex items-center justify-center text-white font-medium">
+
+                  {/* Client Info */}
+                  <div
+                    className="flex items-center gap-3 mb-4 cursor-pointer hover:opacity-80"
+                    onClick={() => navigate(`/profile/${task.client.id}`)}
+                  >
+                    <div className="flex-shrink-0">
+                      {task.client.imageUrl ? (
+                        <img
+                          src={task.client.imageUrl}
+                          alt={task.client.fullName}
+                          className="h-10 w-10 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-400 to-indigo-500 flex items-center justify-center text-white font-medium">
                           {task.client.fullName.charAt(0)}
                         </div>
-                      </div>
-                      <div className="ml-3">
-                        <p className="text-sm font-medium text-gray-900">{task.client.fullName}</p>
-                      </div>
+                      )}
                     </div>
-                    {user?.userType === 'freelancer' && (
-                      <div>
-                        {hasApplied(task.id) ? (
-                          <span className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md bg-green-100 text-green-800">
-                            {t('applied')}
-                          </span>
-                        ) : (
-                          <button
-                            onClick={() => handleApply(task.id)}
-                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
-                          >
-                            {t('applyNow')}
-                          </button>
-                        )}
-                      </div>
-                    )}
+                    <div>
+                      <p className="text-sm font-medium text-gray-900 hover:text-blue-600">
+                        {task.client.fullName}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {t('jobPosted')} {new Date(task.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
                   </div>
+
+                  {/* Apply Button */}
+                  {user && task.client.id !== user.id && (
+                    <div className="mt-4">
+                      {hasApplied(task.id) ? (
+                        <div className="w-full px-4 py-2 bg-green-100 text-green-800 rounded-lg text-center font-medium">
+                          {t('applied')}
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => handleApply(task.id)}
+                          className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                        >
+                          {t('applyNow')}
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

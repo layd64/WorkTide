@@ -4,7 +4,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('tasks')
 export class TasksController {
-  constructor(private tasksService: TasksService) {}
+  constructor(private tasksService: TasksService) { }
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -15,6 +15,7 @@ export class TasksController {
       description: string;
       budget: number;
       skills: string[];
+      imageUrl: string;
     },
   ) {
     return this.tasksService.createTask(req.user.sub, data);
@@ -64,6 +65,7 @@ export class TasksController {
       budget?: number;
       skills?: string[];
       status?: string;
+      imageUrl?: string;
     },
   ) {
     return this.tasksService.updateTask(id, req.user.sub, data);

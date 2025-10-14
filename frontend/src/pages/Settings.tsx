@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { SunIcon, MoonIcon, XCircleIcon, PlusIcon, EyeIcon, CameraIcon } from '@heroicons/react/24/outline';
 import { useAccessibility } from '../contexts/AccessibilityContext';
 import Avatar from '../components/Avatar';
+import SkillSelector from '../components/SkillSelector';
 
 interface Education {
   institution: string;
@@ -47,7 +48,6 @@ const Settings: React.FC = () => {
   const [location, setLocation] = useState<string>('');
   const [hourlyRate, setHourlyRate] = useState<string>('');
   const [skills, setSkills] = useState<string[]>([]);
-  const [newSkill, setNewSkill] = useState<string>('');
   const [languages, setLanguages] = useState<string[]>([]);
   const [newLanguage, setNewLanguage] = useState<string>('');
   const [education, setEducation] = useState<Education[]>([]);
@@ -92,19 +92,6 @@ const Settings: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, [user, navigate]);
-
-  // Handle adding a new skill
-  const handleAddSkill = () => {
-    if (newSkill.trim() && !skills.includes(newSkill.trim())) {
-      setSkills([...skills, newSkill.trim()]);
-      setNewSkill('');
-    }
-  };
-
-  // Handle removing a skill
-  const handleRemoveSkill = (skillToRemove: string) => {
-    setSkills(skills.filter(skill => skill !== skillToRemove));
-  };
 
   // Handle adding a new language
   const handleAddLanguage = () => {
@@ -236,408 +223,33 @@ const Settings: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
             <form onSubmit={handleSubmit}>
               <div className="space-y-8">
-                {/* Profile Picture Section */}
+                {/* App Settings (Moved to top) */}
                 <div>
-                  <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('profilePicture') || 'Profile Picture'}</h2>
-                  <div className="flex flex-col sm:flex-row items-center gap-6">
-                    <div className="relative">
-                      <Avatar
-                        fullName={user?.fullName || 'User'}
-                        imageUrl={avatarPreview || user?.imageUrl}
-                        className="w-24 h-24 text-xl"
-                      />
-                      <label
-                        htmlFor="avatar-upload"
-                        className="absolute bottom-0 right-0 bg-blue-600 text-white p-1.5 rounded-full cursor-pointer hover:bg-blue-700 shadow-sm"
-                      >
-                        <CameraIcon className="w-4 h-4" />
-                        <input
-                          id="avatar-upload"
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={handleAvatarChange}
-                        />
-                      </label>
-                    </div>
-
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between max-w-md">
-                        <div className="flex flex-col">
-                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {t('showAvatarToOthers') || 'Show profile picture to others'}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {t('avatarVisibilityInfo') || 'If disabled, only you will see your profile picture.'}
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={handleToggleAvatarVisible}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${isAvatarVisible ? 'bg-blue-600' : 'bg-gray-200'
-                            }`}
-                          role="switch"
-                          aria-checked={isAvatarVisible}
-                        >
-                          <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isAvatarVisible ? 'translate-x-6' : 'translate-x-1'
-                              }`}
-                          />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Profile Section */}
-                <div>
-                  <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('profileInformation')}</h2>
-                  <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                    <div className="sm:col-span-4">
-                      <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {t('professionalTitle')}
-                      </label>
-                      <div className="mt-1">
-                        <input
-                          type="text"
-                          id="title"
-                          value={title}
-                          onChange={(e) => setTitle(e.target.value)}
-                          className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                          placeholder="UI/UX Designer"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="sm:col-span-6">
-                      <label htmlFor="bio" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {t('aboutMe')}
-                      </label>
-                      <div className="mt-1">
-                        <textarea
-                          id="bio"
-                          rows={4}
-                          value={bio}
-                          onChange={(e) => setBio(e.target.value)}
-                          className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                          placeholder="Tell potential clients about yourself..."
-                        />
-                      </div>
-                    </div>
-
-                    <div className="sm:col-span-3">
-                      <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {t('location')}
-                      </label>
-                      <div className="mt-1">
-                        <input
-                          type="text"
-                          id="location"
-                          value={location}
-                          onChange={(e) => setLocation(e.target.value)}
-                          className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                          placeholder="e.g. New York, USA"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="sm:col-span-3">
-                      <label htmlFor="hourlyRate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {t('hourlyRate')} (USD)
-                      </label>
-                      <div className="mt-1 relative rounded-md shadow-sm">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <span className="text-gray-500 sm:text-sm">$</span>
-                        </div>
-                        <input
-                          type="number"
-                          id="hourlyRate"
-                          value={hourlyRate}
-                          onChange={(e) => setHourlyRate(e.target.value)}
-                          className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-7 sm:text-sm border-gray-300 rounded-md"
-                          placeholder="0.00"
-                          min="0"
-                          step="0.01"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Skills Section */}
-                <div>
-                  <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('skills')}</h2>
-                  <div className="space-y-4">
-                    <div className="flex">
-                      <input
-                        type="text"
-                        value={newSkill}
-                        onChange={(e) => setNewSkill(e.target.value)}
-                        className="flex-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-l-md"
-                        placeholder="Add a skill (e.g. React, Figma)"
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            handleAddSkill();
-                          }
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onClick={handleAddSkill}
-                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                      >
-                        Add
-                      </button>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2">
-                      {skills.map((skill, index) => (
-                        <div key={index} className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
-                          <span className="text-sm">{skill}</span>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveSkill(skill)}
-                            className="ml-1 text-blue-600 hover:text-blue-800"
-                          >
-                            <XCircleIcon className="h-4 w-4" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Languages Section */}
-                <div>
-                  <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('languages')}</h2>
-                  <div className="space-y-4">
-                    <div className="flex">
-                      <input
-                        type="text"
-                        value={newLanguage}
-                        onChange={(e) => setNewLanguage(e.target.value)}
-                        className="flex-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-l-md"
-                        placeholder="Add a language (e.g. English (Native))"
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            handleAddLanguage();
-                          }
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onClick={handleAddLanguage}
-                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                      >
-                        Add
-                      </button>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2">
-                      {languages.map((lang, index) => (
-                        <div key={index} className="flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full">
-                          <span className="text-sm">{lang}</span>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveLanguage(lang)}
-                            className="ml-1 text-green-600 hover:text-green-800"
-                          >
-                            <XCircleIcon className="h-4 w-4" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Education Section */}
-                <div>
-                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-lg font-medium text-gray-900 dark:text-white">{t('education')}</h2>
-                    <button
-                      type="button"
-                      onClick={handleAddEducation}
-                      className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-blue-600 bg-blue-100 hover:bg-blue-200"
-                    >
-                      <PlusIcon className="h-4 w-4 mr-1" />
-                      {t('addEducation')}
-                    </button>
-                  </div>
-
-                  <div className="space-y-4">
-                    {education.map((edu, index) => (
-                      <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-md p-4">
-                        <div className="flex justify-between items-start mb-4">
-                          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {t('educationNumber')}{index + 1}
-                          </h3>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveEducation(index)}
-                            className="text-red-600 hover:text-red-800"
-                          >
-                            <XCircleIcon className="h-5 w-5" />
-                          </button>
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-6">
-                          <div className="sm:col-span-3">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                              {t('institution')}
-                            </label>
-                            <input
-                              type="text"
-                              value={edu.institution}
-                              onChange={(e) => handleEducationChange(index, 'institution', e.target.value)}
-                              className="mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                            />
-                          </div>
-
-                          <div className="sm:col-span-3">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                              {t('year')}
-                            </label>
-                            <input
-                              type="text"
-                              value={edu.year}
-                              onChange={(e) => handleEducationChange(index, 'year', e.target.value)}
-                              className="mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                            />
-                          </div>
-
-                          <div className="sm:col-span-6">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                              {t('degree')}
-                            </label>
-                            <input
-                              type="text"
-                              value={edu.degree}
-                              onChange={(e) => handleEducationChange(index, 'degree', e.target.value)}
-                              className="mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Experience Section */}
-                <div>
-                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-lg font-medium text-gray-900 dark:text-white">{t('workExperience')}</h2>
-                    <button
-                      type="button"
-                      onClick={handleAddExperience}
-                      className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-blue-600 bg-blue-100 hover:bg-blue-200"
-                    >
-                      <PlusIcon className="h-4 w-4 mr-1" />
-                      {t('addExperience')}
-                    </button>
-                  </div>
-
-                  <div className="space-y-4">
-                    {experience.map((exp, index) => (
-                      <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-md p-4">
-                        <div className="flex justify-between items-start mb-4">
-                          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {t('experienceNumber')}{index + 1}
-                          </h3>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveExperience(index)}
-                            className="text-red-600 hover:text-red-800"
-                          >
-                            <XCircleIcon className="h-5 w-5" />
-                          </button>
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-6">
-                          <div className="sm:col-span-3">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                              {t('company')}
-                            </label>
-                            <input
-                              type="text"
-                              value={exp.company}
-                              onChange={(e) => handleExperienceChange(index, 'company', e.target.value)}
-                              className="mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                            />
-                          </div>
-
-                          <div className="sm:col-span-3">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                              {t('period')}
-                            </label>
-                            <input
-                              type="text"
-                              value={exp.period}
-                              onChange={(e) => handleExperienceChange(index, 'period', e.target.value)}
-                              className="mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                              placeholder="2019-2022"
-                            />
-                          </div>
-
-                          <div className="sm:col-span-6">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                              {t('role')}
-                            </label>
-                            <input
-                              type="text"
-                              value={exp.role}
-                              onChange={(e) => handleExperienceChange(index, 'role', e.target.value)}
-                              className="mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                            />
-                          </div>
-
-                          <div className="sm:col-span-6">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                              {t('description')}
-                            </label>
-                            <textarea
-                              rows={3}
-                              value={exp.description}
-                              onChange={(e) => handleExperienceChange(index, 'description', e.target.value)}
-                              className="mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* App Settings */}
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
                   <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('appSettings')}</h2>
 
-                  {/* Freelancer Profile Visibility (only for freelancers) */}
-                  {user?.userType === 'freelancer' && (
-                    <div className="mb-6">
-                      <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">{t('profileVisibility') || 'Profile Visibility'}</h3>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <span className="text-gray-700 dark:text-gray-300">{t('makeProfileHidden') || 'Make my account hidden'}</span>
-                          <span className="text-xs text-gray-500">({t('hiddenProfileInfo') || 'Your profile will not appear on the Find Freelancers page'})</span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={handleToggleHidden}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${isHidden ? 'bg-blue-600' : 'bg-gray-200'
-                            }`}
-                          role="switch"
-                          aria-checked={isHidden}
-                        >
-                          <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isHidden ? 'translate-x-6' : 'translate-x-1'
-                              }`}
-                          />
-                        </button>
+                  {/* Profile Visibility - available to all users */}
+                  <div className="mb-6">
+                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">{t('profileVisibility') || 'Profile Visibility'}</h3>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-gray-700 dark:text-gray-300">{t('makeProfileHidden') || 'Make my account hidden'}</span>
+                        <span className="text-xs text-gray-500">({t('hiddenProfileInfo') || 'Your profile will not appear on the Find Freelancers page'})</span>
                       </div>
+                      <button
+                        type="button"
+                        onClick={handleToggleHidden}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${isHidden ? 'bg-blue-600' : 'bg-gray-200'
+                          }`}
+                        role="switch"
+                        aria-checked={isHidden}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isHidden ? 'translate-x-6' : 'translate-x-1'
+                            }`}
+                        />
+                      </button>
                     </div>
-                  )}
+                  </div>
 
                   {/* Accessibility Settings */}
                   <div className="mb-6 border-t border-gray-200 dark:border-gray-700 pt-6">
@@ -920,6 +532,348 @@ const Settings: React.FC = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Profile Picture Section */}
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                  <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('profilePicture') || 'Profile Picture'}</h2>
+                  <div className="flex flex-col sm:flex-row items-center gap-6">
+                    <div className="relative">
+                      <Avatar
+                        fullName={user?.fullName || 'User'}
+                        imageUrl={avatarPreview || user?.imageUrl}
+                        className="w-24 h-24 text-xl"
+                      />
+                      <label
+                        htmlFor="avatar-upload"
+                        className="absolute bottom-0 right-0 bg-blue-600 text-white p-1.5 rounded-full cursor-pointer hover:bg-blue-700 shadow-sm"
+                      >
+                        <CameraIcon className="w-4 h-4" />
+                        <input
+                          id="avatar-upload"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleAvatarChange}
+                        />
+                      </label>
+                    </div>
+
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between max-w-md">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {t('showAvatarToOthers') || 'Show profile picture to others'}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {t('avatarVisibilityInfo') || 'If disabled, only you will see your profile picture.'}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleToggleAvatarVisible}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${isAvatarVisible ? 'bg-blue-600' : 'bg-gray-200'
+                            }`}
+                          role="switch"
+                          aria-checked={isAvatarVisible}
+                        >
+                          <span
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isAvatarVisible ? 'translate-x-6' : 'translate-x-1'
+                              }`}
+                          />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Profile Section */}
+                <div>
+                  <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('profileInformation')}</h2>
+                  <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                    <div className="sm:col-span-4">
+                      <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {t('professionalTitle')}
+                      </label>
+                      <div className="mt-1">
+                        <input
+                          type="text"
+                          id="title"
+                          value={title}
+                          onChange={(e) => setTitle(e.target.value)}
+                          className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                          placeholder="UI/UX Designer"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-6">
+                      <label htmlFor="bio" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {t('aboutMe')}
+                      </label>
+                      <div className="mt-1">
+                        <textarea
+                          id="bio"
+                          rows={4}
+                          value={bio}
+                          onChange={(e) => setBio(e.target.value)}
+                          className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                          placeholder="Tell potential clients about yourself..."
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-3">
+                      <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {t('location')}
+                      </label>
+                      <div className="mt-1">
+                        <input
+                          type="text"
+                          id="location"
+                          value={location}
+                          onChange={(e) => setLocation(e.target.value)}
+                          className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                          placeholder="e.g. New York, USA"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sm:col-span-3">
+                      <label htmlFor="hourlyRate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {t('hourlyRate')} (USD)
+                      </label>
+                      <div className="mt-1 relative rounded-md shadow-sm">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <span className="text-gray-500 sm:text-sm">$</span>
+                        </div>
+                        <input
+                          type="number"
+                          id="hourlyRate"
+                          value={hourlyRate}
+                          onChange={(e) => setHourlyRate(e.target.value)}
+                          className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-7 sm:text-sm border-gray-300 rounded-md"
+                          placeholder="0.00"
+                          min="0"
+                          step="0.01"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Skills Section */}
+                <div>
+                  <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('skills')}</h2>
+                  <div className="space-y-4">
+                    <SkillSelector
+                      selectedSkills={skills}
+                      onChange={setSkills}
+                    />
+                  </div>
+                </div>
+
+                {/* Languages Section */}
+                <div>
+                  <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('languages')}</h2>
+                  <div className="space-y-4">
+                    <div className="flex">
+                      <input
+                        type="text"
+                        value={newLanguage}
+                        onChange={(e) => setNewLanguage(e.target.value)}
+                        className="flex-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-l-md"
+                        placeholder="Add a language (e.g. English (Native))"
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleAddLanguage();
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddLanguage}
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      >
+                        Add
+                      </button>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      {languages.map((lang, index) => (
+                        <div key={index} className="flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full">
+                          <span className="text-sm">{lang}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveLanguage(lang)}
+                            className="ml-1 text-green-600 hover:text-green-800"
+                          >
+                            <XCircleIcon className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Education Section */}
+                <div>
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg font-medium text-gray-900 dark:text-white">{t('education')}</h2>
+                    <button
+                      type="button"
+                      onClick={handleAddEducation}
+                      className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-blue-600 bg-blue-100 hover:bg-blue-200"
+                    >
+                      <PlusIcon className="h-4 w-4 mr-1" />
+                      {t('addEducation')}
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {education.map((edu, index) => (
+                      <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-md p-4">
+                        <div className="flex justify-between items-start mb-4">
+                          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {t('educationNumber')}{index + 1}
+                          </h3>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveEducation(index)}
+                            className="text-red-600 hover:text-red-800"
+                          >
+                            <XCircleIcon className="h-5 w-5" />
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-6">
+                          <div className="sm:col-span-3">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                              {t('institution')}
+                            </label>
+                            <input
+                              type="text"
+                              value={edu.institution}
+                              onChange={(e) => handleEducationChange(index, 'institution', e.target.value)}
+                              className="mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-3">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                              {t('year')}
+                            </label>
+                            <input
+                              type="text"
+                              value={edu.year}
+                              onChange={(e) => handleEducationChange(index, 'year', e.target.value)}
+                              className="mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-6">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                              {t('degree')}
+                            </label>
+                            <input
+                              type="text"
+                              value={edu.degree}
+                              onChange={(e) => handleEducationChange(index, 'degree', e.target.value)}
+                              className="mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Experience Section */}
+                <div>
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg font-medium text-gray-900 dark:text-white">{t('workExperience')}</h2>
+                    <button
+                      type="button"
+                      onClick={handleAddExperience}
+                      className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-blue-600 bg-blue-100 hover:bg-blue-200"
+                    >
+                      <PlusIcon className="h-4 w-4 mr-1" />
+                      {t('addExperience')}
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {experience.map((exp, index) => (
+                      <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-md p-4">
+                        <div className="flex justify-between items-start mb-4">
+                          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {t('experienceNumber')}{index + 1}
+                          </h3>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveExperience(index)}
+                            className="text-red-600 hover:text-red-800"
+                          >
+                            <XCircleIcon className="h-5 w-5" />
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-6">
+                          <div className="sm:col-span-3">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                              {t('company')}
+                            </label>
+                            <input
+                              type="text"
+                              value={exp.company}
+                              onChange={(e) => handleExperienceChange(index, 'company', e.target.value)}
+                              className="mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-3">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                              {t('period')}
+                            </label>
+                            <input
+                              type="text"
+                              value={exp.period}
+                              onChange={(e) => handleExperienceChange(index, 'period', e.target.value)}
+                              className="mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                              placeholder="2019-2022"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-6">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                              {t('role')}
+                            </label>
+                            <input
+                              type="text"
+                              value={exp.role}
+                              onChange={(e) => handleExperienceChange(index, 'role', e.target.value)}
+                              className="mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                            />
+                          </div>
+
+                          <div className="sm:col-span-6">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                              {t('description')}
+                            </label>
+                            <textarea
+                              rows={3}
+                              value={exp.description}
+                              onChange={(e) => handleExperienceChange(index, 'description', e.target.value)}
+                              className="mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+
               </div>
 
               <div className="mt-8 flex justify-end">

@@ -55,7 +55,14 @@ let AuthController = class AuthController {
                 isAvatarVisible: true,
             },
         });
-        return user;
+        if (!user) {
+            return null;
+        }
+        const userWithSkills = {
+            ...user,
+            skills: user.skills.map(s => s.name),
+        };
+        return userWithSkills;
     }
 };
 exports.AuthController = AuthController;

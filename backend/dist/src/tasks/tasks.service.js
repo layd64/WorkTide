@@ -24,8 +24,11 @@ let TasksService = class TasksService {
         const user = await this.prisma.user.findUnique({
             where: { id: userId },
         });
-        if (!user || user.userType !== 'client') {
-            throw new common_1.ForbiddenException('Only clients can create tasks');
+        if (!user) {
+            throw new common_1.ForbiddenException('User not found');
+        }
+        if (!data.imageUrl) {
+            throw new common_1.BadRequestException('Task image is required');
         }
         const task = await this.prisma.task.create({
             data: {
@@ -33,7 +36,7 @@ let TasksService = class TasksService {
                 clientId: userId,
             },
         });
-        await this.loggingService.logAction(userId, 'TASK_CREATE', task.id, `Task created: ${task.title}`);
+        await this.loggingService.logAction(userId, 'TASK_CREATE', task.id, `Task created: ${task.title} `);
         return task;
     }
     async getAllTasks(filters) {
@@ -79,6 +82,21 @@ let TasksService = class TasksService {
                         rating: true,
                     },
                 },
+                taskRequests: {
+                    where: {
+                        status: 'pending',
+                    },
+                    include: {
+                        freelancer: {
+                            select: {
+                                id: true,
+                                fullName: true,
+                                imageUrl: true,
+                                title: true,
+                            },
+                        },
+                    },
+                },
             },
         });
         if (!task) {
@@ -111,7 +129,7 @@ let TasksService = class TasksService {
             data,
         });
         if (data.status) {
-            await this.loggingService.logAction(updatedTask.clientId, 'TASK_STATUS_UPDATE', updatedTask.id, `Task status updated to ${data.status}: ${updatedTask.title}`);
+            await this.loggingService.logAction(updatedTask.clientId, 'TASK_STATUS_UPDATE', updatedTask.id, `Task status updated to ${data.status}: ${updatedTask.title} `);
         }
         return updatedTask;
     }
@@ -125,9 +143,17 @@ let TasksService = class TasksService {
         if (task.clientId !== userId) {
             throw new common_1.ForbiddenException('You can only delete your own tasks');
         }
-        return this.prisma.task.delete({
+        if (task.status !== 'open') {
+            throw new common_1.ForbiddenException('Only tasks with "open" status can be deleted');
+        }
+        await this.prisma.taskApplication.deleteMany({
+            where: { taskId },
+        });
+        const deletedTask = await this.prisma.task.delete({
             where: { id: taskId },
         });
+        await this.loggingService.logAction(userId, 'TASK_DELETE', taskId, `Task deleted: ${task.title} `);
+        return deletedTask;
     }
 };
 exports.TasksService = TasksService;

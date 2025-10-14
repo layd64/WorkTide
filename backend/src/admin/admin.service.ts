@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class AdminService {
-    constructor(private prisma: PrismaService) { }
+    constructor(
+        private prisma: PrismaService,
+        private notificationsService: NotificationsService, // Inject NotificationsService
+    ) { }
 
     async getAllUsers() {
         const users = await this.prisma.user.findMany({
@@ -48,6 +52,64 @@ export class AdminService {
 
         await this.logAction(adminId, 'UNBAN_USER', userId, `Unbanned user ${user.email}`);
         return user;
+    }
+
+    async sendCustomNotification(adminId: string, userId: string, title: string, message: string) {
+        const user = await this.prisma.user.findUnique({ where: { id: userId } });
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        await this.notificationsService.createNotification(
+            userId,
+            'SYSTEM_NOTIFICATION',
+            title,
+            message,
+        );
+
+        await this.logAction(adminId, 'SEND_NOTIFICATION', userId, `Sent notification to ${user.email}: ${title}`);
+        return { success: true };
+    }
+
+    async getAllTasks() {
+        return this.prisma.task.findMany({
+            include: {
+                client: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true,
+                    },
+                },
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+        });
+    }
+
+    async deleteTask(taskId: string, adminId: string) {
+        const task = await this.prisma.task.findUnique({ where: { id: taskId } });
+        if (!task) {
+            throw new Error('Task not found');
+        }
+
+        // Delete all related TaskApplications first
+        await this.prisma.taskApplication.deleteMany({
+            where: { taskId },
+        });
+
+        // Delete all related TaskRequests
+        await this.prisma.taskRequest.deleteMany({
+            where: { taskId },
+        });
+
+        const deletedTask = await this.prisma.task.delete({
+            where: { id: taskId },
+        });
+
+        await this.logAction(adminId, 'DELETE_TASK', taskId, `Deleted task: ${task.title}`);
+        return deletedTask;
     }
 
     async getAnalytics() {

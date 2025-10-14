@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, UseGuards, Request, Body } from '@nestjs/common';
+import { Controller, Get, Post, Param, UseGuards, Request, Body, Delete } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -34,6 +34,21 @@ export class AdminController {
     @Get('logs')
     async getLogs() {
         return this.adminService.getLogs();
+    }
+
+    @Post('notifications')
+    async sendNotification(@Body() body: { userId: string; title: string; message: string }, @Request() req) {
+        return this.adminService.sendCustomNotification(req.user.sub, body.userId, body.title, body.message);
+    }
+
+    @Get('tasks')
+    async getAllTasks() {
+        return this.adminService.getAllTasks();
+    }
+
+    @Delete('tasks/:id')
+    async deleteTask(@Param('id') id: string, @Request() req) {
+        return this.adminService.deleteTask(id, req.user.sub);
     }
 }
 

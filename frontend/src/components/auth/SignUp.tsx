@@ -41,7 +41,16 @@ const SignUp: React.FC = () => {
                 // If the API returns a token on signup, log the user in
                 if (data.token) {
                     login(data.token);
-                    navigate('/');
+
+                    // Determine welcome message based on user type
+                    let welcomeMessage = '';
+                    if (formData.userType === 'freelancer') {
+                        welcomeMessage = 'Please fill your profile information in settings to get more clients to find you!';
+                    } else {
+                        welcomeMessage = 'Lets get started: Create your first task!';
+                    }
+
+                    navigate('/', { state: { welcomeMessage } });
                 } else {
                     // Otherwise redirect to login
                     navigate('/login');
@@ -58,14 +67,12 @@ const SignUp: React.FC = () => {
     return (
         <div className="min-h-screen flex">
             {/* Left Half - Image */}
-            <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-600 relative overflow-hidden">
-                <div className="absolute inset-0 flex items-center justify-center p-12">
-                    <img
-                        src="/src/assets/auth-hero.png"
-                        alt="WorkTide Platform"
-                        className="w-full h-full object-cover rounded-2xl shadow-2xl"
-                    />
-                </div>
+            <div className="hidden lg:flex lg:w-1/2 relative">
+                <img
+                    src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80"
+                    alt="WorkTide Platform"
+                    className="absolute inset-0 w-full h-full object-cover"
+                />
                 {/* Overlay with branding */}
                 <div className="absolute bottom-0 left-0 right-0 p-12 bg-gradient-to-t from-black/60 to-transparent">
                     <h1 className="text-4xl font-bold text-white mb-4">Join WorkTide</h1>
@@ -162,7 +169,7 @@ const SignUp: React.FC = () => {
 
                             <div>
                                 <label htmlFor="userType" className="block text-sm font-medium text-gray-700">
-                                    I am a
+                                    My primary role is
                                 </label>
                                 <div className="mt-1 relative rounded-md shadow-sm">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -179,6 +186,9 @@ const SignUp: React.FC = () => {
                                         <option value="client">Client (I want to hire)</option>
                                     </select>
                                 </div>
+                                <p className="mt-2 text-xs text-gray-500">
+                                    You can still create tasks and apply for work regardless of your choice
+                                </p>
                             </div>
 
                             <div>

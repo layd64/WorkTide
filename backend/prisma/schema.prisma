@@ -19,13 +19,14 @@ model User {
   email        String   @unique
   password     String
   fullName     String
-  userType     String   // 'freelancer' or 'client'
+  userType     String   // 'freelancer' or 'client' - represents user preference, not restriction
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   // Profile fields
   title        String?
   bio          String?
-  skills       String[] @default([])
+  legacySkills String[] @default([]) @map("skills") // Renamed from skills to legacySkills, keeping DB column name "skills"
+  skills       Skill[]  // New relation
   hourlyRate   Float?
   rating       Float?
   completedJobs Int?
@@ -46,6 +47,15 @@ model User {
   receivedMessages Message[] @relation("ReceivedMessages")
   actionLogs   ActionLog[] // Logs of actions performed by this user
   isBanned     Boolean  @default(false)
+  freelancerRequests TaskRequest[] @relation("FreelancerRequests") // Task requests received by freelancer
+  clientRequests     TaskRequest[] @relation("ClientRequests") // Task requests sent by client
+  notifications      Notification[] // Notifications received by user
+}
+
+model Skill {
+  id    String @id @default(uuid())
+  name  String @unique
+  users User[]
 }
 
 model Project {
@@ -64,7 +74,8 @@ model Task {
   description String
   budget      Float
   skills      String[] @default([])
-  status      String   @default("open") // 'open', 'in_progress', 'completed'
+  status      String   @default("open") // 'open', 'in_progress', 'completed', 'pending'
+  imageUrl    String?  // Thumbnail image for the task
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
@@ -72,6 +83,7 @@ model Task {
   clientId    String
   client      User     @relation(fields: [clientId], references: [id])
   applications TaskApplication[] // Applications received for this task
+  taskRequests TaskRequest[] // Direct assignment requests for this task
 }
 
 model Rating {
@@ -107,11 +119,30 @@ model TaskApplication {
   @@unique([taskId, freelancerId])
 }
 
+model TaskRequest {
+  id           String   @id @default(uuid())
+  status       String   @default("pending") // 'pending', 'accepted', 'rejected'
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relations
+  taskId       String
+  task         Task     @relation(fields: [taskId], references: [id])
+  freelancerId String
+  freelancer   User     @relation("FreelancerRequests", fields: [freelancerId], references: [id])
+  clientId     String
+  client       User     @relation("ClientRequests", fields: [clientId], references: [id])
+  
+  // Only one pending request per task at a time
+  @@unique([taskId])
+}
+
 model Message {
   id        String   @id @default(uuid())
   content   String
   senderId  String
   receiverId String
+  isSystem  Boolean  @default(false) // True for system messages (e.g. initial chat message)
   createdAt DateTime @default(now())
   
   sender    User     @relation("SentMessages", fields: [senderId], references: [id])
@@ -128,4 +159,16 @@ model ActionLog {
   createdAt DateTime @default(now())
 
   user      User     @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String   // Recipient
+  user      User     @relation(fields: [userId], references: [id])
+  type      String   // 'APPLICATION_RECEIVED', 'APPLICATION_ACCEPTED', 'APPLICATION_DECLINED', 'REQUEST_RECEIVED'
+  title     String
+  message   String
+  relatedId String?  // ID of related entity (task, application, etc.)
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
 }

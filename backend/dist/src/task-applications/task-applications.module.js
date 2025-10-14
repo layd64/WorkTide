@@ -11,15 +11,16 @@ const common_1 = require("@nestjs/common");
 const task_applications_service_1 = require("./task-applications.service");
 const task_applications_controller_1 = require("./task-applications.controller");
 const prisma_module_1 = require("../prisma/prisma.module");
+const notifications_module_1 = require("../notifications/notifications.module");
+const chat_module_1 = require("../chat/chat.module");
 let TaskApplicationsModule = class TaskApplicationsModule {
 };
 exports.TaskApplicationsModule = TaskApplicationsModule;
 exports.TaskApplicationsModule = TaskApplicationsModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule],
+        imports: [prisma_module_1.PrismaModule, notifications_module_1.NotificationsModule, chat_module_1.ChatModule],
         controllers: [task_applications_controller_1.TaskApplicationsController],
         providers: [task_applications_service_1.TaskApplicationsService],
-        exports: [task_applications_service_1.TaskApplicationsService],
     })
 ], TaskApplicationsModule);
 //# sourceMappingURL=task-applications.module.js.map

@@ -19,7 +19,7 @@ export declare class AuthController {
             updatedAt: Date;
             title: string | null;
             bio: string | null;
-            skills: string[];
+            legacySkills: string[];
             hourlyRate: number | null;
             rating: number | null;
             completedJobs: number | null;
@@ -43,6 +43,7 @@ export declare class AuthController {
         user: any;
     }>;
     getProfile(req: any): Promise<{
+        skills: any[];
         id: string;
         email: string;
         fullName: string;
@@ -50,7 +51,6 @@ export declare class AuthController {
         createdAt: Date;
         title: string | null;
         bio: string | null;
-        skills: string[];
         hourlyRate: number | null;
         rating: number | null;
         completedJobs: number | null;

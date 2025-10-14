@@ -184,9 +184,13 @@ const AllReviewsComponent: React.FC<AllReviewsProps> = ({
                         imageUrl={rating.client.imageUrl}
                         className="h-12 w-12 mr-4"
                         textSize="text-sm"
+                        onClick={() => navigate(`/profile/${rating.client.id}`)}
                       />
                       <div className="flex-1">
-                        <p className="font-medium text-gray-900">{rating.client.fullName}</p>
+                        <p
+                          className="font-medium text-gray-900 cursor-pointer hover:text-blue-600"
+                          onClick={() => navigate(`/profile/${rating.client.id}`)}
+                        >{rating.client.fullName}</p>
                         <div className="flex items-center mt-1">
                           {[...Array(5)].map((_, index) => (
                             <StarIconSolid

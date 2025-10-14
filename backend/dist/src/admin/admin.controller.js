@@ -39,6 +39,15 @@ let AdminController = class AdminController {
     async getLogs() {
         return this.adminService.getLogs();
     }
+    async sendNotification(body, req) {
+        return this.adminService.sendCustomNotification(req.user.sub, body.userId, body.title, body.message);
+    }
+    async getAllTasks() {
+        return this.adminService.getAllTasks();
+    }
+    async deleteTask(id, req) {
+        return this.adminService.deleteTask(id, req.user.sub);
+    }
 };
 exports.AdminController = AdminController;
 __decorate([
@@ -75,6 +84,28 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "getLogs", null);
+__decorate([
+    (0, common_1.Post)('notifications'),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "sendNotification", null);
+__decorate([
+    (0, common_1.Get)('tasks'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "getAllTasks", null);
+__decorate([
+    (0, common_1.Delete)('tasks/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "deleteTask", null);
 exports.AdminController = AdminController = __decorate([
     (0, common_1.Controller)('admin'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),

@@ -13,7 +13,7 @@ export default {
     'email': 'Email',
     'password': 'Password',
     'fullName': 'Full Name',
-    'accountType': 'Account Type',
+    'accountPreference': 'Account Preference',
     'memberSince': 'Member Since',
     'loading': 'Loading...',
     'error': 'An error occurred',
@@ -24,6 +24,7 @@ export default {
     'findFreelancers': 'Find Freelancers',
     'myTasks': 'My Tasks',
     'myApplications': 'My Applications',
+    'requests': 'Requests',
 
     // Settings page
     'appearance': 'Appearance',
@@ -44,7 +45,7 @@ export default {
     'languages': 'Languages',
     'education': 'Education',
     'workExperience': 'Work Experience',
-    'appSettings': 'App Settings',
+    'appSettings': 'Platform Primary Settings',
     'editProfile': 'Edit Profile',
     'contact': 'Contact',
     'noBioProvided': 'No bio provided yet',
@@ -67,7 +68,7 @@ export default {
     'saveChanges': 'Save Changes',
     'saving': 'Saving...',
     'profileVisibility': 'Profile Visibility',
-    'makeProfileHidden': 'Make my account hidden',
+    'makeProfileHidden': 'Client mode: Hide my profile from the freelancers list',
     'hiddenProfileInfo': 'Your profile will not appear on the Find Freelancers page',
 
     // Homepage

@@ -24,8 +24,10 @@ export class UploadController {
         }),
     }))
     uploadFile(@UploadedFile() file: Express.Multer.File) {
+        const baseUrl = process.env.API_URL || 'http://localhost:3000';
+        const fullUrl = `${baseUrl}/uploads/${file.filename}`;
         return {
-            url: `/uploads/${file.filename}`,
+            url: fullUrl,
             name: file.originalname,
             type: file.mimetype,
         };

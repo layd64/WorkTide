@@ -16,6 +16,7 @@ const tasks_module_1 = require("./tasks/tasks.module");
 const profile_module_1 = require("./profile/profile.module");
 const ratings_module_1 = require("./ratings/ratings.module");
 const task_applications_module_1 = require("./task-applications/task-applications.module");
+const task_requests_module_1 = require("./task-requests/task-requests.module");
 const chat_module_1 = require("./chat/chat.module");
 const users_module_1 = require("./users/users.module");
 const upload_module_1 = require("./upload/upload.module");
@@ -23,6 +24,8 @@ const serve_static_1 = require("@nestjs/serve-static");
 const path_1 = require("path");
 const admin_module_1 = require("./admin/admin.module");
 const logging_module_1 = require("./logging/logging.module");
+const skills_module_1 = require("./skills/skills.module");
+const notifications_module_1 = require("./notifications/notifications.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -37,13 +40,16 @@ exports.AppModule = AppModule = __decorate([
             profile_module_1.ProfileModule,
             ratings_module_1.RatingsModule,
             task_applications_module_1.TaskApplicationsModule,
+            task_requests_module_1.TaskRequestsModule,
             upload_module_1.UploadModule,
             admin_module_1.AdminModule,
             logging_module_1.LoggingModule,
+            skills_module_1.SkillsModule,
             serve_static_1.ServeStaticModule.forRoot({
                 rootPath: (0, path_1.join)(process.cwd(), 'uploads'),
                 serveRoot: '/uploads',
             }),
+            notifications_module_1.NotificationsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

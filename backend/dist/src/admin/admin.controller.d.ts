@@ -20,7 +20,7 @@ export declare class AdminController {
         updatedAt: Date;
         title: string | null;
         bio: string | null;
-        skills: string[];
+        legacySkills: string[];
         hourlyRate: number | null;
         rating: number | null;
         completedJobs: number | null;
@@ -43,7 +43,7 @@ export declare class AdminController {
         updatedAt: Date;
         title: string | null;
         bio: string | null;
-        skills: string[];
+        legacySkills: string[];
         hourlyRate: number | null;
         rating: number | null;
         completedJobs: number | null;
@@ -87,4 +87,41 @@ export declare class AdminController {
         targetId: string | null;
         details: string | null;
     })[]>;
+    sendNotification(body: {
+        userId: string;
+        title: string;
+        message: string;
+    }, req: any): Promise<{
+        success: boolean;
+    }>;
+    getAllTasks(): Promise<({
+        client: {
+            id: string;
+            email: string;
+            fullName: string;
+        };
+    } & {
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        title: string;
+        imageUrl: string | null;
+        skills: string[];
+        description: string;
+        budget: number;
+        status: string;
+        clientId: string;
+    })[]>;
+    deleteTask(id: string, req: any): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        title: string;
+        imageUrl: string | null;
+        skills: string[];
+        description: string;
+        budget: number;
+        status: string;
+        clientId: string;
+    }>;
 }

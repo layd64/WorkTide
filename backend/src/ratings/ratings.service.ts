@@ -10,7 +10,7 @@ interface CreateRatingParams {
 
 @Injectable()
 export class RatingsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async createRating(params: CreateRatingParams) {
     const { clientId, freelancerId, score, comment } = params;
@@ -20,35 +20,27 @@ export class RatingsService {
       throw new BadRequestException('Rating score must be between 1 and 5');
     }
 
-    // Check if freelancer exists and is actually a freelancer
+    // Check if the person being rated exists
     const freelancer = await this.prisma.user.findUnique({
       where: { id: freelancerId },
     });
 
     if (!freelancer) {
-      throw new BadRequestException('Freelancer not found');
+      throw new BadRequestException('User not found');
     }
 
-    if (freelancer.userType !== 'freelancer') {
-      throw new BadRequestException('Cannot rate a non-freelancer user');
-    }
-
-    // Check if client exists and is actually a client
+    // Check if the person giving the rating exists
     const client = await this.prisma.user.findUnique({
       where: { id: clientId },
     });
 
     if (!client) {
-      throw new BadRequestException('Client not found');
-    }
-
-    if (client.userType !== 'client') {
-      throw new ForbiddenException('Only clients can rate freelancers');
+      throw new BadRequestException('User not found');
     }
 
     // Check if rating already exists
     const existingRating = await this.prisma.rating.findUnique({
-      where: { 
+      where: {
         clientId_freelancerId: {
           clientId,
           freelancerId,
@@ -95,7 +87,7 @@ export class RatingsService {
 
   async checkRatingExists(clientId: string, freelancerId: string) {
     const rating = await this.prisma.rating.findUnique({
-      where: { 
+      where: {
         clientId_freelancerId: {
           clientId,
           freelancerId,
@@ -120,7 +112,7 @@ export class RatingsService {
     // Update freelancer's rating
     await this.prisma.user.update({
       where: { id: freelancerId },
-      data: { 
+      data: {
         rating: avgRating,
         completedJobs: ratingCount, // Assuming each rating corresponds to a completed job
       },

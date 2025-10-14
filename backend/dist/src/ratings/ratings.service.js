@@ -26,19 +26,13 @@ let RatingsService = class RatingsService {
             where: { id: freelancerId },
         });
         if (!freelancer) {
-            throw new common_1.BadRequestException('Freelancer not found');
-        }
-        if (freelancer.userType !== 'freelancer') {
-            throw new common_1.BadRequestException('Cannot rate a non-freelancer user');
+            throw new common_1.BadRequestException('User not found');
         }
         const client = await this.prisma.user.findUnique({
             where: { id: clientId },
         });
         if (!client) {
-            throw new common_1.BadRequestException('Client not found');
-        }
-        if (client.userType !== 'client') {
-            throw new common_1.ForbiddenException('Only clients can rate freelancers');
+            throw new common_1.BadRequestException('User not found');
         }
         const existingRating = await this.prisma.rating.findUnique({
             where: {

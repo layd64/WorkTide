@@ -1,92 +1,102 @@
 import { PrismaService } from '../prisma/prisma.service';
+import { ChatService } from '../chat/chat.service';
+import { NotificationsService } from '../notifications/notifications.service';
 export declare class TaskApplicationsService {
     private prisma;
-    constructor(prisma: PrismaService);
+    private chatService;
+    private notificationsService;
+    constructor(prisma: PrismaService, chatService: ChatService, notificationsService: NotificationsService);
     applyToTask(freelancerId: string, taskId: string, coverLetter?: string): Promise<{
         id: string;
         createdAt: Date;
-        updatedAt: Date;
         status: string;
+        updatedAt: Date;
+        taskId: string;
         freelancerId: string;
         coverLetter: string | null;
-        taskId: string;
     }>;
     getTaskApplications(taskId: string, clientId: string): Promise<({
         freelancer: {
             id: string;
-            fullName: string;
             title: string | null;
-            skills: string[];
+            skills: {
+                id: string;
+                name: string;
+            }[];
+            imageUrl: string | null;
+            fullName: string;
             hourlyRate: number | null;
             rating: number | null;
             location: string | null;
-            imageUrl: string | null;
         };
     } & {
         id: string;
         createdAt: Date;
-        updatedAt: Date;
         status: string;
+        updatedAt: Date;
+        taskId: string;
         freelancerId: string;
         coverLetter: string | null;
-        taskId: string;
     })[]>;
     getFreelancerApplications(freelancerId: string): Promise<({
         task: {
             client: {
                 id: string;
-                fullName: string;
                 imageUrl: string | null;
+                fullName: string;
             };
         } & {
             id: string;
-            createdAt: Date;
-            updatedAt: Date;
             title: string;
-            skills: string[];
+            createdAt: Date;
+            status: string;
+            updatedAt: Date;
+            clientId: string;
             description: string;
             budget: number;
-            status: string;
-            clientId: string;
+            skills: string[];
+            imageUrl: string | null;
         };
     } & {
         id: string;
         createdAt: Date;
-        updatedAt: Date;
         status: string;
+        updatedAt: Date;
+        taskId: string;
         freelancerId: string;
         coverLetter: string | null;
-        taskId: string;
     })[]>;
     updateApplicationStatus(applicationId: string, clientId: string, status: 'accepted' | 'rejected'): Promise<{
         id: string;
         createdAt: Date;
-        updatedAt: Date;
         status: string;
+        updatedAt: Date;
+        taskId: string;
         freelancerId: string;
         coverLetter: string | null;
-        taskId: string;
     }>;
     assignFreelancerToTask(applicationId: string, clientId: string): Promise<{
+        freelancerId: string;
         application: {
             id: string;
             createdAt: Date;
-            updatedAt: Date;
             status: string;
+            updatedAt: Date;
+            taskId: string;
             freelancerId: string;
             coverLetter: string | null;
-            taskId: string;
         };
         task: {
             id: string;
-            createdAt: Date;
-            updatedAt: Date;
             title: string;
-            skills: string[];
+            createdAt: Date;
+            status: string;
+            updatedAt: Date;
+            clientId: string;
             description: string;
             budget: number;
-            status: string;
-            clientId: string;
+            skills: string[];
+            imageUrl: string | null;
         };
     }>;
 }

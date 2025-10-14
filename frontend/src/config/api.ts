@@ -65,11 +65,22 @@ export const API_ENDPOINTS = {
     updateStatus: (applicationId: string) => `${API_BASE_URL}/task-applications/${applicationId}/status`,
     assignFreelancer: (applicationId: string) => `${API_BASE_URL}/task-applications/${applicationId}/assign`,
   },
+  taskRequests: {
+    create: `${API_BASE_URL}/task-requests`,
+    getForFreelancer: (freelancerId: string) => `${API_BASE_URL}/task-requests/freelancer/${freelancerId}`,
+    accept: (requestId: string) => `${API_BASE_URL}/task-requests/${requestId}/accept`,
+    reject: (requestId: string) => `${API_BASE_URL}/task-requests/${requestId}/reject`,
+    cancel: (requestId: string) => `${API_BASE_URL}/task-requests/${requestId}/cancel`,
+  },
   admin: {
     users: `${API_BASE_URL}/admin/users`,
     banUser: (id: string) => `${API_BASE_URL}/admin/users/${id}/ban`,
     unbanUser: (id: string) => `${API_BASE_URL}/admin/users/${id}/unban`,
     analytics: `${API_BASE_URL}/admin/analytics`,
     logs: `${API_BASE_URL}/admin/logs`,
-  }
+    sendNotification: `${API_BASE_URL}/admin/notifications`,
+    getTasks: `${API_BASE_URL}/admin/tasks`,
+    deleteTask: (id: string) => `${API_BASE_URL}/admin/tasks/${id}`,
+  },
+  upload: `${API_BASE_URL}/upload`,
 };

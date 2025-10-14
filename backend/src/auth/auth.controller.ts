@@ -59,6 +59,17 @@ export class AuthController {
       },
     });
 
-    return user;
+    if (!user) {
+      return null;
+    }
+
+    // Map skills relation to string array for frontend compatibility
+    // We need to cast to any because the type inference from select doesn't automatically pick up the relation structure perfectly here
+    const userWithSkills = {
+      ...user,
+      skills: (user.skills as any[]).map(s => s.name),
+    };
+
+    return userWithSkills;
   }
 } 

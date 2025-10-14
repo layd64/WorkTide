@@ -13,6 +13,7 @@ interface Message {
     content: string;
     senderId: string;
     receiverId: string;
+    isSystem?: boolean; // True for system messages (e.g., initial chat message)
     createdAt: string;
     sender?: {
         id: string;

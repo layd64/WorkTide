@@ -5,13 +5,14 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ChatService {
     constructor(private prisma: PrismaService) { }
 
-    async sendMessage(senderId: string, receiverId: string, content: string, attachments?: any[]) {
+    async sendMessage(senderId: string, receiverId: string, content: string, attachments?: any[], isSystem: boolean = false) {
         return this.prisma.message.create({
             data: {
                 senderId,
                 receiverId,
                 content,
                 attachments: attachments || [],
+                isSystem,
             },
             include: {
                 sender: {
@@ -96,5 +97,17 @@ export class ChatService {
         });
 
         return Array.from(conversations.values());
+    }
+
+    async createInitialChatMessage(freelancerId: string, clientId: string) {
+        // Create initial system message from freelancer to client
+        // This ensures the conversation appears in both users' conversation lists
+        return this.sendMessage(
+            freelancerId,
+            clientId,
+            'This chat has been started since both participants decided to work together.',
+            [],
+            true // Mark as system message
+        );
     }
 }

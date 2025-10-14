@@ -12,10 +12,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const notifications_service_1 = require("../notifications/notifications.service");
 let AdminService = class AdminService {
     prisma;
-    constructor(prisma) {
+    notificationsService;
+    constructor(prisma, notificationsService) {
         this.prisma = prisma;
+        this.notificationsService = notificationsService;
     }
     async getAllUsers() {
         const users = await this.prisma.user.findMany({
@@ -53,6 +56,48 @@ let AdminService = class AdminService {
         });
         await this.logAction(adminId, 'UNBAN_USER', userId, `Unbanned user ${user.email}`);
         return user;
+    }
+    async sendCustomNotification(adminId, userId, title, message) {
+        const user = await this.prisma.user.findUnique({ where: { id: userId } });
+        if (!user) {
+            throw new Error('User not found');
+        }
+        await this.notificationsService.createNotification(userId, 'SYSTEM_NOTIFICATION', title, message);
+        await this.logAction(adminId, 'SEND_NOTIFICATION', userId, `Sent notification to ${user.email}: ${title}`);
+        return { success: true };
+    }
+    async getAllTasks() {
+        return this.prisma.task.findMany({
+            include: {
+                client: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true,
+                    },
+                },
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+        });
+    }
+    async deleteTask(taskId, adminId) {
+        const task = await this.prisma.task.findUnique({ where: { id: taskId } });
+        if (!task) {
+            throw new Error('Task not found');
+        }
+        await this.prisma.taskApplication.deleteMany({
+            where: { taskId },
+        });
+        await this.prisma.taskRequest.deleteMany({
+            where: { taskId },
+        });
+        const deletedTask = await this.prisma.task.delete({
+            where: { id: taskId },
+        });
+        await this.logAction(adminId, 'DELETE_TASK', taskId, `Deleted task: ${task.title}`);
+        return deletedTask;
     }
     async getAnalytics() {
         const totalUsers = await this.prisma.user.count();
@@ -142,6 +187,7 @@ let AdminService = class AdminService {
 exports.AdminService = AdminService;
 exports.AdminService = AdminService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        notifications_service_1.NotificationsService])
 ], AdminService);
 //# sourceMappingURL=admin.service.js.map
