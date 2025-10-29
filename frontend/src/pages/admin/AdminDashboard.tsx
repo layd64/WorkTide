@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { API_ENDPOINTS } from '../../config/api';
+import { useTheme } from '../../contexts/ThemeContext';
 import { Users, Briefcase, CheckCircle, TrendingUp, PieChart as PieChartIcon, BarChart as BarChartIcon } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, Legend } from 'recharts';
 
@@ -19,6 +20,8 @@ interface DashboardStats {
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 const AdminDashboard: React.FC = () => {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -57,40 +60,40 @@ const AdminDashboard: React.FC = () => {
 
     return (
         <div className="space-y-8">
-            <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Dashboard Overview</h2>
+            <h2 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>Dashboard Overview</h2>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow flex items-center">
-                    <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 mr-4">
+                <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow flex items-center`}>
+                    <div className={`p-3 rounded-full ${isDark ? 'bg-blue-900 text-blue-300' : 'bg-blue-100 text-blue-600'} mr-4`}>
                         <Users className="h-8 w-8" />
                     </div>
                     <div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Total Users</p>
-                        <p className="text-2xl font-bold text-gray-800 dark:text-white">{stats.totalUsers}</p>
-                        <p className="text-xs text-gray-400 mt-1">
+                        <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Total Users</p>
+                        <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>{stats.totalUsers}</p>
+                        <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'} mt-1`}>
                             {stats.userBreakdown.freelancers} Freelancers, {stats.userBreakdown.clients} Clients
                         </p>
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow flex items-center">
-                    <div className="p-3 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 mr-4">
+                <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow flex items-center`}>
+                    <div className={`p-3 rounded-full ${isDark ? 'bg-green-900 text-green-300' : 'bg-green-100 text-green-600'} mr-4`}>
                         <Briefcase className="h-8 w-8" />
                     </div>
                     <div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Total Projects</p>
-                        <p className="text-2xl font-bold text-gray-800 dark:text-white">{stats.totalProjects}</p>
+                        <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Total Projects</p>
+                        <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>{stats.totalProjects}</p>
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow flex items-center">
-                    <div className="p-3 rounded-full bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 mr-4">
+                <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow flex items-center`}>
+                    <div className={`p-3 rounded-full ${isDark ? 'bg-purple-900 text-purple-300' : 'bg-purple-100 text-purple-600'} mr-4`}>
                         <CheckCircle className="h-8 w-8" />
                     </div>
                     <div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Total Tasks</p>
-                        <p className="text-2xl font-bold text-gray-800 dark:text-white">{stats.totalTasks}</p>
+                        <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Total Tasks</p>
+                        <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>{stats.totalTasks}</p>
                     </div>
                 </div>
             </div>
@@ -98,8 +101,8 @@ const AdminDashboard: React.FC = () => {
             {/* Charts Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* User Growth Chart */}
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow`}>
+                    <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-800'} mb-4 flex items-center`}>
                         <TrendingUp className="mr-2 h-5 w-5" />
                         User Growth (Last 6 Months)
                     </h3>
@@ -120,8 +123,8 @@ const AdminDashboard: React.FC = () => {
                 </div>
 
                 {/* Task Status Distribution */}
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow`}>
+                    <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-800'} mb-4 flex items-center`}>
                         <PieChartIcon className="mr-2 h-5 w-5" />
                         Task Status Distribution
                     </h3>
@@ -152,8 +155,8 @@ const AdminDashboard: React.FC = () => {
                 </div>
 
                 {/* User Distribution Bar Chart */}
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow lg:col-span-2">
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow lg:col-span-2`}>
+                    <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-800'} mb-4 flex items-center`}>
                         <BarChartIcon className="mr-2 h-5 w-5" />
                         User Distribution
                     </h3>

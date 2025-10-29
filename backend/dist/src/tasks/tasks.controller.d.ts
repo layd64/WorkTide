@@ -74,6 +74,18 @@ export declare class TasksController {
         status: string;
         clientId: string;
     }>;
+    getRecommendedFreelancers(id: string, limit?: string): Promise<{
+        id: string;
+        fullName: string;
+        imageUrl?: string | null;
+        title?: string | null;
+        hourlyRate?: number | null;
+        rating?: number | null;
+        completedJobs?: number | null;
+        location?: string | null;
+        skills: string[];
+        score: number;
+    }[]>;
     getClientTasks(clientId: string): Promise<{
         id: string;
         createdAt: Date;

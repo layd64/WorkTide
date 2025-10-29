@@ -49,6 +49,19 @@ export class TasksController {
     return this.tasksService.getTaskById(id);
   }
 
+  @Get(':id/recommendations')
+  @UseGuards(JwtAuthGuard)
+  async getRecommendedFreelancers(
+    @Param('id') id: string,
+    @Query('limit') limit?: string,
+  ) {
+    const parsedLimit = limit ? parseInt(limit, 10) : undefined;
+    return this.tasksService.getRecommendedFreelancersForTask(
+      id,
+      parsedLimit && parsedLimit > 0 ? parsedLimit : 10,
+    );
+  }
+
   @Get('client/:clientId')
   async getClientTasks(@Param('clientId') clientId: string) {
     return this.tasksService.getClientTasks(clientId);

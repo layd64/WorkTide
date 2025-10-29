@@ -79,11 +79,7 @@ const AppContent: React.FC = () => {
           <Route path="/signup" element={<SignUp />} />
           <Route
             path="/profile/:id"
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }
+            element={<Profile />}
           />
           <Route
             path="/profile"

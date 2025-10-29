@@ -1,7 +1,9 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import EmojiPicker, { EmojiClickData, Theme } from 'emoji-picker-react';
 import { useChat } from '../contexts/ChatContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { useParams, useNavigate } from 'react-router-dom';
 
 interface Conversation {
@@ -19,12 +21,44 @@ interface Conversation {
 
 const Chat: React.FC = () => {
     const { user, token } = useAuth();
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+    const { t } = useTranslation();
     const { messages, sendMessage, activeChat, setActiveChat } = useChat();
     const { userId } = useParams<{ userId: string }>();
     const navigate = useNavigate();
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [currentPartner, setCurrentPartner] = useState<{ id: string; fullName: string; imageUrl?: string; userType?: string } | null>(null);
+
+    // Fetch conversations - use useCallback to make it stable
+    const fetchConversations = React.useCallback(() => {
+        if (user && token) {
+            console.log('Fetching conversations for user:', user.id);
+            fetch(`http://localhost:3000/api/chat/conversations/${user.id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+                .then((res) => {
+                    if (!res.ok) throw new Error('Failed to fetch conversations');
+                    return res.json();
+                })
+                .then((data) => {
+                    console.log('Conversations fetched:', data);
+                    if (Array.isArray(data)) {
+                        setConversations(data);
+                    } else {
+                        console.error('Conversations data is not an array:', data);
+                        setConversations([]);
+                    }
+                })
+                .catch((err) => {
+                    console.error('Error fetching conversations:', err);
+                    setConversations([]);
+                });
+        }
+    }, [user, token]);
     const [attachments, setAttachments] = useState<any[]>([]);
     const [isUploading, setIsUploading] = useState(false);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -63,47 +97,18 @@ const Chat: React.FC = () => {
                             setCurrentPartner(data);
                         } else {
                             console.error('Invalid user data:', data);
-                            setCurrentPartner({ id: activeChat, fullName: 'Unknown User' });
+                            setCurrentPartner({ id: activeChat, fullName: t('unknownUser') });
                         }
                     })
                     .catch(err => {
                         console.error('Failed to fetch partner details:', err);
-                        setCurrentPartner({ id: activeChat, fullName: 'Unknown User' });
+                        setCurrentPartner({ id: activeChat, fullName: t('unknownUser') });
                     });
             }
         } else {
             setCurrentPartner(null);
         }
-    }, [activeChat, conversations, token]);
-
-    // Fetch conversations - use useCallback to make it stable
-    const fetchConversations = React.useCallback(() => {
-        if (user && token) {
-            console.log('Fetching conversations for user:', user.id);
-            fetch(`http://localhost:3000/api/chat/conversations/${user.id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-                .then((res) => {
-                    if (!res.ok) throw new Error('Failed to fetch conversations');
-                    return res.json();
-                })
-                .then((data) => {
-                    console.log('Conversations fetched:', data);
-                    if (Array.isArray(data)) {
-                        setConversations(data);
-                    } else {
-                        console.error('Conversations data is not an array:', data);
-                        setConversations([]);
-                    }
-                })
-                .catch((err) => {
-                    console.error('Error fetching conversations:', err);
-                    setConversations([]);
-                });
-        }
-    }, [user, token]);
+    }, [activeChat, conversations, token, t]);
 
     useEffect(() => {
         fetchConversations();
@@ -185,26 +190,25 @@ const Chat: React.FC = () => {
         navigate(`/profile/${partnerId}`);
     };
 
-    if (!user) return <div>Please login to chat.</div>;
+    if (!user) return <div className="p-4">{t('pleaseLoginChat')}</div>;
 
     return (
-        <div className="flex h-[calc(100vh-64px)] bg-gray-100 dark:bg-gray-900">
+        <div className={`flex h-[calc(100vh-64px)] ${isDark ? 'bg-gray-900' : 'bg-gray-100'}`}>
             {/* Sidebar */}
-            <div className="w-1/3 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-y-auto">
-                <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                    <h2 className="text-xl font-semibold text-gray-800 dark:text-white">Messages</h2>
+            <div className={`w-1/3 border-r ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'} overflow-y-auto`}>
+                <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                    <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>{t('messages')}</h2>
                 </div>
                 <ul>
                     {conversations.map((conv) => (
                         <li
                             key={conv.partner.id}
                             onClick={() => handleSelectChat(conv.partner.id)}
-                            className={`p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 ${activeChat === conv.partner.id ? 'bg-blue-50 dark:bg-gray-700' : ''
-                                }`}
+                            className={`p-4 cursor-pointer ${activeChat === conv.partner.id ? isDark ? 'bg-gray-700' : 'bg-blue-50' : ''} ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
                         >
                             <div className="flex items-center space-x-3">
                                 <div
-                                    className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden cursor-pointer"
+                                    className={`w-10 h-10 rounded-full ${isDark ? 'bg-gray-600' : 'bg-gray-300'} overflow-hidden cursor-pointer`}
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         handleNavigateToProfile(conv.partner.id);
@@ -213,14 +217,14 @@ const Chat: React.FC = () => {
                                     {conv.partner.imageUrl ? (
                                         <img src={conv.partner.imageUrl} alt={conv.partner.fullName} className="w-full h-full object-cover" />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-gray-600 font-bold">
+                                        <div className={`w-full h-full flex items-center justify-center ${isDark ? 'text-gray-300' : 'text-gray-600'} font-bold`}>
                                             {conv.partner.fullName.charAt(0)}
                                         </div>
                                     )}
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p
-                                        className="text-sm font-medium text-gray-900 dark:text-white truncate cursor-pointer hover:text-blue-600"
+                                        className={`text-sm font-medium ${isDark ? 'text-white hover:text-blue-400' : 'text-gray-900 hover:text-blue-600'} truncate cursor-pointer`}
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleNavigateToProfile(conv.partner.id);
@@ -228,7 +232,7 @@ const Chat: React.FC = () => {
                                     >
                                         {conv.partner.fullName}
                                     </p>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                                    <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} truncate`}>
                                         {conv.lastMessage.content}
                                     </p>
                                 </div>
@@ -239,32 +243,34 @@ const Chat: React.FC = () => {
             </div>
 
             {/* Chat Window */}
-            <div className="flex-1 flex flex-col bg-gray-50 dark:bg-gray-900">
+            <div className={`flex-1 flex flex-col ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
                 {activeChat ? (
                     <>
                         {/* Header */}
-                        <div className="p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center space-x-3">
+                        <div className={`p-4 ${isDark ? 'bg-gray-800' : 'bg-white'} border-b ${isDark ? 'border-gray-700' : 'border-gray-200'} flex items-center space-x-3`}>
                             {currentPartner ? (
                                 <>
                                     <div
-                                        className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden cursor-pointer"
+                                        className={`w-10 h-10 rounded-full ${isDark ? 'bg-gray-600' : 'bg-gray-300'} overflow-hidden cursor-pointer`}
                                         onClick={() => handleNavigateToProfile(currentPartner.id)}
                                     >
                                         {currentPartner.imageUrl ? (
                                             <img src={currentPartner.imageUrl} alt={currentPartner.fullName || 'User'} className="w-full h-full object-cover" />
                                         ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-gray-600 font-bold">
+                                            <div className={`w-full h-full flex items-center justify-center ${isDark ? 'text-gray-300' : 'text-gray-600'} font-bold`}>
                                                 {(currentPartner.fullName || '?').charAt(0)}
                                             </div>
                                         )}
                                     </div>
                                     <h3
-                                        className="text-lg font-medium text-gray-800 dark:text-white cursor-pointer hover:text-blue-600"
+                                        className={`text-lg font-medium ${isDark ? 'text-white hover:text-blue-400' : 'text-gray-800 hover:text-blue-600'} cursor-pointer`}
                                         onClick={() => handleNavigateToProfile(currentPartner.id)}
-                                    >{currentPartner.fullName || 'Unknown User'}</h3>
+                                    >{currentPartner.fullName || t('unknownUser')}</h3>
                                 </>
                             ) : (
-                                <h3 className="text-lg font-medium text-gray-800 dark:text-white">Chat</h3>
+                                <h3 className={`text-lg font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                    {t('unknownUser')}
+                                </h3>
                             )}
                         </div>
 
@@ -278,9 +284,9 @@ const Chat: React.FC = () => {
                                 if (isSystemMessage) {
                                     return (
                                         <div key={msg.id} className="flex justify-center my-4">
-                                            <div className="max-w-md px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg text-center text-sm">
+                                            <div className={`max-w-md px-4 py-2 ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'} rounded-lg text-center text-sm`}>
                                                 <p>{msg.content}</p>
-                                                <p className="text-xs mt-1 text-gray-400">
+                                                <p className={`text-xs mt-1 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
                                                     {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </p>
                                             </div>
@@ -297,7 +303,7 @@ const Chat: React.FC = () => {
                                         <div
                                             className={`max-w-xs md:max-w-md px-4 py-2 rounded-lg ${isMe
                                                 ? 'bg-blue-600 text-white rounded-br-none'
-                                                : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-bl-none shadow-sm'
+                                                : (isDark ? 'bg-gray-800 text-gray-200' : 'bg-white text-gray-800') + ' rounded-bl-none shadow-sm'
                                                 }`}
                                         >
                                             <p>{msg.content}</p>
@@ -317,7 +323,7 @@ const Chat: React.FC = () => {
                                                     ))}
                                                 </div>
                                             )}
-                                            <p className={`text-xs mt-1 ${isMe ? 'text-blue-200' : 'text-gray-400'}`}>
+                                            <p className={`text-xs mt-1 ${isMe ? 'text-blue-200' : isDark ? 'text-gray-500' : 'text-gray-400'}`}>
                                                 {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                             </p>
                                         </div>
@@ -328,7 +334,7 @@ const Chat: React.FC = () => {
                         </div>
 
                         {/* Input */}
-                        <form onSubmit={handleSend} className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+                        <form onSubmit={handleSend} className={`p-4 ${isDark ? 'bg-gray-800' : 'bg-white'} border-t ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
                             <div className="flex space-x-2 items-end">
                                 <input
                                     type="file"
@@ -340,7 +346,7 @@ const Chat: React.FC = () => {
                                 <button
                                     type="button"
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                                    className={`p-2 transition-colors ${isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'}`}
                                     title="Attach file"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -354,7 +360,7 @@ const Chat: React.FC = () => {
                                             e.stopPropagation();
                                             setShowEmojiPicker(!showEmojiPicker);
                                         }}
-                                        className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                                        className={`p-2 transition-colors ${isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'}`}
                                         title="Add emoji"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -371,12 +377,12 @@ const Chat: React.FC = () => {
                                     {attachments.length > 0 && (
                                         <div className="flex flex-wrap gap-2 mb-2">
                                             {attachments.map((att, idx) => (
-                                                <div key={idx} className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-sm flex items-center">
-                                                    <span className="truncate max-w-[100px] text-gray-800 dark:text-gray-200">{att.name}</span>
+                                                <div key={idx} className={`${isDark ? 'bg-gray-700' : 'bg-gray-200'} px-2 py-1 rounded text-sm flex items-center`}>
+                                                    <span className={`truncate max-w-[100px] ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>{att.name}</span>
                                                     <button
                                                         type="button"
                                                         onClick={() => setAttachments(attachments.filter((_, i) => i !== idx))}
-                                                        className="ml-2 text-red-500 hover:text-red-700"
+                                                        className={`ml-2 ${isDark ? 'text-red-400 hover:text-red-300' : 'text-red-500 hover:text-red-700'}`}
                                                     >
                                                         ×
                                                     </button>
@@ -388,8 +394,8 @@ const Chat: React.FC = () => {
                                         type="text"
                                         value={newMessage}
                                         onChange={(e) => setNewMessage(e.target.value)}
-                                        placeholder="Type a message..."
-                                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                        placeholder={t('typeMessage')}
+                                        className={`w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300'}`}
                                     />
                                 </div>
                                 <button
@@ -397,14 +403,14 @@ const Chat: React.FC = () => {
                                     disabled={(!newMessage.trim() && attachments.length === 0) || isUploading}
                                     className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors h-10"
                                 >
-                                    {isUploading ? '...' : 'Send'}
+                                    {isUploading ? '...' : t('send')}
                                 </button>
                             </div>
                         </form>
                     </>
                 ) : (
-                    <div className="flex-1 flex items-center justify-center text-gray-500 dark:text-gray-400">
-                        Select a conversation to start chatting
+                    <div className={`flex-1 flex items-center justify-center ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                        {t('selectChat')}
                     </div>
                 )}
             </div>

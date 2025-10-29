@@ -57,6 +57,13 @@ export const API_ENDPOINTS = {
     getByClient: (clientId: string) => `${API_BASE_URL}/tasks/client/${clientId}`,
     update: (id: string) => `${API_BASE_URL}/tasks/${id}`,
     delete: (id: string) => `${API_BASE_URL}/tasks/${id}`,
+    getRecommendations: (id: string, limit?: number) => {
+      const base = `${API_BASE_URL}/tasks/${id}/recommendations`;
+      if (!limit) return base;
+      const params = new URLSearchParams();
+      params.append('limit', String(limit));
+      return `${base}?${params.toString()}`;
+    },
   },
   taskApplications: {
     apply: (taskId: string) => `${API_BASE_URL}/task-applications/${taskId}/apply`,

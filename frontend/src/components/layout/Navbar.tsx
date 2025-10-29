@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 import { useDropdown } from '../../contexts/DropdownContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import Avatar from '../Avatar';
 import {
     Bars3Icon,
@@ -11,6 +12,7 @@ import {
     UserCircleIcon,
     Cog6ToothIcon,
     ArrowRightOnRectangleIcon,
+    ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 import NotificationMenu from './NotificationMenu';
 
@@ -18,6 +20,7 @@ const Navbar: React.FC = () => {
     const { t } = useTranslation();
     const { user, logout } = useAuth();
     const { isDropdownOpen, setDropdownOpen, toggleDropdown } = useDropdown();
+    const { theme } = useTheme();
     const navigate = useNavigate();
     const location = useLocation();
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -49,18 +52,22 @@ const Navbar: React.FC = () => {
     };
 
     const isActive = (path: string) => {
-        return location.pathname === path ? 'text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400';
+        return location.pathname === path
+            ? isDark ? 'text-blue-400 font-semibold' : 'text-blue-600 font-semibold'
+            : isDark ? 'text-gray-300 hover:text-blue-400' : 'text-gray-800 hover:text-blue-600';
     };
 
     console.log('Navbar render. isDropdownOpen:', isDropdownOpen, 'isMobileMenuOpen:', isMobileMenuOpen);
 
+    const isDark = theme === 'dark';
+
     return (
-        <nav className="bg-white dark:bg-gray-800 shadow-sm fixed w-full z-50 top-0 left-0 border-b border-gray-200 dark:border-gray-700">
+        <nav className={`${isDark ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'} shadow-sm fixed w-full z-50 top-0 left-0 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16">
                     <div className="flex items-center">
                         <Link to="/" className="flex-shrink-0 flex items-center">
-                            <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">WorkTide</span>
+                            <span className={`text-2xl font-bold ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>WorkTide</span>
                         </Link>
                         <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                             <Link to="/find-work" className={`inline-flex items-center px-1 pt-1 text-sm font-medium ${isActive('/find-work')}`}>
@@ -90,7 +97,7 @@ const Navbar: React.FC = () => {
 
                         {user ? (
                             <>
-                                <Link to="/chat" className="p-1 rounded-full text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none relative">
+                                <Link to="/chat" className={`p-1 rounded-full focus:outline-none relative ${isDark ? 'text-gray-300 hover:text-white' : 'text-gray-800 hover:text-gray-900'}`}>
                                     <ChatBubbleLeftRightIcon className="h-6 w-6" />
                                     {/* Notification badge could go here */}
                                 </Link>
@@ -102,7 +109,7 @@ const Navbar: React.FC = () => {
                                                 console.log('Toggling dropdown');
                                                 toggleDropdown();
                                             }}
-                                            className="bg-white dark:bg-gray-800 flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer"
+                                            className={`${isDark ? 'bg-gray-800' : 'bg-white'} flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer`}
                                             id="user-menu-button"
                                             aria-expanded={isDropdownOpen}
                                             aria-haspopup="true"
@@ -118,31 +125,31 @@ const Navbar: React.FC = () => {
 
                                     {isDropdownOpen && (
                                         <div
-                                            className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                                            className={`origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 ${isDark ? 'bg-gray-700' : 'bg-white'} ring-1 ring-black ring-opacity-5 focus:outline-none z-50`}
                                             role="menu"
                                             aria-orientation="vertical"
                                             aria-labelledby="user-menu-button"
                                             tabIndex={-1}
                                         >
-                                            <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-600">
-                                                <p className="text-sm text-gray-900 dark:text-white font-medium truncate">{user.fullName}</p>
-                                                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
+                                            <div className={`px-4 py-2 border-b ${isDark ? 'border-gray-600' : 'border-gray-100'}`}>
+                                                <p className={`text-sm ${isDark ? 'text-white' : 'text-gray-900'} font-medium truncate`}>{user.fullName}</p>
+                                                <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} truncate`}>{user.email}</p>
                                             </div>
                                             {user.userType === 'admin' && (
                                                 <Link
                                                     to="/admin"
-                                                    className="block px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center font-semibold"
+                                                    className={`block px-4 py-2 text-sm ${isDark ? 'text-blue-400 hover:bg-gray-600' : 'text-blue-600 hover:bg-gray-100'} flex items-center font-semibold`}
                                                     role="menuitem"
                                                     tabIndex={-1}
                                                     id="user-menu-item-admin"
                                                 >
-                                                    <ArrowRightOnRectangleIcon className="mr-2 h-4 w-4" />
+                                                    <ShieldCheckIcon className="mr-2 h-4 w-4" />
                                                     {t('adminPanel') || 'Admin Panel'}
                                                 </Link>
                                             )}
                                             <Link
                                                 to="/profile"
-                                                className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
+                                                className={`block px-4 py-2 text-sm ${isDark ? 'text-gray-200 hover:bg-gray-600' : 'text-gray-700 hover:bg-gray-100'} flex items-center`}
                                                 role="menuitem"
                                                 tabIndex={-1}
                                                 id="user-menu-item-0"
@@ -152,7 +159,7 @@ const Navbar: React.FC = () => {
                                             </Link>
                                             <Link
                                                 to="/settings"
-                                                className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
+                                                className={`block px-4 py-2 text-sm ${isDark ? 'text-gray-200 hover:bg-gray-600' : 'text-gray-700 hover:bg-gray-100'} flex items-center`}
                                                 role="menuitem"
                                                 tabIndex={-1}
                                                 id="user-menu-item-1"
@@ -162,7 +169,7 @@ const Navbar: React.FC = () => {
                                             </Link>
                                             <button
                                                 onClick={handleLogout}
-                                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
+                                                className={`block w-full text-left px-4 py-2 text-sm ${isDark ? 'text-gray-200 hover:bg-gray-600' : 'text-gray-700 hover:bg-gray-100'} flex items-center`}
                                                 role="menuitem"
                                                 tabIndex={-1}
                                                 id="user-menu-item-2"
@@ -178,7 +185,7 @@ const Navbar: React.FC = () => {
                             <div className="flex space-x-4">
                                 <Link
                                     to="/login"
-                                    className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium"
+                                    className={`${isDark ? 'text-gray-300 hover:text-blue-400' : 'text-gray-800 hover:text-blue-600'} px-3 py-2 rounded-md text-sm font-medium`}
                                 >
                                     {t('login') || 'Log in'}
                                 </Link>
@@ -196,7 +203,7 @@ const Navbar: React.FC = () => {
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                             type="button"
-                            className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+                            className={`inline-flex items-center justify-center p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 ${isDark ? 'text-gray-300 hover:text-white hover:bg-gray-700' : 'text-gray-800 hover:text-gray-900 hover:bg-gray-100'}`}
                             aria-controls="mobile-menu"
                             aria-expanded={isMobileMenuOpen}
                         >
@@ -213,13 +220,13 @@ const Navbar: React.FC = () => {
 
             {/* Mobile menu */}
             {isMobileMenuOpen && (
-                <div className="sm:hidden" id="mobile-menu">
+                <div className={`sm:hidden ${isDark ? 'bg-gray-800' : 'bg-white'}`} id="mobile-menu">
                     <div className="pt-2 pb-3 space-y-1">
                         <Link
                             to="/find-work"
                             className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${location.pathname === '/find-work'
-                                ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-500 text-blue-700 dark:text-blue-300'
-                                : 'border-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 hover:text-gray-800 dark:hover:text-white'
+                                ? isDark ? 'bg-blue-900/20 border-blue-500 text-blue-300' : 'bg-blue-50 border-blue-500 text-blue-700'
+                                : isDark ? 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' : 'border-transparent text-black hover:bg-gray-50 hover:border-gray-300 hover:text-gray-900'
                                 }`}
                         >
                             {t('findWork') || 'Find Work'}
@@ -227,8 +234,8 @@ const Navbar: React.FC = () => {
                         <Link
                             to="/find-freelancers"
                             className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${location.pathname === '/find-freelancers'
-                                ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-500 text-blue-700 dark:text-blue-300'
-                                : 'border-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 hover:text-gray-800 dark:hover:text-white'
+                                ? isDark ? 'bg-blue-900/20 border-blue-500 text-blue-300' : 'bg-blue-50 border-blue-500 text-blue-700'
+                                : isDark ? 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' : 'border-transparent text-black hover:bg-gray-50 hover:border-gray-300 hover:text-gray-900'
                                 }`}
                         >
                             {t('findFreelancers') || 'Find Freelancers'}
@@ -238,8 +245,8 @@ const Navbar: React.FC = () => {
                                 <Link
                                     to="/my-tasks"
                                     className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${location.pathname === '/my-tasks'
-                                        ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-500 text-blue-700 dark:text-blue-300'
-                                        : 'border-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 hover:text-gray-800 dark:hover:text-white'
+                                        ? isDark ? 'bg-blue-900/20 border-blue-500 text-blue-300' : 'bg-blue-50 border-blue-500 text-blue-700'
+                                        : isDark ? 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' : 'border-transparent text-black hover:bg-gray-50 hover:border-gray-300 hover:text-gray-900'
                                         }`}
                                 >
                                     {t('myTasks') || 'My Tasks'}
@@ -247,8 +254,8 @@ const Navbar: React.FC = () => {
                                 <Link
                                     to="/my-applications"
                                     className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${location.pathname === '/my-applications'
-                                        ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-500 text-blue-700 dark:text-blue-300'
-                                        : 'border-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 hover:text-gray-800 dark:hover:text-white'
+                                        ? isDark ? 'bg-blue-900/20 border-blue-500 text-blue-300' : 'bg-blue-50 border-blue-500 text-blue-700'
+                                        : isDark ? 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' : 'border-transparent text-black hover:bg-gray-50 hover:border-gray-300 hover:text-gray-900'
                                         }`}
                                 >
                                     {t('myApplications') || 'My Applications'}
@@ -256,15 +263,33 @@ const Navbar: React.FC = () => {
                                 <Link
                                     to="/requests"
                                     className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${location.pathname === '/requests'
-                                        ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-500 text-blue-700 dark:text-blue-300'
-                                        : 'border-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 hover:text-gray-800 dark:hover:text-white'
+                                        ? isDark ? 'bg-blue-900/20 border-blue-500 text-blue-300' : 'bg-blue-50 border-blue-500 text-blue-700'
+                                        : isDark ? 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' : 'border-transparent text-black hover:bg-gray-50 hover:border-gray-300 hover:text-gray-900'
                                         }`}
                                 >
                                     {t('requests') || 'Requests'}
                                 </Link>
+                                <Link
+                                    to="/chat"
+                                    className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${location.pathname.startsWith('/chat')
+                                        ? isDark ? 'bg-blue-900/20 border-blue-500 text-blue-300' : 'bg-blue-50 border-blue-500 text-blue-700'
+                                        : isDark ? 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-300 hover:text-white' : 'border-transparent text-black hover:bg-gray-50 hover:border-gray-300 hover:text-gray-900'
+                                        }`}
+                                >
+                                    {t('chat') || 'Chat'}
+                                </Link>
                             </>
                         )}
                     </div>
+                    {user && (
+                        <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                            <span className="text-base font-medium text-gray-600 dark:text-gray-300">
+                                {t('notifications') || 'Notifications'}
+                            </span>
+                            {/* Reuse desktop notification dropdown on mobile */}
+                            <NotificationMenu />
+                        </div>
+                    )}
                     <div className="pt-4 pb-4 border-t border-gray-200 dark:border-gray-700">
                         {user ? (
                             <>
@@ -284,19 +309,19 @@ const Navbar: React.FC = () => {
                                 <div className="mt-3 space-y-1">
                                     <Link
                                         to="/profile"
-                                        className="block px-4 py-2 text-base font-medium text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        className="block px-4 py-2 text-base font-medium text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
                                     >
                                         {t('profile') || 'Profile'}
                                     </Link>
                                     <Link
                                         to="/settings"
-                                        className="block px-4 py-2 text-base font-medium text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        className="block px-4 py-2 text-base font-medium text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
                                     >
                                         {t('settings') || 'Settings'}
                                     </Link>
                                     <button
                                         onClick={handleLogout}
-                                        className="block w-full text-left px-4 py-2 text-base font-medium text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        className="block w-full text-left px-4 py-2 text-base font-medium text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
                                     >
                                         {t('logout') || 'Sign out'}
                                     </button>
@@ -306,13 +331,13 @@ const Navbar: React.FC = () => {
                             <div className="mt-3 space-y-1 px-4">
                                 <Link
                                     to="/login"
-                                    className="block text-center w-full px-4 py-2 border border-transparent text-base font-medium rounded-md text-blue-600 bg-blue-50 hover:bg-blue-100"
+                                    className="block text-center w-full px-4 py-2 border border-transparent text-base font-medium rounded-md text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30"
                                 >
                                     {t('login') || 'Log in'}
                                 </Link>
                                 <Link
                                     to="/signup"
-                                    className="block text-center w-full mt-2 px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                                    className="block text-center w-full mt-2 px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
                                 >
                                     {t('signup') || 'Sign up'}
                                 </Link>

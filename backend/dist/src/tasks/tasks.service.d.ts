@@ -44,6 +44,18 @@ export declare class TasksService {
         status: string;
         clientId: string;
     })[]>;
+    getRecommendedFreelancersForTask(taskId: string, limit?: number): Promise<{
+        id: string;
+        fullName: string;
+        imageUrl?: string | null;
+        title?: string | null;
+        hourlyRate?: number | null;
+        rating?: number | null;
+        completedJobs?: number | null;
+        location?: string | null;
+        skills: string[];
+        score: number;
+    }[]>;
     getTaskById(id: string): Promise<{
         client: {
             id: string;

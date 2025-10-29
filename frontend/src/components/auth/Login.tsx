@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { EnvelopeIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import { API_ENDPOINTS } from '../../config/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const Login: React.FC = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const location = useLocation();
     const { login } = useAuth();
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -43,10 +48,10 @@ const Login: React.FC = () => {
                 navigate(from);
             } else {
                 const data = await response.json();
-                setError(data.message || 'Invalid email or password');
+                setError(data.message || t('invalidEmailOrPassword'));
             }
         } catch (err) {
-            setError('An error occurred. Please try again.');
+            setError(t('errorOccurred'));
         }
     };
 
@@ -67,16 +72,16 @@ const Login: React.FC = () => {
             </div>
 
             {/* Right Half - Form */}
-            <div className="flex-1 lg:w-1/2 bg-white flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24">
+            <div className={`flex-1 lg:w-1/2 ${isDark ? 'bg-gray-800' : 'bg-white'} flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24`}>
                 <div className="mx-auto w-full max-w-md">
                     <div>
-                        <h2 className="text-3xl font-extrabold text-gray-900">
-                            Sign in to your account
+                        <h2 className={`text-3xl font-extrabold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                            {t('signInToAccount')}
                         </h2>
-                        <p className="mt-2 text-sm text-gray-600">
-                            Or{' '}
-                            <Link to="/signup" className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors">
-                                create a new account
+                        <p className={`mt-2 text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                            {t('or') || 'Or'}{' '}
+                            <Link to="/signup" className={`font-medium ${isDark ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-600 hover:text-indigo-500'} transition-colors`}>
+                                {t('createAccountLink')}
                             </Link>
                         </p>
                     </div>
@@ -84,18 +89,18 @@ const Login: React.FC = () => {
                     <div className="mt-8">
                         <form className="space-y-6" onSubmit={handleSubmit}>
                             {error && (
-                                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
+                                <div className={`${isDark ? 'bg-red-900/20 border-red-500 text-red-300' : 'bg-red-50 border-red-200 text-red-600'} border px-4 py-3 rounded-md text-sm`}>
                                     {error}
                                 </div>
                             )}
 
                             <div>
-                                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                                    Email address
+                                <label htmlFor="email" className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    {t('emailAddress')}
                                 </label>
                                 <div className="mt-1 relative rounded-md shadow-sm">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <EnvelopeIcon className="h-5 w-5 text-gray-400" />
+                                        <EnvelopeIcon className={`h-5 w-5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`} />
                                     </div>
                                     <input
                                         id="email"
@@ -105,19 +110,19 @@ const Login: React.FC = () => {
                                         required
                                         value={formData.email}
                                         onChange={handleChange}
-                                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors"
+                                        className={`block w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'}`}
                                         placeholder="you@example.com"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                    Password
+                                <label htmlFor="password" className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    {t('password')}
                                 </label>
                                 <div className="mt-1 relative rounded-md shadow-sm">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <LockClosedIcon className="h-5 w-5 text-gray-400" />
+                                        <LockClosedIcon className={`h-5 w-5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`} />
                                     </div>
                                     <input
                                         id="password"
@@ -127,7 +132,7 @@ const Login: React.FC = () => {
                                         required
                                         value={formData.password}
                                         onChange={handleChange}
-                                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors"
+                                        className={`block w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'}`}
                                     />
                                 </div>
                             </div>
@@ -138,16 +143,16 @@ const Login: React.FC = () => {
                                         id="remember-me"
                                         name="remember-me"
                                         type="checkbox"
-                                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                                        className={`h-4 w-4 text-indigo-600 focus:ring-indigo-500 rounded ${isDark ? 'border-gray-600' : 'border-gray-300'}`}
                                     />
-                                    <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                                        Remember me
+                                    <label htmlFor="remember-me" className={`ml-2 block text-sm ${isDark ? 'text-gray-300' : 'text-gray-900'}`}>
+                                        {t('rememberMe')}
                                     </label>
                                 </div>
 
                                 <div className="text-sm">
-                                    <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors">
-                                        Forgot your password?
+                                    <a href="#" className={`font-medium ${isDark ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-600 hover:text-indigo-500'} transition-colors`}>
+                                        {t('forgotPassword')}
                                     </a>
                                 </div>
                             </div>
@@ -157,7 +162,7 @@ const Login: React.FC = () => {
                                     type="submit"
                                     className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 hover:shadow-lg"
                                 >
-                                    Sign in
+                                    {t('signIn')}
                                 </button>
                             </div>
                         </form>

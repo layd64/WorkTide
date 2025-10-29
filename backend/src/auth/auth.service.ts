@@ -58,6 +58,7 @@ export class AuthService {
         password: hashedPassword,
         fullName: userData.fullName,
         userType: userData.userType,
+        isHidden: userData.isHidden,
       },
     });
 

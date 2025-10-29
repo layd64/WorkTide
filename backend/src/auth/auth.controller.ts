@@ -18,6 +18,7 @@ export class AuthController {
       password: string;
       fullName: string;
       userType: 'freelancer' | 'client';
+      isHidden?: boolean;
     },
   ) {
     return this.authService.register(data);

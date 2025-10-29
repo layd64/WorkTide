@@ -9,94 +9,94 @@ export declare class TaskApplicationsService {
     applyToTask(freelancerId: string, taskId: string, coverLetter?: string): Promise<{
         id: string;
         createdAt: Date;
-        status: string;
         updatedAt: Date;
+        status: string;
+        coverLetter: string | null;
         taskId: string;
         freelancerId: string;
-        coverLetter: string | null;
     }>;
     getTaskApplications(taskId: string, clientId: string): Promise<({
         freelancer: {
             id: string;
+            fullName: string;
             title: string | null;
+            hourlyRate: number | null;
+            rating: number | null;
+            location: string | null;
+            imageUrl: string | null;
             skills: {
                 id: string;
                 name: string;
             }[];
-            imageUrl: string | null;
-            fullName: string;
-            hourlyRate: number | null;
-            rating: number | null;
-            location: string | null;
         };
     } & {
         id: string;
         createdAt: Date;
-        status: string;
         updatedAt: Date;
+        status: string;
+        coverLetter: string | null;
         taskId: string;
         freelancerId: string;
-        coverLetter: string | null;
     })[]>;
     getFreelancerApplications(freelancerId: string): Promise<({
         task: {
             client: {
                 id: string;
-                imageUrl: string | null;
                 fullName: string;
+                imageUrl: string | null;
             };
         } & {
             id: string;
-            title: string;
             createdAt: Date;
-            status: string;
             updatedAt: Date;
-            clientId: string;
+            title: string;
+            imageUrl: string | null;
+            skills: string[];
             description: string;
             budget: number;
-            skills: string[];
-            imageUrl: string | null;
+            status: string;
+            clientId: string;
         };
     } & {
         id: string;
         createdAt: Date;
-        status: string;
         updatedAt: Date;
+        status: string;
+        coverLetter: string | null;
         taskId: string;
         freelancerId: string;
-        coverLetter: string | null;
     })[]>;
     updateApplicationStatus(applicationId: string, clientId: string, status: 'accepted' | 'rejected'): Promise<{
         id: string;
         createdAt: Date;
-        status: string;
         updatedAt: Date;
+        status: string;
+        coverLetter: string | null;
         taskId: string;
         freelancerId: string;
-        coverLetter: string | null;
     }>;
     assignFreelancerToTask(applicationId: string, clientId: string): Promise<{
         freelancerId: string;
         application: {
             id: string;
             createdAt: Date;
-            status: string;
             updatedAt: Date;
+            status: string;
+            coverLetter: string | null;
             taskId: string;
             freelancerId: string;
-            coverLetter: string | null;
         };
         task: {
             id: string;
-            title: string;
             createdAt: Date;
-            status: string;
             updatedAt: Date;
-            clientId: string;
+            title: string;
+            imageUrl: string | null;
+            skills: string[];
             description: string;
             budget: number;
-            skills: string[];
-            imageUrl: string | null;
+            status: string;
+            clientId: string;
         };
     }>;
 }

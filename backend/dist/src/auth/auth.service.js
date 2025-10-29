@@ -57,6 +57,7 @@ let AuthService = class AuthService {
                 password: hashedPassword,
                 fullName: userData.fullName,
                 userType: userData.userType,
+                isHidden: userData.isHidden,
             },
         });
         await this.loggingService.logAction(newUser.id, 'USER_REGISTER', newUser.id, `User registered: ${newUser.email}`);

@@ -5,6 +5,8 @@ import { API_ENDPOINTS } from '../config/api';
 import Avatar from '../components/Avatar';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
+import MotionWrapper from '../components/common/MotionWrapper';
 
 
 interface Freelancer {
@@ -33,6 +35,8 @@ const FindFreelancers: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, token } = useAuth();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [freelancers, setFreelancers] = useState<Freelancer[]>([]);
@@ -178,31 +182,31 @@ const FindFreelancers: React.FC = () => {
 
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} py-8`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">{t('findFreelancersTitle')}</h1>
-          <p className="mt-2 text-gray-600">{t('connectWithTalentedProfessionals')}</p>
+          <h1 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('findFreelancersTitle')}</h1>
+          <p className={`mt-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{t('connectWithTalentedProfessionals')}</p>
         </div>
 
         {/* Search and Filter Section */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+        <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm p-6 mb-8`}>
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
-                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                <MagnifyingGlassIcon className={`h-5 w-5 ${isDark ? 'text-gray-500' : 'text-gray-400'} absolute left-3 top-1/2 transform -translate-y-1/2`} />
                 <input
                   type="text"
                   placeholder={t('searchByNameOrSkills')}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className={`w-full pl-10 pr-4 py-2 border ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <FunnelIcon className="h-5 w-5 text-gray-400" />
-              <span className="text-gray-600">{t('filterBySkillsLabel')}</span>
+              <FunnelIcon className={`h-5 w-5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`} />
+              <span className={isDark ? 'text-gray-300' : 'text-gray-600'}>{t('filterBySkillsLabel')}</span>
             </div>
           </div>
 
@@ -213,8 +217,8 @@ const FindFreelancers: React.FC = () => {
                 key={skill}
                 onClick={() => toggleSkill(skill)}
                 className={`px-3 py-1 rounded-full text-sm font-medium ${selectedSkills.includes(skill)
-                  ? 'bg-blue-100 text-blue-800'
-                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                  ? isDark ? 'bg-blue-900/30 text-blue-300' : 'bg-blue-100 text-blue-800'
+                  : isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                   }`}
               >
                 {skill}
@@ -226,17 +230,17 @@ const FindFreelancers: React.FC = () => {
         {/* Loading State */}
         {loading && (
           <div className="text-center py-12">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent" role="status">
+            <div className={`inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid ${isDark ? 'border-blue-400' : 'border-blue-600'} border-r-transparent`} role="status">
               <span className="sr-only">{t('loading')}</span>
             </div>
-            <p className="mt-4 text-gray-600">{t('loadingFreelancers')}</p>
+            <p className={`mt-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{t('loadingFreelancers')}</p>
           </div>
         )}
 
         {/* Error State */}
         {error && !loading && (
           <div className="text-center py-12">
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            <div className={`${isDark ? 'bg-red-900/20 border-red-500 text-red-300' : 'bg-red-100 border-red-400 text-red-700'} border px-4 py-3 rounded`}>
               <p>{error}</p>
             </div>
           </div>
@@ -245,98 +249,104 @@ const FindFreelancers: React.FC = () => {
         {/* Empty State */}
         {!loading && !error && freelancers.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-600">{t('noFreelancersFound')}</p>
+            <p className={isDark ? 'text-gray-300' : 'text-gray-600'}>{t('noFreelancersFound')}</p>
           </div>
         )}
 
         {/* Freelancers Grid */}
         {!loading && !error && freelancers.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {freelancers.map(freelancer => (
-              <div
+            {freelancers.map((freelancer, index) => (
+              <MotionWrapper
                 key={freelancer.id}
-                className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+                type="fadeIn"
+                delay={index * 0.1} // Stagger effect
+                className="h-full"
               >
-                <div className="p-6">
-                  <div
-                    className="cursor-pointer"
-                    onClick={() => handleViewProfile(freelancer.id)}
-                  >
-                    <div className="flex items-center gap-4">
-                      <Avatar
-                        fullName={freelancer.fullName}
-                        imageUrl={freelancer.imageUrl}
-                        className="w-16 h-16"
-                        textSize="text-base"
-                      />
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900">{freelancer.fullName}</h3>
-                        <p className="text-gray-600">{freelancer.title || t('freelancer')}</p>
-                      </div>
-                    </div>
-
-                    <div className="mt-4">
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <span>⭐ {freelancer.rating || 'N/A'}</span>
-                        <span>•</span>
-                        <span>{freelancer.completedJobs || 0} {t('jobsCompleted')}</span>
-                        <span>•</span>
-                        <span>{freelancer.location || t('remote')}</span>
-                      </div>
-                    </div>
-
-                    {/* Profile Visibility for all users */}
-                    <div className="mb-6">
-                      <p className="text-sm text-gray-700 line-clamp-3">
-                        {freelancer.bio}
-                      </p>
-                    </div>
-
-                    <div className="mt-4">
-                      <div className="flex flex-wrap gap-2">
-                        {freelancer.skills && freelancer.skills.map(skill => (
-                          <span
-                            key={skill}
-                            className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-sm"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="mt-4">
-                      <span className="text-lg font-semibold text-gray-900">
-                        ${freelancer.hourlyRate || 0}/{t('perHour')}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="mt-4 flex gap-2">
-                    <button
-                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleViewProfile(freelancer.id);
-                      }}
+                <div
+                  className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow h-full`}
+                >
+                  <div className="p-6 flex flex-col h-full">
+                    <div
+                      className="cursor-pointer"
+                      onClick={() => handleViewProfile(freelancer.id)}
                     >
-                      {t('viewProfile')}
-                    </button>
-                    {user && user.id !== freelancer.id && (
+                      <div className="flex items-center gap-4">
+                        <Avatar
+                          fullName={freelancer.fullName}
+                          imageUrl={freelancer.imageUrl}
+                          className="w-16 h-16"
+                          textSize="text-base"
+                        />
+                        <div>
+                          <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{freelancer.fullName}</h3>
+                          <p className={isDark ? 'text-gray-300' : 'text-gray-600'}>{freelancer.title || t('freelancer')}</p>
+                        </div>
+                      </div>
+
+                      <div className="mt-4">
+                        <div className={`flex items-center gap-2 text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                          <span>⭐ {freelancer.rating || 'N/A'}</span>
+                          <span>•</span>
+                          <span>{freelancer.completedJobs || 0} {t('jobsCompleted')}</span>
+                          <span>•</span>
+                          <span>{freelancer.location || t('remote')}</span>
+                        </div>
+                      </div>
+
+                      {/* Profile Visibility for all users */}
+                      <div className="mb-6">
+                        <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'} line-clamp-3`}>
+                          {freelancer.bio}
+                        </p>
+                      </div>
+
+                      <div className="mt-4">
+                        <div className="flex flex-wrap gap-2">
+                          {freelancer.skills && freelancer.skills.map(skill => (
+                            <span
+                              key={skill}
+                              className={`px-2 py-1 ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-800'} rounded-full text-sm`}
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="mt-4">
+                        <span className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                          ${freelancer.hourlyRate || 0}/{t('perHour')}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="mt-auto pt-4 flex gap-2">
                       <button
-                        className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                        className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleOpenAssignModal(freelancer);
+                          handleViewProfile(freelancer.id);
                         }}
                       >
-                        Send A Request
+                        {t('viewProfile')}
                       </button>
-                    )}
+                      {user && user.id !== freelancer.id && (
+                        <button
+                          className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenAssignModal(freelancer);
+                          }}
+                        >
+                          Send A Request
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
+              </MotionWrapper>
             ))}
           </div>
         )}
@@ -354,10 +364,10 @@ const FindFreelancers: React.FC = () => {
         {/* Assignment Modal */}
         {isAssignModalOpen && selectedFreelancer && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" role="dialog">
-            <div className="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto`}>
               <div className="p-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-2xl font-bold text-gray-900">
+                  <h2 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                     Assign Task to {selectedFreelancer.fullName}
                   </h2>
                   <button
@@ -365,54 +375,54 @@ const FindFreelancers: React.FC = () => {
                       setIsAssignModalOpen(false);
                       setSelectedFreelancer(null);
                     }}
-                    className="text-gray-400 hover:text-gray-600"
+                    className={isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'}
                   >
                     <XMarkIcon className="h-6 w-6" />
                   </button>
                 </div>
 
-                <p className="text-gray-600 mb-6">
+                <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'} mb-6`}>
                   Select one of your available tasks to assign to this freelancer:
                 </p>
 
                 {loadingTasks ? (
                   <div className="text-center py-12">
-                    <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent" role="status">
+                    <div className={`inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid ${isDark ? 'border-blue-400' : 'border-blue-600'} border-r-transparent`} role="status">
                       <span className="sr-only">Loading...</span>
                     </div>
-                    <p className="mt-4 text-gray-600">Loading your tasks...</p>
+                    <p className={`mt-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Loading your tasks...</p>
                   </div>
                 ) : clientTasks.length === 0 ? (
                   <div className="text-center py-12">
-                    <p className="text-gray-600">You don't have any available tasks to assign.</p>
-                    <p className="text-sm text-gray-500 mt-2">Create a new task in the "My Tasks" section.</p>
+                    <p className={isDark ? 'text-gray-300' : 'text-gray-600'}>You don't have any available tasks to assign.</p>
+                    <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-2`}>Create a new task in the "My Tasks" section.</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {clientTasks.map(task => (
                       <div
                         key={task.id}
-                        className="border border-gray-200 rounded-lg p-4 hover:border-blue-500 transition-colors"
+                        className={`border ${isDark ? 'border-gray-700 hover:border-blue-500' : 'border-gray-200 hover:border-blue-500'} rounded-lg p-4 transition-colors`}
                       >
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
-                            <h3 className="font-semibold text-gray-900">{task.title}</h3>
-                            <p className="text-sm text-gray-600 mt-1 line-clamp-2">{task.description}</p>
+                            <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{task.title}</h3>
+                            <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'} mt-1 line-clamp-2`}>{task.description}</p>
                             <div className="flex items-center gap-4 mt-2">
-                              <span className="text-sm font-medium text-gray-900">
+                              <span className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
                                 ${task.budget}
                               </span>
                               <div className="flex flex-wrap gap-1">
                                 {task.skills.slice(0, 3).map(skill => (
                                   <span
                                     key={skill}
-                                    className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs"
+                                    className={`px-2 py-0.5 ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'} rounded text-xs`}
                                   >
                                     {skill}
                                   </span>
                                 ))}
                                 {task.skills.length > 3 && (
-                                  <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs">
+                                  <span className={`px-2 py-0.5 ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'} rounded text-xs`}>
                                     +{task.skills.length - 3} more
                                   </span>
                                 )}

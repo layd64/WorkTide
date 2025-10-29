@@ -11,92 +11,92 @@ export declare class TaskRequestsService {
     createRequest(clientId: string, taskId: string, freelancerId: string): Promise<{
         task: {
             id: string;
-            status: string;
             createdAt: Date;
             updatedAt: Date;
-            clientId: string;
             title: string;
+            imageUrl: string | null;
+            skills: string[];
             description: string;
             budget: number;
-            skills: string[];
-            imageUrl: string | null;
+            status: string;
+            clientId: string;
         };
         freelancer: {
             id: string;
-            imageUrl: string | null;
             fullName: string;
+            imageUrl: string | null;
         };
         client: {
             id: string;
-            imageUrl: string | null;
             fullName: string;
+            imageUrl: string | null;
         };
     } & {
         id: string;
-        status: string;
         createdAt: Date;
         updatedAt: Date;
+        status: string;
+        clientId: string;
         taskId: string;
         freelancerId: string;
-        clientId: string;
     }>;
     getFreelancerRequests(freelancerId: string): Promise<({
         task: {
             id: string;
-            status: string;
             createdAt: Date;
             updatedAt: Date;
-            clientId: string;
             title: string;
+            imageUrl: string | null;
+            skills: string[];
             description: string;
             budget: number;
-            skills: string[];
-            imageUrl: string | null;
+            status: string;
+            clientId: string;
         };
         client: {
             id: string;
-            imageUrl: string | null;
             fullName: string;
+            imageUrl: string | null;
         };
     } & {
         id: string;
-        status: string;
         createdAt: Date;
         updatedAt: Date;
+        status: string;
+        clientId: string;
         taskId: string;
         freelancerId: string;
-        clientId: string;
     })[]>;
     acceptRequest(requestId: string, freelancerId: string): Promise<{
         request: {
             task: {
                 id: string;
-                status: string;
                 createdAt: Date;
                 updatedAt: Date;
-                clientId: string;
                 title: string;
+                imageUrl: string | null;
+                skills: string[];
                 description: string;
                 budget: number;
-                skills: string[];
-                imageUrl: string | null;
+                status: string;
+                clientId: string;
             };
             freelancer: {
                 id: string;
-                createdAt: Date;
-                updatedAt: Date;
-                title: string | null;
-                imageUrl: string | null;
                 email: string;
                 password: string;
                 fullName: string;
                 userType: string;
+                createdAt: Date;
+                updatedAt: Date;
+                title: string | null;
                 bio: string | null;
                 legacySkills: string[];
                 hourlyRate: number | null;
                 rating: number | null;
                 completedJobs: number | null;
                 location: string | null;
+                imageUrl: string | null;
                 languages: string[];
                 education: import("@prisma/client/runtime/library").JsonValue[];
                 experience: import("@prisma/client/runtime/library").JsonValue[];
@@ -106,20 +106,20 @@ export declare class TaskRequestsService {
             };
             client: {
                 id: string;
-                createdAt: Date;
-                updatedAt: Date;
-                title: string | null;
-                imageUrl: string | null;
                 email: string;
                 password: string;
                 fullName: string;
                 userType: string;
+                createdAt: Date;
+                updatedAt: Date;
+                title: string | null;
                 bio: string | null;
                 legacySkills: string[];
                 hourlyRate: number | null;
                 rating: number | null;
                 completedJobs: number | null;
                 location: string | null;
+                imageUrl: string | null;
                 languages: string[];
                 education: import("@prisma/client/runtime/library").JsonValue[];
                 experience: import("@prisma/client/runtime/library").JsonValue[];
@@ -129,12 +129,12 @@ export declare class TaskRequestsService {
             };
         } & {
             id: string;
-            status: string;
             createdAt: Date;
             updatedAt: Date;
+            status: string;
+            clientId: string;
             taskId: string;
             freelancerId: string;
-            clientId: string;
         };
         chat: {
             partnerId: string;

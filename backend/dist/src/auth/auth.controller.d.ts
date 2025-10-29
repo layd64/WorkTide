@@ -9,6 +9,7 @@ export declare class AuthController {
         password: string;
         fullName: string;
         userType: 'freelancer' | 'client';
+        isHidden?: boolean;
     }): Promise<{
         user: {
             id: string;

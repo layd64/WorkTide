@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeftIcon, EnvelopeIcon, PhoneIcon, GlobeAltIcon, StarIcon, ArrowRightIcon, XMarkIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 import { API_ENDPOINTS } from '../config/api';
 import RatingComponent from '../components/RatingComponent';
 import Avatar from '../components/Avatar';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
+import MotionWrapper from '../components/common/MotionWrapper';
 
 interface UserProfile {
     id: string;
@@ -45,8 +48,11 @@ interface Task {
 
 const Profile: React.FC = () => {
     const { id } = useParams<{ id: string }>();
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { user, token } = useAuth();
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
     const [profileUser, setProfileUser] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -100,8 +106,7 @@ const Profile: React.FC = () => {
 
     const handleOpenAssignModal = async () => {
         if (!user || !token) {
-            setNotification({ type: 'error', message: 'Please log in to assign tasks' });
-            setTimeout(() => setNotification(null), 3000);
+            navigate('/signup');
             return;
         }
 
@@ -172,13 +177,13 @@ const Profile: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 py-8">
+            <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} py-8`}>
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center py-12">
                         <div className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-blue-600" role="status">
                             <span className="visually-hidden">Loading...</span>
                         </div>
-                        <p className="mt-2 text-gray-600">Loading profile...</p>
+                        <p className={`mt-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{t('loading')}</p>
                     </div>
                 </div>
             </div>
@@ -187,16 +192,16 @@ const Profile: React.FC = () => {
 
     if (error || !profileUser) {
         return (
-            <div className="min-h-screen bg-gray-50 py-8">
+            <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} py-8`}>
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center py-12">
-                        <h2 className="text-2xl font-bold text-gray-900">User not found</h2>
-                        <p className="mt-2 text-gray-600">The user you're looking for doesn't exist or has been removed.</p>
+                        <h2 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('userNotFound')}</h2>
+                        <p className={`mt-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{t('userNotFoundDesc')}</p>
                         <button
                             onClick={() => navigate(-1)}
                             className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
                         >
-                            Go Back
+                            {t('goBack')}
                         </button>
                     </div>
                 </div>
@@ -218,89 +223,97 @@ const Profile: React.FC = () => {
     const shouldShowSection = (hasData: boolean) => hasData || isOwnProfile;
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8">
+        <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} py-8`}>
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center text-gray-600 hover:text-blue-600 mb-6"
+                    className={`flex items-center ${isDark ? 'text-gray-300 hover:text-blue-400' : 'text-gray-600 hover:text-blue-600'} mb-6`}
                 >
                     <ArrowLeftIcon className="h-4 w-4 mr-1" />
-                    Back
+                    {t('back')}
                 </button>
 
                 {/* Profile Header */}
-                <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
-                    <div className="p-6 sm:p-8">
-                        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-                            <Avatar
-                                fullName={displayName}
-                                imageUrl={profileUser.imageUrl}
-                                className="w-24 h-24 sm:w-32 sm:h-32 text-xl"
-                            />
-                            <div className="flex-1 text-center sm:text-left">
-                                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{displayName}</h1>
-                                <p className="text-xl text-gray-600 mt-1">{profileUser.title || (isOwnProfile ? 'Add a title' : '')}</p>
+                <MotionWrapper type="fadeIn" duration={0.5}>
+                    <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm overflow-hidden mb-6`}>
+                        <div className="p-6 sm:p-8">
+                            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+                                <Avatar
+                                    fullName={displayName}
+                                    imageUrl={profileUser.imageUrl}
+                                    className="w-24 h-24 sm:w-32 sm:h-32 text-xl"
+                                />
+                                <div className="flex-1 text-center sm:text-left">
+                                    <h1 className={`text-2xl sm:text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{displayName}</h1>
+                                    <p className={`text-xl ${isDark ? 'text-gray-300' : 'text-gray-600'} mt-1`}>{profileUser.title || (isOwnProfile ? 'Add a title' : '')}</p>
 
-                                <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-3">
-                                    {profileUser.rating != null && (
-                                        <div className="flex items-center">
-                                            <StarIcon className="h-5 w-5 text-yellow-400" />
-                                            <span className="ml-1 text-gray-700">{Number(profileUser.rating).toFixed(1)}</span>
-                                            <Link
-                                                to={`/freelancer-reviews/${profileUser.id}`}
-                                                className="ml-1 text-blue-600 hover:text-blue-800 hover:underline"
+                                    <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-3">
+                                        {profileUser.rating != null && (
+                                            <div className="flex items-center">
+                                                <StarIcon className="h-5 w-5 text-yellow-400" />
+                                                <span className={`ml-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{Number(profileUser.rating).toFixed(1)}</span>
+                                                <Link
+                                                    to={`/freelancer-reviews/${profileUser.id}`}
+                                                    className={`ml-1 ${isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'} hover:underline`}
+                                                >
+                                                    ({profileUser.completedJobs || 0} reviews)
+                                                </Link>
+                                            </div>
+                                        )}
+                                        {profileUser.location && (
+                                            <>
+                                                <span className={isDark ? 'text-gray-600' : 'text-gray-300'}>•</span>
+                                                <div className={isDark ? 'text-gray-300' : 'text-gray-700'}>{profileUser.location}</div>
+                                            </>
+                                        )}
+                                        {profileUser.hourlyRate && (
+                                            <>
+                                                <span className={isDark ? 'text-gray-600' : 'text-gray-300'}>•</span>
+                                                <div className="text-green-600 dark:text-green-400 font-medium">${profileUser.hourlyRate}/hr</div>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="mt-4 sm:mt-0">
+                                    {isOwnProfile ? (
+                                        <button
+                                            onClick={() => navigate('/settings')}
+                                            className={`px-6 py-2 ${isDark ? 'bg-gray-700 border-gray-600 text-gray-200 hover:bg-gray-600' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'} border rounded-lg transition-colors flex items-center`}
+                                        >
+                                            <PencilSquareIcon className="h-5 w-5 mr-2" />
+                                            {t('editProfile')}
+                                        </button>
+                                    ) : (
+                                        <div className="flex gap-3">
+                                            {/* Only show Assign button if current user is a client (or not specified) and profile user is not me */}
+                                            {/* And maybe check if profile user is a freelancer? Or just allow assigning to anyone? */}
+                                            {/* Assuming we can only assign to freelancers for now, or anyone who has a 'freelancer' type or just anyone. */}
+                                            {/* The original code didn't strictly check userType for the button, just user.id !== freelancer.id */}
+                                            <button
+                                                onClick={handleOpenAssignModal}
+                                                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                                             >
-                                                ({profileUser.completedJobs || 0} reviews)
-                                            </Link>
+                                                {t('sendRequest')}
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    if (!user) {
+                                                        navigate('/signup');
+                                                    } else {
+                                                        navigate(`/chat/${profileUser.id}`);
+                                                    }
+                                                }}
+                                                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                            >
+                                                {t('contactMe')}
+                                            </button>
                                         </div>
-                                    )}
-                                    {profileUser.location && (
-                                        <>
-                                            <span className="text-gray-300">•</span>
-                                            <div className="text-gray-700">{profileUser.location}</div>
-                                        </>
-                                    )}
-                                    {profileUser.hourlyRate && (
-                                        <>
-                                            <span className="text-gray-300">•</span>
-                                            <div className="text-green-600 font-medium">${profileUser.hourlyRate}/hr</div>
-                                        </>
                                     )}
                                 </div>
                             </div>
-                            <div className="mt-4 sm:mt-0">
-                                {isOwnProfile ? (
-                                    <button
-                                        onClick={() => navigate('/settings')}
-                                        className="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center"
-                                    >
-                                        <PencilSquareIcon className="h-5 w-5 mr-2" />
-                                        Edit Profile
-                                    </button>
-                                ) : (
-                                    <div className="flex gap-3">
-                                        {/* Only show Assign button if current user is a client (or not specified) and profile user is not me */}
-                                        {/* And maybe check if profile user is a freelancer? Or just allow assigning to anyone? */}
-                                        {/* Assuming we can only assign to freelancers for now, or anyone who has a 'freelancer' type or just anyone. */}
-                                        {/* The original code didn't strictly check userType for the button, just user.id !== freelancer.id */}
-                                        <button
-                                            onClick={handleOpenAssignModal}
-                                            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                                        >
-                                            Send A Request
-                                        </button>
-                                        <button
-                                            onClick={() => navigate(`/chat/${profileUser.id}`)}
-                                            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                                        >
-                                            Contact Me
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
                         </div>
                     </div>
-                </div>
+                </MotionWrapper>
 
                 {/* Main Content */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -308,154 +321,174 @@ const Profile: React.FC = () => {
                     <div className="lg:col-span-2 space-y-6">
                         {/* About */}
                         {shouldShowSection(!!hasBio) && (
-                            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                                <div className="p-6">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-4">About Me</h2>
-                                    {profileUser.bio ? (
-                                        <p className="text-gray-700">{profileUser.bio}</p>
-                                    ) : (
-                                        <p className="text-gray-500 italic">No bio provided</p>
-                                    )}
+                            <MotionWrapper type="slideUp" delay={0.1}>
+                                <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm overflow-hidden`}>
+                                    <div className="p-6">
+                                        <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>{t('aboutMe')}</h2>
+                                        {profileUser.bio ? (
+                                            <p className={isDark ? 'text-gray-300' : 'text-gray-700'}>{profileUser.bio}</p>
+                                        ) : (
+                                            <p className={isDark ? 'text-gray-400' : 'text-gray-500'} style={{ fontStyle: 'italic' }}>{t('noBioProvided')}</p>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
+                            </MotionWrapper>
                         )}
 
                         {/* Work Experience */}
                         {shouldShowSection(!!hasExperience) && (
-                            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                                <div className="p-6">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Work Experience</h2>
-                                    {hasExperience ? (
-                                        <div className="space-y-4">
-                                            {profileUser.experience?.map((exp, index) => (
-                                                <div key={index} className="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
-                                                    <h3 className="font-medium text-gray-900">{exp.role}</h3>
-                                                    <div className="text-gray-600 text-sm mt-1">{exp.company} • {exp.period}</div>
-                                                    <p className="text-gray-700 mt-2">{exp.description}</p>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <p className="text-gray-500 italic">No experience information provided</p>
-                                    )}
+                            <MotionWrapper type="slideUp" delay={0.2}>
+                                <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm overflow-hidden`}>
+                                    <div className="p-6">
+                                        <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>{t('workExperience')}</h2>
+                                        {hasExperience ? (
+                                            <div className="space-y-4">
+                                                {profileUser.experience?.map((exp, index) => (
+                                                    <div key={index} className={`border-b ${isDark ? 'border-gray-700' : 'border-gray-100'} pb-4 last:border-0 last:pb-0`}>
+                                                        <h3 className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{exp.role}</h3>
+                                                        <div className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-sm mt-1`}>{exp.company} • {exp.period}</div>
+                                                        <p className={`${isDark ? 'text-gray-300' : 'text-gray-700'} mt-2`}>{exp.description}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <p className={isDark ? 'text-gray-400' : 'text-gray-500'} style={{ fontStyle: 'italic' }}>{t('noExperienceProvided')}</p>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
+                            </MotionWrapper>
                         )}
 
                         {/* Education */}
                         {shouldShowSection(!!hasEducation) && (
-                            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                                <div className="p-6">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Education</h2>
-                                    {hasEducation ? (
-                                        <div className="space-y-4">
-                                            {profileUser.education?.map((edu, index) => (
-                                                <div key={index} className="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
-                                                    <h3 className="font-medium text-gray-900">{edu.degree}</h3>
-                                                    <div className="text-gray-600 text-sm mt-1">{edu.institution} • {edu.year}</div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <p className="text-gray-500 italic">No education information provided</p>
-                                    )}
+                            <MotionWrapper type="slideUp" delay={0.3}>
+                                <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm overflow-hidden`}>
+                                    <div className="p-6">
+                                        <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>{t('education')}</h2>
+                                        {hasEducation ? (
+                                            <div className="space-y-4">
+                                                {profileUser.education?.map((edu, index) => (
+                                                    <div key={index} className={`border-b ${isDark ? 'border-gray-700' : 'border-gray-100'} pb-4 last:border-0 last:pb-0`}>
+                                                        <h3 className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{edu.degree}</h3>
+                                                        <div className={`${isDark ? 'text-gray-400' : 'text-gray-600'} text-sm mt-1`}>{edu.institution} • {edu.year}</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <p className={isDark ? 'text-gray-400' : 'text-gray-500'} style={{ fontStyle: 'italic' }}>{t('noEducationProvided')}</p>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
+                            </MotionWrapper>
                         )}
 
                         {/* Ratings & Reviews Section */}
-                        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                            <div className="p-6">
-                                <div className="flex justify-between items-center mb-4">
-                                    <h2 className="text-xl font-semibold text-gray-900">Ratings & Reviews</h2>
-                                    <Link
-                                        to={`/freelancer-reviews/${profileUser.id}`}
-                                        className="flex items-center text-blue-600 hover:text-blue-700"
-                                    >
-                                        View all reviews
-                                        <ArrowRightIcon className="h-4 w-4 ml-1" />
-                                    </Link>
-                                </div>
+                        <MotionWrapper type="slideUp" delay={0.4}>
+                            <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm overflow-hidden`}>
+                                <div className="p-6">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('ratingsReviews')}</h2>
+                                        <Link
+                                            to={`/freelancer-reviews/${profileUser.id}`}
+                                            className={`flex items-center ${isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'}`}
+                                        >
+                                            {t('viewAllReviews')}
+                                            <ArrowRightIcon className="h-4 w-4 ml-1" />
+                                        </Link>
+                                    </div>
 
-                                {profileUser.id && (
-                                    <RatingComponent
-                                        freelancerId={profileUser.id}
-                                        onRatingSuccess={handleRatingSuccess}
-                                        previewMode={true}
-                                        maxReviews={3}
-                                        readOnly={true}
-                                    />
-                                )}
+                                    {profileUser.id && (
+                                        <RatingComponent
+                                            freelancerId={profileUser.id}
+                                            onRatingSuccess={handleRatingSuccess}
+                                            previewMode={true}
+                                            maxReviews={3}
+                                            readOnly={true}
+                                        />
+                                    )}
+                                </div>
                             </div>
-                        </div>
+                        </MotionWrapper>
                     </div>
 
                     {/* Right Column */}
                     <div className="space-y-6">
                         {/* Skills */}
                         {shouldShowSection(!!hasSkills) && (
-                            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                                <div className="p-6">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Skills</h2>
-                                    {hasSkills ? (
-                                        <div className="flex flex-wrap gap-2">
-                                            {profileUser.skills?.map(skill => (
-                                                <span
-                                                    key={skill}
-                                                    className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                                                >
-                                                    {skill}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <p className="text-gray-500 italic">No skills listed</p>
-                                    )}
+                            <MotionWrapper type="slideUp" delay={0.1}>
+                                <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm overflow-hidden`}>
+                                    <div className="p-6">
+                                        <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>{t('skills')}</h2>
+                                        {hasSkills ? (
+                                            <div className="flex flex-wrap gap-2">
+                                                {profileUser.skills?.map(skill => (
+                                                    <span
+                                                        key={skill}
+                                                        className={`px-3 py-1 ${isDark ? 'bg-blue-900/30 text-blue-300' : 'bg-blue-100 text-blue-800'} rounded-full text-sm`}
+                                                    >
+                                                        {skill}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <p className={isDark ? 'text-gray-400' : 'text-gray-500'} style={{ fontStyle: 'italic' }}>{t('noSkillsProvided')}</p>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
+                            </MotionWrapper>
                         )}
 
                         {/* Languages */}
                         {shouldShowSection(!!hasLanguages) && (
-                            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                                <div className="p-6">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Languages</h2>
-                                    {hasLanguages ? (
-                                        <ul className="space-y-2">
-                                            {profileUser.languages?.map((language, index) => (
-                                                <li key={index} className="text-gray-700">{language}</li>
-                                            ))}
-                                        </ul>
-                                    ) : (
-                                        <p className="text-gray-500 italic">No languages listed</p>
-                                    )}
+                            <MotionWrapper type="slideUp" delay={0.2}>
+                                <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm overflow-hidden`}>
+                                    <div className="p-6">
+                                        <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>{t('languages')}</h2>
+                                        {hasLanguages ? (
+                                            <ul className="space-y-2">
+                                                {profileUser.languages?.map((language, index) => (
+                                                    <li key={index} className={isDark ? 'text-gray-300' : 'text-gray-700'}>{language}</li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            <p className={isDark ? 'text-gray-400' : 'text-gray-500'} style={{ fontStyle: 'italic' }}>{t('noLanguagesProvided')}</p>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
+                            </MotionWrapper>
                         )}
 
                         {/* Contact Info */}
-                        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                            <div className="p-6">
-                                <h2 className="text-xl font-semibold text-gray-900 mb-4">Contact</h2>
-                                <div className="space-y-3">
-                                    <button
-                                        onClick={() => navigate(`/chat/${profileUser.id}`)}
-                                        className="flex items-center text-gray-700 hover:text-blue-600 w-full text-left"
-                                    >
-                                        <EnvelopeIcon className="h-5 w-5 mr-2" />
-                                        <span>Send a message</span>
-                                    </button>
-                                    <a href="#" className="flex items-center text-gray-700 hover:text-blue-600">
-                                        <PhoneIcon className="h-5 w-5 mr-2" />
-                                        <span>Schedule a call</span>
-                                    </a>
-                                    <a href="#" className="flex items-center text-gray-700 hover:text-blue-600">
-                                        <GlobeAltIcon className="h-5 w-5 mr-2" />
-                                        <span>View portfolio</span>
-                                    </a>
+                        <MotionWrapper type="slideUp" delay={0.3}>
+                            <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm overflow-hidden`}>
+                                <div className="p-6">
+                                    <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>{t('contact')}</h2>
+                                    <div className="space-y-3">
+                                        <button
+                                            onClick={() => {
+                                                if (!user) {
+                                                    navigate('/signup');
+                                                } else {
+                                                    navigate(`/chat/${profileUser.id}`);
+                                                }
+                                            }}
+                                            className={`flex items-center ${isDark ? 'text-gray-300 hover:text-blue-400' : 'text-gray-700 hover:text-blue-600'} w-full text-left`}
+                                        >
+                                            <EnvelopeIcon className="h-5 w-5 mr-2" />
+                                            <span>{t('sendMessage')}</span>
+                                        </button>
+                                        <a href="#" className={`flex items-center ${isDark ? 'text-gray-300 hover:text-blue-400' : 'text-gray-700 hover:text-blue-600'}`}>
+                                            <PhoneIcon className="h-5 w-5 mr-2" />
+                                            <span>{t('scheduleCall')}</span>
+                                        </a>
+                                        <a href="#" className={`flex items-center ${isDark ? 'text-gray-300 hover:text-blue-400' : 'text-gray-700 hover:text-blue-600'}`}>
+                                            <GlobeAltIcon className="h-5 w-5 mr-2" />
+                                            <span>{t('viewPortfolio')}</span>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </MotionWrapper>
                     </div>
                 </div>
 
@@ -472,24 +505,24 @@ const Profile: React.FC = () => {
                 {/* Assignment Modal */}
                 {isAssignModalOpen && profileUser && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" role="dialog">
-                        <div className="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+                        <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto`}>
                             <div className="p-6">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h2 className="text-2xl font-bold text-gray-900">
-                                        Assign Task to {profileUser.fullName}
+                                    <h2 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                        {t('assignTaskTo')} {profileUser.fullName}
                                     </h2>
                                     <button
                                         onClick={() => {
                                             setIsAssignModalOpen(false);
                                         }}
-                                        className="text-gray-400 hover:text-gray-600"
+                                        className={isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'}
                                     >
                                         <XMarkIcon className="h-6 w-6" />
                                     </button>
                                 </div>
 
-                                <p className="text-gray-600 mb-6">
-                                    Select one of your available tasks to assign to this user:
+                                <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'} mb-6`}>
+                                    {t('selectTaskToAssign')}
                                 </p>
 
                                 {loadingTasks ? (
@@ -497,39 +530,39 @@ const Profile: React.FC = () => {
                                         <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent" role="status">
                                             <span className="sr-only">Loading...</span>
                                         </div>
-                                        <p className="mt-4 text-gray-600">Loading your tasks...</p>
+                                        <p className="mt-4 text-gray-600">{t('loadingTasks')}</p>
                                     </div>
                                 ) : clientTasks.length === 0 ? (
                                     <div className="text-center py-12">
-                                        <p className="text-gray-600">You don't have any available tasks to assign.</p>
-                                        <p className="text-sm text-gray-500 mt-2">Create a new task in the "My Tasks" section.</p>
+                                        <p className={isDark ? 'text-gray-300' : 'text-gray-600'}>{t('noAvailableTasks')}</p>
+                                        <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-2`}>{t('createTaskInMyTasks')}</p>
                                     </div>
                                 ) : (
                                     <div className="space-y-3">
                                         {clientTasks.map(task => (
                                             <div
                                                 key={task.id}
-                                                className="border border-gray-200 rounded-lg p-4 hover:border-blue-500 transition-colors"
+                                                className={`border ${isDark ? 'border-gray-700 hover:border-blue-500' : 'border-gray-200 hover:border-blue-500'} rounded-lg p-4 transition-colors`}
                                             >
                                                 <div className="flex justify-between items-start">
                                                     <div className="flex-1">
-                                                        <h3 className="font-semibold text-gray-900">{task.title}</h3>
-                                                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">{task.description}</p>
+                                                        <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{task.title}</h3>
+                                                        <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'} mt-1 line-clamp-2`}>{task.description}</p>
                                                         <div className="flex items-center gap-4 mt-2">
-                                                            <span className="text-sm font-medium text-gray-900">
+                                                            <span className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
                                                                 ${task.budget}
                                                             </span>
                                                             <div className="flex flex-wrap gap-1">
                                                                 {task.skills.slice(0, 3).map(skill => (
                                                                     <span
                                                                         key={skill}
-                                                                        className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs"
+                                                                        className={`px-2 py-0.5 ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'} rounded text-xs`}
                                                                     >
                                                                         {skill}
                                                                     </span>
                                                                 ))}
                                                                 {task.skills.length > 3 && (
-                                                                    <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs">
+                                                                    <span className={`px-2 py-0.5 ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'} rounded text-xs`}>
                                                                         +{task.skills.length - 3} more
                                                                     </span>
                                                                 )}
@@ -541,7 +574,7 @@ const Profile: React.FC = () => {
                                                         disabled={assigningTask}
                                                         className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
                                                     >
-                                                        {assigningTask ? 'Assigning...' : 'Assign'}
+                                                        {assigningTask ? t('assigning') : t('assign')}
                                                     </button>
                                                 </div>
                                             </div>

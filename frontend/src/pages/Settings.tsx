@@ -4,7 +4,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { SunIcon, MoonIcon, XCircleIcon, PlusIcon, EyeIcon, CameraIcon } from '@heroicons/react/24/outline';
+import { SunIcon, MoonIcon, XCircleIcon, PlusIcon, CameraIcon } from '@heroicons/react/24/outline';
 import { useAccessibility } from '../contexts/AccessibilityContext';
 import Avatar from '../components/Avatar';
 import SkillSelector from '../components/SkillSelector';
@@ -210,30 +210,32 @@ const Settings: React.FC = () => {
     }
   };
 
+  const isDark = theme === 'dark';
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} py-8`}>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('settings')}</h1>
+        <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-6`}>{t('settings')}</h1>
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
           </div>
         ) : (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
-            <form onSubmit={handleSubmit}>
-              <div className="space-y-8">
-                {/* App Settings (Moved to top) */}
-                <div>
-                  <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('appSettings')}</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="space-y-6">
+              {/* Platform Settings Section */}
+              <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm p-6`}>
+                <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-6 pb-3 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>{t('appSettings')}</h2>
+                <div className="space-y-6">
 
                   {/* Profile Visibility - available to all users */}
                   <div className="mb-6">
-                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">{t('profileVisibility') || 'Profile Visibility'}</h3>
+                    <h3 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-4`}>{t('profileVisibility') || 'Profile Visibility'}</h3>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <span className="text-gray-700 dark:text-gray-300">{t('makeProfileHidden') || 'Make my account hidden'}</span>
-                        <span className="text-xs text-gray-500">({t('hiddenProfileInfo') || 'Your profile will not appear on the Find Freelancers page'})</span>
+                        <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>{t('makeProfileHidden') || 'Make my account hidden'}</span>
+                        <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>({t('hiddenProfileInfo') || 'Your profile will not appear on the Find Freelancers page'})</span>
                       </div>
                       <button
                         type="button"
@@ -252,12 +254,12 @@ const Settings: React.FC = () => {
                   </div>
 
                   {/* Accessibility Settings */}
-                  <div className="mb-6 border-t border-gray-200 dark:border-gray-700 pt-6">
-                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">{t('accessibility') || 'Accessibility'}</h3>
+                  <div className={`mb-6 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'} pt-6`}>
+                    <h3 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-4`}>{t('accessibility') || 'Accessibility'}</h3>
 
                     {/* Font Size */}
                     <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                         {t('fontSize') || 'Font Size'}
                       </label>
                       <div className="flex space-x-4">
@@ -266,30 +268,30 @@ const Settings: React.FC = () => {
                           onClick={() => setFontSize('normal')}
                           className={`px-3 py-2 border rounded-md text-sm ${fontSize === 'normal'
                             ? 'bg-blue-600 text-white border-blue-600'
-                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
+                            : `${isDark ? 'bg-gray-800 text-gray-300 border-gray-600' : 'bg-white text-gray-700 border-gray-300'}`
                             }`}
                         >
-                          Normal
+                          {t('normal')}
                         </button>
                         <button
                           type="button"
                           onClick={() => setFontSize('large')}
                           className={`px-3 py-2 border rounded-md text-base ${fontSize === 'large'
                             ? 'bg-blue-600 text-white border-blue-600'
-                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
+                            : `${isDark ? 'bg-gray-800 text-gray-300 border-gray-600' : 'bg-white text-gray-700 border-gray-300'}`
                             }`}
                         >
-                          Large
+                          {t('large')}
                         </button>
                         <button
                           type="button"
                           onClick={() => setFontSize('xlarge')}
                           className={`px-3 py-2 border rounded-md text-lg ${fontSize === 'xlarge'
                             ? 'bg-blue-600 text-white border-blue-600'
-                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
+                            : `${isDark ? 'bg-gray-800 text-gray-300 border-gray-600' : 'bg-white text-gray-700 border-gray-300'}`
                             }`}
                         >
-                          Extra Large
+                          {t('extraLarge')}
                         </button>
                       </div>
                     </div>
@@ -297,8 +299,7 @@ const Settings: React.FC = () => {
                     {/* High Contrast */}
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center space-x-3">
-                        <EyeIcon className="h-6 w-6 text-gray-500" />
-                        <span className="text-gray-700 dark:text-gray-300">{t('highContrast') || 'High Contrast'}</span>
+                        <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>{t('highContrast') || 'High Contrast'}</span>
                       </div>
                       <button
                         type="button"
@@ -318,7 +319,7 @@ const Settings: React.FC = () => {
                     {/* Reduced Motion */}
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center space-x-3">
-                        <span className="text-gray-700 dark:text-gray-300">{t('reducedMotion') || 'Reduced Motion'}</span>
+                        <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>{t('reducedMotion') || 'Reduced Motion'}</span>
                       </div>
                       <button
                         type="button"
@@ -338,7 +339,7 @@ const Settings: React.FC = () => {
                     {/* Highlight Links */}
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center space-x-3">
-                        <span className="text-gray-700 dark:text-gray-300">{t('highlightLinks') || 'Highlight Links'}</span>
+                        <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>{t('highlightLinks') || 'Highlight Links'}</span>
                       </div>
                       <button
                         type="button"
@@ -358,7 +359,7 @@ const Settings: React.FC = () => {
                     {/* Big Cursor */}
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center space-x-3">
-                        <span className="text-gray-700 dark:text-gray-300">{t('bigCursor') || 'Big Cursor'}</span>
+                        <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>{t('bigCursor') || 'Big Cursor'}</span>
                       </div>
                       <button
                         type="button"
@@ -378,7 +379,7 @@ const Settings: React.FC = () => {
                     {/* Reading Guide */}
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center space-x-3">
-                        <span className="text-gray-700 dark:text-gray-300">{t('readingGuide') || 'Reading Guide'}</span>
+                        <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>{t('readingGuide') || 'Reading Guide'}</span>
                       </div>
                       <button
                         type="button"
@@ -398,7 +399,7 @@ const Settings: React.FC = () => {
                     {/* Invert Colors */}
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center space-x-3">
-                        <span className="text-gray-700 dark:text-gray-300">{t('invertColors') || 'Invert Colors'}</span>
+                        <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>{t('invertColors') || 'Invert Colors'}</span>
                       </div>
                       <button
                         type="button"
@@ -417,7 +418,7 @@ const Settings: React.FC = () => {
 
                     {/* Saturation */}
                     <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                         {t('saturation') || 'Saturation'}
                       </label>
                       <div className="flex flex-wrap gap-2">
@@ -426,40 +427,40 @@ const Settings: React.FC = () => {
                           onClick={() => setSaturation('normal')}
                           className={`px-3 py-2 border rounded-md text-sm ${saturation === 'normal'
                             ? 'bg-blue-600 text-white border-blue-600'
-                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
+                            : `${isDark ? 'bg-gray-800 text-gray-300 border-gray-600' : 'bg-white text-gray-700 border-gray-300'}`
                             }`}
                         >
-                          Normal
+                          {t('normal')}
                         </button>
                         <button
                           type="button"
                           onClick={() => setSaturation('low')}
                           className={`px-3 py-2 border rounded-md text-sm ${saturation === 'low'
                             ? 'bg-blue-600 text-white border-blue-600'
-                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
+                            : `${isDark ? 'bg-gray-800 text-gray-300 border-gray-600' : 'bg-white text-gray-700 border-gray-300'}`
                             }`}
                         >
-                          Low
+                          {t('low')}
                         </button>
                         <button
                           type="button"
                           onClick={() => setSaturation('high')}
                           className={`px-3 py-2 border rounded-md text-sm ${saturation === 'high'
                             ? 'bg-blue-600 text-white border-blue-600'
-                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
+                            : `${isDark ? 'bg-gray-800 text-gray-300 border-gray-600' : 'bg-white text-gray-700 border-gray-300'}`
                             }`}
                         >
-                          High
+                          {t('high')}
                         </button>
                         <button
                           type="button"
                           onClick={() => setSaturation('bw')}
                           className={`px-3 py-2 border rounded-md text-sm ${saturation === 'bw'
                             ? 'bg-blue-600 text-white border-blue-600'
-                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600'
+                            : `${isDark ? 'bg-gray-800 text-gray-300 border-gray-600' : 'bg-white text-gray-700 border-gray-300'}`
                             }`}
                         >
-                          B&W
+                          {t('bw')}
                         </button>
                       </div>
                     </div>
@@ -467,7 +468,7 @@ const Settings: React.FC = () => {
 
                   {/* Theme Settings */}
                   <div className="mb-6">
-                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">{t('appearance')}</h3>
+                    <h3 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-4`}>{t('appearance')}</h3>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         {theme === 'light' ? (
@@ -475,7 +476,7 @@ const Settings: React.FC = () => {
                         ) : (
                           <MoonIcon className="h-6 w-6 text-blue-400" />
                         )}
-                        <span className="text-gray-700 dark:text-gray-300">{t('darkMode')}</span>
+                        <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>{t('darkMode')}</span>
                       </div>
                       <button
                         type="button"
@@ -495,14 +496,14 @@ const Settings: React.FC = () => {
 
                   {/* Language Settings */}
                   <div>
-                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">{t('language')}</h3>
+                    <h3 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-4`}>{t('language')}</h3>
                     <div className="space-y-2">
                       <button
                         type="button"
                         onClick={() => changeLanguage('en')}
                         className={`w-full flex items-center justify-between p-3 rounded-md border ${language === 'en'
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
-                          : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                          ? `border-blue-500 ${isDark ? 'bg-blue-900/20 text-blue-300' : 'bg-blue-50 text-blue-700'}`
+                          : `${isDark ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'}`
                           }`}
                       >
                         <div className="flex items-center">
@@ -517,8 +518,8 @@ const Settings: React.FC = () => {
                         type="button"
                         onClick={() => changeLanguage('uk')}
                         className={`w-full flex items-center justify-between p-3 rounded-md border ${language === 'uk'
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
-                          : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                          ? `border-blue-500 ${isDark ? 'bg-blue-900/20 text-blue-300' : 'bg-blue-50 text-blue-700'}`
+                          : `${isDark ? 'border-gray-700 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'}`
                           }`}
                       >
                         <div className="flex items-center">
@@ -532,10 +533,15 @@ const Settings: React.FC = () => {
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Profile Settings Section */}
+              <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm p-6`}>
+                <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-6 pb-3 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>{t('profileInformation')}</h2>
 
                 {/* Profile Picture Section */}
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                  <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('profilePicture') || 'Profile Picture'}</h2>
+                <div className="mb-8">
+                  <h3 className={`text-lg font-medium ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>{t('profilePicture') || 'Profile Picture'}</h3>
                   <div className="flex flex-col sm:flex-row items-center gap-6">
                     <div className="relative">
                       <Avatar
@@ -561,10 +567,10 @@ const Settings: React.FC = () => {
                     <div className="flex-1">
                       <div className="flex items-center justify-between max-w-md">
                         <div className="flex flex-col">
-                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          <span className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                             {t('showAvatarToOthers') || 'Show profile picture to others'}
                           </span>
-                          <span className="text-xs text-gray-500">
+                          <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                             {t('avatarVisibilityInfo') || 'If disabled, only you will see your profile picture.'}
                           </span>
                         </div>
@@ -586,12 +592,12 @@ const Settings: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Profile Section */}
-                <div>
-                  <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('profileInformation')}</h2>
+                {/* Profile Information Section */}
+                <div className={`border-t ${isDark ? 'border-gray-700' : 'border-gray-200'} pt-6`}>
+                  <h3 className={`text-lg font-medium ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>{t('profileInformation')}</h3>
                   <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                     <div className="sm:col-span-4">
-                      <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <label htmlFor="title" className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                         {t('professionalTitle')}
                       </label>
                       <div className="mt-1">
@@ -600,14 +606,14 @@ const Settings: React.FC = () => {
                           id="title"
                           value={title}
                           onChange={(e) => setTitle(e.target.value)}
-                          className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                          className={`shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-md px-4 py-2`}
                           placeholder="UI/UX Designer"
                         />
                       </div>
                     </div>
 
                     <div className="sm:col-span-6">
-                      <label htmlFor="bio" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <label htmlFor="bio" className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                         {t('aboutMe')}
                       </label>
                       <div className="mt-1">
@@ -616,14 +622,14 @@ const Settings: React.FC = () => {
                           rows={4}
                           value={bio}
                           onChange={(e) => setBio(e.target.value)}
-                          className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                          className={`shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-md px-4 py-2`}
                           placeholder="Tell potential clients about yourself..."
                         />
                       </div>
                     </div>
 
                     <div className="sm:col-span-3">
-                      <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <label htmlFor="location" className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                         {t('location')}
                       </label>
                       <div className="mt-1">
@@ -632,26 +638,26 @@ const Settings: React.FC = () => {
                           id="location"
                           value={location}
                           onChange={(e) => setLocation(e.target.value)}
-                          className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                          className={`shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-md px-4 py-2`}
                           placeholder="e.g. New York, USA"
                         />
                       </div>
                     </div>
 
                     <div className="sm:col-span-3">
-                      <label htmlFor="hourlyRate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <label htmlFor="hourlyRate" className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                         {t('hourlyRate')} (USD)
                       </label>
                       <div className="mt-1 relative rounded-md shadow-sm">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <span className="text-gray-500 sm:text-sm">$</span>
+                          <span className={`${isDark ? 'text-gray-400' : 'text-gray-500'} sm:text-sm`}>$</span>
                         </div>
                         <input
                           type="number"
                           id="hourlyRate"
                           value={hourlyRate}
                           onChange={(e) => setHourlyRate(e.target.value)}
-                          className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-7 sm:text-sm border-gray-300 rounded-md"
+                          className={`focus:ring-blue-500 focus:border-blue-500 block w-full pl-7 pr-4 py-2 sm:text-sm ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-md`}
                           placeholder="0.00"
                           min="0"
                           step="0.01"
@@ -663,7 +669,7 @@ const Settings: React.FC = () => {
 
                 {/* Skills Section */}
                 <div>
-                  <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('skills')}</h2>
+                  <h2 className={`text-lg font-medium ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>{t('skills')}</h2>
                   <div className="space-y-4">
                     <SkillSelector
                       selectedSkills={skills}
@@ -674,14 +680,14 @@ const Settings: React.FC = () => {
 
                 {/* Languages Section */}
                 <div>
-                  <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('languages')}</h2>
+                  <h2 className={`text-lg font-medium ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>{t('languages')}</h2>
                   <div className="space-y-4">
                     <div className="flex">
                       <input
                         type="text"
                         value={newLanguage}
                         onChange={(e) => setNewLanguage(e.target.value)}
-                        className="flex-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-l-md"
+                        className={`flex-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-l-md px-4 py-2`}
                         placeholder="Add a language (e.g. English (Native))"
                         onKeyPress={(e) => {
                           if (e.key === 'Enter') {
@@ -701,12 +707,12 @@ const Settings: React.FC = () => {
 
                     <div className="flex flex-wrap gap-2">
                       {languages.map((lang, index) => (
-                        <div key={index} className="flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full">
+                        <div key={index} className={`flex items-center ${isDark ? 'bg-green-900/30 text-green-300' : 'bg-green-100 text-green-800'} px-3 py-1 rounded-full`}>
                           <span className="text-sm">{lang}</span>
                           <button
                             type="button"
                             onClick={() => handleRemoveLanguage(lang)}
-                            className="ml-1 text-green-600 hover:text-green-800"
+                            className={`ml-1 ${isDark ? 'text-green-400 hover:text-green-300' : 'text-green-600 hover:text-green-800'}`}
                           >
                             <XCircleIcon className="h-4 w-4" />
                           </button>
@@ -719,11 +725,11 @@ const Settings: React.FC = () => {
                 {/* Education Section */}
                 <div>
                   <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-lg font-medium text-gray-900 dark:text-white">{t('education')}</h2>
+                    <h2 className={`text-lg font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('education')}</h2>
                     <button
                       type="button"
                       onClick={handleAddEducation}
-                      className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-blue-600 bg-blue-100 hover:bg-blue-200"
+                      className={`inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md ${isDark ? 'text-blue-400 bg-blue-900/30 hover:bg-blue-900/40' : 'text-blue-600 bg-blue-100 hover:bg-blue-200'}`}
                     >
                       <PlusIcon className="h-4 w-4 mr-1" />
                       {t('addEducation')}
@@ -732,15 +738,15 @@ const Settings: React.FC = () => {
 
                   <div className="space-y-4">
                     {education.map((edu, index) => (
-                      <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-md p-4">
+                      <div key={index} className={`border ${isDark ? 'border-gray-700' : 'border-gray-200'} rounded-md p-4`}>
                         <div className="flex justify-between items-start mb-4">
-                          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          <h3 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                             {t('educationNumber')}{index + 1}
                           </h3>
                           <button
                             type="button"
                             onClick={() => handleRemoveEducation(index)}
-                            className="text-red-600 hover:text-red-800"
+                            className={isDark ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-800'}
                           >
                             <XCircleIcon className="h-5 w-5" />
                           </button>
@@ -748,38 +754,38 @@ const Settings: React.FC = () => {
 
                         <div className="grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-6">
                           <div className="sm:col-span-3">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                               {t('institution')}
                             </label>
                             <input
                               type="text"
                               value={edu.institution}
                               onChange={(e) => handleEducationChange(index, 'institution', e.target.value)}
-                              className="mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                              className={`mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-md px-4 py-2`}
                             />
                           </div>
 
                           <div className="sm:col-span-3">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                               {t('year')}
                             </label>
                             <input
                               type="text"
                               value={edu.year}
                               onChange={(e) => handleEducationChange(index, 'year', e.target.value)}
-                              className="mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                              className={`mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-md px-4 py-2`}
                             />
                           </div>
 
                           <div className="sm:col-span-6">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                               {t('degree')}
                             </label>
                             <input
                               type="text"
                               value={edu.degree}
                               onChange={(e) => handleEducationChange(index, 'degree', e.target.value)}
-                              className="mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                              className={`mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-md px-4 py-2`}
                             />
                           </div>
                         </div>
@@ -791,11 +797,11 @@ const Settings: React.FC = () => {
                 {/* Experience Section */}
                 <div>
                   <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-lg font-medium text-gray-900 dark:text-white">{t('workExperience')}</h2>
+                    <h2 className={`text-lg font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('workExperience')}</h2>
                     <button
                       type="button"
                       onClick={handleAddExperience}
-                      className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-blue-600 bg-blue-100 hover:bg-blue-200"
+                      className={`inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md ${isDark ? 'text-blue-400 bg-blue-900/30 hover:bg-blue-900/40' : 'text-blue-600 bg-blue-100 hover:bg-blue-200'}`}
                     >
                       <PlusIcon className="h-4 w-4 mr-1" />
                       {t('addExperience')}
@@ -804,15 +810,15 @@ const Settings: React.FC = () => {
 
                   <div className="space-y-4">
                     {experience.map((exp, index) => (
-                      <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-md p-4">
+                      <div key={index} className={`border ${isDark ? 'border-gray-700' : 'border-gray-200'} rounded-md p-4`}>
                         <div className="flex justify-between items-start mb-4">
-                          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          <h3 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                             {t('experienceNumber')}{index + 1}
                           </h3>
                           <button
                             type="button"
                             onClick={() => handleRemoveExperience(index)}
-                            className="text-red-600 hover:text-red-800"
+                            className={isDark ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-800'}
                           >
                             <XCircleIcon className="h-5 w-5" />
                           </button>
@@ -820,51 +826,51 @@ const Settings: React.FC = () => {
 
                         <div className="grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-6">
                           <div className="sm:col-span-3">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                               {t('company')}
                             </label>
                             <input
                               type="text"
                               value={exp.company}
                               onChange={(e) => handleExperienceChange(index, 'company', e.target.value)}
-                              className="mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                              className={`mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-md`}
                             />
                           </div>
 
                           <div className="sm:col-span-3">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                               {t('period')}
                             </label>
                             <input
                               type="text"
                               value={exp.period}
                               onChange={(e) => handleExperienceChange(index, 'period', e.target.value)}
-                              className="mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                              className={`mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-md`}
                               placeholder="2019-2022"
                             />
                           </div>
 
                           <div className="sm:col-span-6">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                               {t('role')}
                             </label>
                             <input
                               type="text"
                               value={exp.role}
                               onChange={(e) => handleExperienceChange(index, 'role', e.target.value)}
-                              className="mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                              className={`mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-md`}
                             />
                           </div>
 
                           <div className="sm:col-span-6">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                               {t('description')}
                             </label>
                             <textarea
                               rows={3}
                               value={exp.description}
                               onChange={(e) => handleExperienceChange(index, 'description', e.target.value)}
-                              className="mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                              className={`mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-md`}
                             />
                           </div>
                         </div>
@@ -872,40 +878,41 @@ const Settings: React.FC = () => {
                     ))}
                   </div>
                 </div>
-
-
               </div>
 
-              <div className="mt-8 flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => navigate('/profile')}
-                  className="bg-white dark:bg-gray-800 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-3"
-                >
-                  {t('cancel')}
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-                >
-                  {saving ? t('saving') : t('saveChanges')}
-                </button>
+              {/* Submit Buttons */}
+              <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm p-6`}>
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => navigate('/profile')}
+                    className={`${isDark ? 'bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'} py-2 px-4 border rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-3`}
+                  >
+                    {t('cancel')}
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                  >
+                    {saving ? t('saving') : t('saveChanges')}
+                  </button>
+                </div>
               </div>
 
               {saveError && (
-                <div className="mt-4 text-sm text-red-600 text-center">
+                <div className={`mt-4 text-sm ${isDark ? 'text-red-400' : 'text-red-600'} text-center`}>
                   {saveError}
                 </div>
               )}
 
               {saveSuccess && (
-                <div className="mt-4 text-sm text-green-600 text-center">
+                <div className={`mt-4 text-sm ${isDark ? 'text-green-400' : 'text-green-600'} text-center`}>
                   {t('profileSaved')}
                 </div>
               )}
-            </form>
-          </div>
+            </div>
+          </form>
         )}
       </div>
     </div>

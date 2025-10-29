@@ -6,42 +6,42 @@ export declare class NotificationsService {
     constructor(prisma: PrismaService, chatGateway: ChatGateway);
     createNotification(userId: string, type: string, title: string, message: string, relatedId?: string): Promise<{
         id: string;
-        userId: string;
-        type: string;
+        createdAt: Date;
         title: string;
         message: string;
+        userId: string;
+        type: string;
         relatedId: string | null;
         isRead: boolean;
-        createdAt: Date;
     }>;
     getUserNotifications(userId: string): Promise<{
         id: string;
-        userId: string;
-        type: string;
+        createdAt: Date;
         title: string;
         message: string;
+        userId: string;
+        type: string;
         relatedId: string | null;
         isRead: boolean;
-        createdAt: Date;
     }[]>;
     markAsRead(id: string): Promise<{
         id: string;
-        userId: string;
-        type: string;
+        createdAt: Date;
         title: string;
         message: string;
+        userId: string;
+        type: string;
         relatedId: string | null;
         isRead: boolean;
-        createdAt: Date;
     }>;
     deleteNotification(id: string): Promise<{
         id: string;
-        userId: string;
-        type: string;
+        createdAt: Date;
         title: string;
         message: string;
+        userId: string;
+        type: string;
         relatedId: string | null;
         isRead: boolean;
-        createdAt: Date;
     } | null>;
 }

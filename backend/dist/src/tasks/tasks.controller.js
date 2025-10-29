@@ -40,6 +40,10 @@ let TasksController = class TasksController {
     async getTaskById(id) {
         return this.tasksService.getTaskById(id);
     }
+    async getRecommendedFreelancers(id, limit) {
+        const parsedLimit = limit ? parseInt(limit, 10) : undefined;
+        return this.tasksService.getRecommendedFreelancersForTask(id, parsedLimit && parsedLimit > 0 ? parsedLimit : 10);
+    }
     async getClientTasks(clientId) {
         return this.tasksService.getClientTasks(clientId);
     }
@@ -76,6 +80,15 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], TasksController.prototype, "getTaskById", null);
+__decorate([
+    (0, common_1.Get)(':id/recommendations'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Query)('limit')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], TasksController.prototype, "getRecommendedFreelancers", null);
 __decorate([
     (0, common_1.Get)('client/:clientId'),
     __param(0, (0, common_1.Param)('clientId')),

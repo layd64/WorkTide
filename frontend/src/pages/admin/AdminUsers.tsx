@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Search, Ban, CheckCircle, Bell, X } from 'lucide-react';
 import { API_ENDPOINTS } from '../../config/api';
+import { useTheme } from '../../contexts/ThemeContext';
 import { toast } from 'sonner';
 
 interface User {
@@ -14,6 +15,8 @@ interface User {
 }
 
 const AdminUsers: React.FC = () => {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -98,42 +101,42 @@ const AdminUsers: React.FC = () => {
 
     return (
         <div>
-            <h2 className="text-3xl font-bold mb-8 text-gray-800 dark:text-white">User Management</h2>
+            <h2 className={`text-3xl font-bold mb-8 ${isDark ? 'text-white' : 'text-gray-800'}`}>User Management</h2>
 
             <div className="mb-6 relative">
                 <input
                     type="text"
                     placeholder="Search users..."
-                    className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300'}`}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
                 <Search className="absolute left-3 top-2.5 text-gray-400 w-5 h-5" />
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead className="bg-gray-50 dark:bg-gray-700">
+            <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow overflow-hidden`}>
+                <table className={`min-w-full divide-y ${isDark ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                    <thead className={isDark ? 'bg-gray-700' : 'bg-gray-50'}>
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Role</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                            <th className={`px-6 py-3 text-left text-xs font-medium ${isDark ? 'text-gray-300' : 'text-gray-500'} uppercase tracking-wider`}>Name</th>
+                            <th className={`px-6 py-3 text-left text-xs font-medium ${isDark ? 'text-gray-300' : 'text-gray-500'} uppercase tracking-wider`}>Email</th>
+                            <th className={`px-6 py-3 text-left text-xs font-medium ${isDark ? 'text-gray-300' : 'text-gray-500'} uppercase tracking-wider`}>Role</th>
+                            <th className={`px-6 py-3 text-left text-xs font-medium ${isDark ? 'text-gray-300' : 'text-gray-500'} uppercase tracking-wider`}>Status</th>
+                            <th className={`px-6 py-3 text-left text-xs font-medium ${isDark ? 'text-gray-300' : 'text-gray-500'} uppercase tracking-wider`}>Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    <tbody className={`${isDark ? 'bg-gray-800 divide-gray-700' : 'bg-white divide-gray-200'} divide-y`}>
                         {filteredUsers.map((user) => (
                             <tr key={user.id}>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{user.fullName}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{user.email}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 capitalize">{user.userType}</td>
+                                <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{user.fullName}</td>
+                                <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{user.email}</td>
+                                <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} capitalize`}>{user.userType}</td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <span
-                                        className={`px - 2 inline - flex text - xs leading - 5 font - semibold rounded - full ${user.isBanned
-                                            ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300'
-                                            : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300'
-                                            } `}
+                                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.isBanned
+                                            ? isDark ? 'bg-red-900/20 text-red-300' : 'bg-red-100 text-red-800'
+                                            : isDark ? 'bg-green-900/20 text-green-300' : 'bg-green-100 text-green-800'
+                                            }`}
                                     >
                                         {user.isBanned ? 'Banned' : 'Active'}
                                     </span>
@@ -145,8 +148,8 @@ const AdminUsers: React.FC = () => {
                                         className={`flex items-center ${user.userType === 'admin'
                                             ? 'text-gray-400 cursor-not-allowed'
                                             : user.isBanned
-                                                ? 'text-green-600 hover:text-green-900 dark:hover:text-green-400'
-                                                : 'text-red-600 hover:text-red-900 dark:hover:text-red-400'
+                                                ? isDark ? 'text-green-400 hover:text-green-300' : 'text-green-600 hover:text-green-900'
+                                                : isDark ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'
                                             }`}
                                     >
                                         {user.isBanned ? (
@@ -161,7 +164,7 @@ const AdminUsers: React.FC = () => {
                                     </button>
                                     <button
                                         onClick={() => handleOpenNotificationModal(user)}
-                                        className="flex items-center text-blue-600 hover:text-blue-900 dark:hover:text-blue-400 ml-4"
+                                        className={`flex items-center ${isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-900'} ml-4`}
                                     >
                                         <Bell className="w-4 h-4 mr-1" /> Notify
                                     </button>
@@ -174,38 +177,38 @@ const AdminUsers: React.FC = () => {
             {/* Notification Modal */}
             {showNotificationModal && selectedUser && (
                 <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md p-6 relative">
+                    <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg w-full max-w-md p-6 relative`}>
                         <button
                             onClick={() => setShowNotificationModal(false)}
-                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                            className={`absolute top-4 right-4 ${isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'}`}
                         >
                             <X className="w-6 h-6" />
                         </button>
-                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                        <h3 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>
                             Send Notification to {selectedUser.fullName}
                         </h3>
                         <form onSubmit={handleSendNotification}>
                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-1`}>
                                     Title
                                 </label>
                                 <input
                                     type="text"
                                     value={notificationTitle}
                                     onChange={(e) => setNotificationTitle(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300'}`}
                                     required
                                 />
                             </div>
                             <div className="mb-6">
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-1`}>
                                     Message
                                 </label>
                                 <textarea
                                     value={notificationMessage}
                                     onChange={(e) => setNotificationMessage(e.target.value)}
                                     rows={4}
-                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300'}`}
                                     required
                                 />
                             </div>
@@ -213,7 +216,7 @@ const AdminUsers: React.FC = () => {
                                 <button
                                     type="button"
                                     onClick={() => setShowNotificationModal(false)}
-                                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                                    className={`px-4 py-2 text-sm font-medium rounded-md ${isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
                                 >
                                     Cancel
                                 </button>
