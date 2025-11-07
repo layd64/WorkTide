@@ -88,6 +88,8 @@ export const API_ENDPOINTS = {
     sendNotification: `${API_BASE_URL}/admin/notifications`,
     getTasks: `${API_BASE_URL}/admin/tasks`,
     deleteTask: (id: string) => `${API_BASE_URL}/admin/tasks/${id}`,
+    getRatings: `${API_BASE_URL}/admin/ratings`,
+    deleteRating: (id: string) => `${API_BASE_URL}/admin/ratings/${id}`,
   },
   upload: `${API_BASE_URL}/upload`,
 };

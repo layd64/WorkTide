@@ -77,8 +77,8 @@ export declare class TasksService {
             updatedAt: Date;
             status: string;
             clientId: string;
-            taskId: string;
             freelancerId: string;
+            taskId: string;
         })[];
     } & {
         id: string;

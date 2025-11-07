@@ -173,6 +173,65 @@ let AdminService = class AdminService {
             },
         });
     }
+    async getAllRatings() {
+        return this.prisma.rating.findMany({
+            include: {
+                freelancer: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true,
+                    },
+                },
+                client: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true,
+                    },
+                },
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+        });
+    }
+    async deleteRating(ratingId, adminId) {
+        const rating = await this.prisma.rating.findUnique({
+            where: { id: ratingId },
+            include: {
+                freelancer: {
+                    select: {
+                        fullName: true,
+                    },
+                },
+            },
+        });
+        if (!rating) {
+            throw new Error('Rating not found');
+        }
+        const deletedRating = await this.prisma.rating.delete({
+            where: { id: ratingId },
+        });
+        const freelancerRatings = await this.prisma.rating.findMany({
+            where: { freelancerId: rating.freelancerId },
+        });
+        if (freelancerRatings.length > 0) {
+            const avgRating = freelancerRatings.reduce((sum, r) => sum + r.score, 0) / freelancerRatings.length;
+            await this.prisma.user.update({
+                where: { id: rating.freelancerId },
+                data: { rating: Math.round(avgRating * 10) / 10 },
+            });
+        }
+        else {
+            await this.prisma.user.update({
+                where: { id: rating.freelancerId },
+                data: { rating: null },
+            });
+        }
+        await this.logAction(adminId, 'DELETE_RATING', ratingId, `Deleted rating for ${rating.freelancer.fullName}`);
+        return deletedRating;
+    }
     async logAction(userId, action, targetId, details) {
         await this.prisma.actionLog.create({
             data: {

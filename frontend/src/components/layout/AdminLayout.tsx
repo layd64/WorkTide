@@ -1,6 +1,6 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Users, FileText, BarChart2, LogOut } from 'lucide-react';
+import { Users, FileText, BarChart2, LogOut, Star } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 
@@ -41,6 +41,13 @@ const AdminLayout: React.FC = () => {
                     >
                         <FileText className="w-5 h-5 mr-3" />
                         Tasks
+                    </Link>
+                    <Link
+                        to="/admin/ratings"
+                        className={`flex items-center px-6 py-3 ${isDark ? 'text-gray-200 hover:bg-gray-700' : 'text-gray-700 hover:bg-blue-50'} ${isActive('/admin/ratings') ? isDark ? 'bg-gray-700 border-r-4 border-blue-600' : 'bg-blue-50 border-r-4 border-blue-600' : ''}`}
+                    >
+                        <Star className="w-5 h-5 mr-3" />
+                        Ratings
                     </Link>
                     <Link
                         to="/admin/logs"

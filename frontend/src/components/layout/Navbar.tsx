@@ -278,18 +278,10 @@ const Navbar: React.FC = () => {
                                 >
                                     {t('chat') || 'Chat'}
                                 </Link>
+                                <NotificationMenu mobile={true} />
                             </>
                         )}
                     </div>
-                    {user && (
-                        <div className="px-4 py-2 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                            <span className="text-base font-medium text-gray-600 dark:text-gray-300">
-                                {t('notifications') || 'Notifications'}
-                            </span>
-                            {/* Reuse desktop notification dropdown on mobile */}
-                            <NotificationMenu />
-                        </div>
-                    )}
                     <div className="pt-4 pb-4 border-t border-gray-200 dark:border-gray-700">
                         {user ? (
                             <>
@@ -302,26 +294,26 @@ const Navbar: React.FC = () => {
                                         />
                                     </div>
                                     <div className="ml-3">
-                                        <div className="text-base font-medium text-gray-800 dark:text-white">{user.fullName}</div>
+                                        <div className="text-base font-medium text-black">{user.fullName}</div>
                                         <div className="text-sm font-medium text-gray-500 dark:text-gray-400">{user.email}</div>
                                     </div>
                                 </div>
                                 <div className="mt-3 space-y-1">
                                     <Link
                                         to="/profile"
-                                        className="block px-4 py-2 text-base font-medium text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        className="block px-4 py-2 text-base font-medium text-black hover:bg-gray-100 dark:hover:bg-gray-700"
                                     >
                                         {t('profile') || 'Profile'}
                                     </Link>
                                     <Link
                                         to="/settings"
-                                        className="block px-4 py-2 text-base font-medium text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        className="block px-4 py-2 text-base font-medium text-black hover:bg-gray-100 dark:hover:bg-gray-700"
                                     >
                                         {t('settings') || 'Settings'}
                                     </Link>
                                     <button
                                         onClick={handleLogout}
-                                        className="block w-full text-left px-4 py-2 text-base font-medium text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        className="block w-full text-left px-4 py-2 text-base font-medium text-black hover:bg-gray-100 dark:hover:bg-gray-700"
                                     >
                                         {t('logout') || 'Sign out'}
                                     </button>

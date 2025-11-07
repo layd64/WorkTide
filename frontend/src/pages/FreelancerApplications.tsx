@@ -99,7 +99,7 @@ const FreelancerApplications: React.FC = () => {
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-indigo-100 text-indigo-800';
       case 'accepted':
         return 'bg-green-100 text-green-800';
       case 'rejected':
@@ -114,9 +114,9 @@ const FreelancerApplications: React.FC = () => {
       case 'open':
         return 'bg-green-100 text-green-800';
       case 'in_progress':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-indigo-100 text-indigo-800';
       case 'completed':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-indigo-100 text-indigo-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -278,7 +278,7 @@ const FreelancerApplications: React.FC = () => {
                       <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('projectStatus')}</dt>
                       <dd className="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
                         {application.task.status === 'completed' ? (
-                          <span className="font-medium text-purple-600 dark:text-purple-400">{t('completed')}</span>
+                          <span className="font-medium text-indigo-600 dark:text-indigo-400">{t('completed')}</span>
                         ) : (
                           application.task.status.charAt(0).toUpperCase() + application.task.status.slice(1).replace('_', ' ')
                         )}

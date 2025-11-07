@@ -176,8 +176,9 @@ const AdminUsers: React.FC = () => {
             </div>
             {/* Notification Modal */}
             {showNotificationModal && selectedUser && (
-                <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg w-full max-w-md p-6 relative`}>
+                <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center">
+                    <div className="fixed inset-0 bg-gray-500 opacity-75" onClick={() => setShowNotificationModal(false)}></div>
+                    <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg w-full max-w-md p-6 relative z-10`}>
                         <button
                             onClick={() => setShowNotificationModal(false)}
                             className={`absolute top-4 right-4 ${isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'}`}

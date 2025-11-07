@@ -28,6 +28,7 @@ import AdminLayout from './components/layout/AdminLayout'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminUsers from './pages/admin/AdminUsers'
 import AdminTasks from './pages/admin/AdminTasks'
+import AdminRatings from './pages/admin/AdminRatings'
 import AdminLogs from './pages/admin/AdminLogs'
 import AdminRoute from './components/auth/AdminRoute'
 import ReadingGuide from './components/accessibility/ReadingGuide'
@@ -143,6 +144,7 @@ const AppContent: React.FC = () => {
               <Route index element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="tasks" element={<AdminTasks />} />
+              <Route path="ratings" element={<AdminRatings />} />
               <Route path="logs" element={<AdminLogs />} />
             </Route>
           </Route>

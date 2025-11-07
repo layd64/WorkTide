@@ -6,18 +6,6 @@ export declare class TaskRequestsController {
         taskId: string;
         freelancerId: string;
     }): Promise<{
-        task: {
-            id: string;
-            createdAt: Date;
-            updatedAt: Date;
-            title: string;
-            imageUrl: string | null;
-            skills: string[];
-            description: string;
-            budget: number;
-            status: string;
-            clientId: string;
-        };
         freelancer: {
             id: string;
             fullName: string;
@@ -28,16 +16,6 @@ export declare class TaskRequestsController {
             fullName: string;
             imageUrl: string | null;
         };
-    } & {
-        id: string;
-        createdAt: Date;
-        updatedAt: Date;
-        status: string;
-        clientId: string;
-        taskId: string;
-        freelancerId: string;
-    }>;
-    getFreelancerRequests(freelancerId: string): Promise<({
         task: {
             id: string;
             createdAt: Date;
@@ -50,10 +28,32 @@ export declare class TaskRequestsController {
             status: string;
             clientId: string;
         };
+    } & {
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        status: string;
+        clientId: string;
+        freelancerId: string;
+        taskId: string;
+    }>;
+    getFreelancerRequests(freelancerId: string): Promise<({
         client: {
             id: string;
             fullName: string;
             imageUrl: string | null;
+        };
+        task: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            title: string;
+            imageUrl: string | null;
+            skills: string[];
+            description: string;
+            budget: number;
+            status: string;
+            clientId: string;
         };
     } & {
         id: string;
@@ -61,23 +61,11 @@ export declare class TaskRequestsController {
         updatedAt: Date;
         status: string;
         clientId: string;
-        taskId: string;
         freelancerId: string;
+        taskId: string;
     })[]>;
     acceptRequest(requestId: string, req: any): Promise<{
         request: {
-            task: {
-                id: string;
-                createdAt: Date;
-                updatedAt: Date;
-                title: string;
-                imageUrl: string | null;
-                skills: string[];
-                description: string;
-                budget: number;
-                status: string;
-                clientId: string;
-            };
             freelancer: {
                 id: string;
                 email: string;
@@ -124,14 +112,26 @@ export declare class TaskRequestsController {
                 isAvatarVisible: boolean;
                 isBanned: boolean;
             };
+            task: {
+                id: string;
+                createdAt: Date;
+                updatedAt: Date;
+                title: string;
+                imageUrl: string | null;
+                skills: string[];
+                description: string;
+                budget: number;
+                status: string;
+                clientId: string;
+            };
         } & {
             id: string;
             createdAt: Date;
             updatedAt: Date;
             status: string;
             clientId: string;
-            taskId: string;
             freelancerId: string;
+            taskId: string;
         };
         chat: {
             partnerId: string;

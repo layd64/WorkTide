@@ -9,9 +9,9 @@ export declare class TaskApplicationsController {
         createdAt: Date;
         updatedAt: Date;
         status: string;
+        freelancerId: string;
         coverLetter: string | null;
         taskId: string;
-        freelancerId: string;
     }>;
     getTaskApplications(req: any, taskId: string): Promise<({
         freelancer: {
@@ -32,9 +32,9 @@ export declare class TaskApplicationsController {
         createdAt: Date;
         updatedAt: Date;
         status: string;
+        freelancerId: string;
         coverLetter: string | null;
         taskId: string;
-        freelancerId: string;
     })[]>;
     getFreelancerApplications(req: any): Promise<({
         task: {
@@ -60,9 +60,9 @@ export declare class TaskApplicationsController {
         createdAt: Date;
         updatedAt: Date;
         status: string;
+        freelancerId: string;
         coverLetter: string | null;
         taskId: string;
-        freelancerId: string;
     })[]>;
     updateApplicationStatus(req: any, applicationId: string, data: {
         status: 'accepted' | 'rejected';
@@ -71,9 +71,9 @@ export declare class TaskApplicationsController {
         createdAt: Date;
         updatedAt: Date;
         status: string;
+        freelancerId: string;
         coverLetter: string | null;
         taskId: string;
-        freelancerId: string;
     }>;
     assignFreelancer(req: any, applicationId: string): Promise<{
         freelancerId: string;
@@ -82,9 +82,9 @@ export declare class TaskApplicationsController {
             createdAt: Date;
             updatedAt: Date;
             status: string;
+            freelancerId: string;
             coverLetter: string | null;
             taskId: string;
-            freelancerId: string;
         };
         task: {
             id: string;

@@ -56,7 +56,6 @@ export class ProfileService {
     async getAllFreelancers(search?: string, skills: string[] = []) {
         const freelancers = await this.prisma.user.findMany({
             where: {
-                userType: 'freelancer',
                 isHidden: false,
                 AND: [
                     search ? {
@@ -107,8 +106,8 @@ export class ProfileService {
             throw new NotFoundException('User not found');
         }
 
-        // Determine if isHidden should be updated
-        const isHiddenUpdate = user.userType === 'freelancer' && profileData.isHidden !== undefined
+        // Determine if isHidden should be updated (allow for all user types)
+        const isHiddenUpdate = profileData.isHidden !== undefined
             ? { isHidden: profileData.isHidden }
             : {};
 

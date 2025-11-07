@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MagnifyingGlassIcon, FunnelIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, FunnelIcon, XMarkIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { API_ENDPOINTS } from '../config/api';
 import Avatar from '../components/Avatar';
 import { useTranslation } from 'react-i18next';
@@ -42,6 +42,12 @@ const FindFreelancers: React.FC = () => {
   const [freelancers, setFreelancers] = useState<Freelancer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [minRating, setMinRating] = useState<number | null>(null);
+  const [showSkillsFilter, setShowSkillsFilter] = useState(false);
+  const [allAvailableSkills, setAllAvailableSkills] = useState<string[]>([]);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const itemsPerPage = 15;
 
   // Assignment modal state
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
@@ -51,6 +57,22 @@ const FindFreelancers: React.FC = () => {
   const [assigningTask, setAssigningTask] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
+
+  // Fetch all skills on mount
+  useEffect(() => {
+    const fetchSkills = async () => {
+      try {
+        const response = await fetch(`${API_ENDPOINTS.auth.me.replace('/auth/me', '/skills')}`);
+        if (response.ok) {
+          const data = await response.json();
+          setAllAvailableSkills(data.map((s: { name: string }) => s.name));
+        }
+      } catch (err) {
+        console.error('Error fetching skills:', err);
+      }
+    };
+    fetchSkills();
+  }, []);
 
   // Fetch freelancers when component mounts or filters change
   useEffect(() => {
@@ -71,7 +93,25 @@ const FindFreelancers: React.FC = () => {
         }
 
         const data = await response.json();
-        setFreelancers(data);
+        // Filter out the current user if they have isHidden set to true (backend should handle this, but adding client-side check as safeguard)
+        let filteredData = user && user.isHidden
+          ? data.filter((f: Freelancer) => f.id !== user.id)
+          : data;
+        
+        // Apply rating filter
+        if (minRating !== null) {
+          filteredData = filteredData.filter((f: Freelancer) => (f.rating || 0) >= minRating);
+        }
+        
+        // Sort by rating
+        filteredData.sort((a: Freelancer, b: Freelancer) => {
+          const ratingA = a.rating || 0;
+          const ratingB = b.rating || 0;
+          return sortOrder === 'desc' ? ratingB - ratingA : ratingA - ratingB;
+        });
+        
+        setFreelancers(filteredData);
+        setCurrentPage(1); // Reset to first page when filters change
       } catch (err) {
         console.error('Error fetching freelancers:', err);
         setError('Failed to load freelancers. Please try again later.');
@@ -86,9 +126,7 @@ const FindFreelancers: React.FC = () => {
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [searchQuery, selectedSkills]);
-
-  const allSkills = Array.from(new Set(freelancers.flatMap(f => f.skills).filter(Boolean)));
+  }, [searchQuery, selectedSkills, minRating, sortOrder]);
 
   const toggleSkill = (skill: string) => {
     setSelectedSkills(prev =>
@@ -97,6 +135,22 @@ const FindFreelancers: React.FC = () => {
         : [...prev, skill]
     );
   };
+
+  const addSkill = (skill: string) => {
+    if (!selectedSkills.includes(skill)) {
+      setSelectedSkills(prev => [...prev, skill]);
+    }
+  };
+
+  const removeSkill = (skill: string) => {
+    setSelectedSkills(prev => prev.filter(s => s !== skill));
+  };
+
+  // Pagination calculations
+  const totalPages = Math.ceil(freelancers.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedFreelancers = freelancers.slice(startIndex, endIndex);
 
   const handleViewProfile = (freelancerId: string) => {
     navigate(`/profile/${freelancerId}`);
@@ -204,27 +258,88 @@ const FindFreelancers: React.FC = () => {
                 />
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <FunnelIcon className={`h-5 w-5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`} />
-              <span className={isDark ? 'text-gray-300' : 'text-gray-600'}>{t('filterBySkillsLabel')}</span>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setShowSkillsFilter(!showSkillsFilter)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg ${isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'} transition-colors`}
+              >
+                <FunnelIcon className={`h-5 w-5 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
+                <span className={isDark ? 'text-gray-300' : 'text-gray-600'}>{t('filterBySkillsLabel')}</span>
+              </button>
+              
+              {/* Rating Filter */}
+              <div className="flex items-center gap-2">
+                <label className={isDark ? 'text-gray-300' : 'text-gray-600'}>Min Rating:</label>
+                <select
+                  value={minRating || ''}
+                  onChange={(e) => setMinRating(e.target.value ? parseFloat(e.target.value) : null)}
+                  className={`px-3 py-2 rounded-lg border ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500`}
+                >
+                  <option value="">All</option>
+                  <option value="3">3.0+</option>
+                  <option value="3.5">3.5+</option>
+                  <option value="4">4.0+</option>
+                  <option value="4.5">4.5+</option>
+                </select>
+              </div>
+              
+              {/* Sort Order */}
+              <div className="flex items-center gap-2">
+                <label className={isDark ? 'text-gray-300' : 'text-gray-600'}>Sort by Rating:</label>
+                <select
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}
+                  className={`px-3 py-2 rounded-lg border ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500`}
+                >
+                  <option value="desc">Highest First</option>
+                  <option value="asc">Lowest First</option>
+                </select>
+              </div>
             </div>
           </div>
 
-          {/* Skills Filter */}
-          <div className="mt-4 flex flex-wrap gap-2">
-            {allSkills.map(skill => (
-              <button
-                key={skill}
-                onClick={() => toggleSkill(skill)}
-                className={`px-3 py-1 rounded-full text-sm font-medium ${selectedSkills.includes(skill)
-                  ? isDark ? 'bg-blue-900/30 text-blue-300' : 'bg-blue-100 text-blue-800'
-                  : isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                  }`}
-              >
-                {skill}
-              </button>
-            ))}
-          </div>
+          {/* Skills Filter Dropdown */}
+          {showSkillsFilter && (
+            <div className="mt-4">
+              <div className="mb-3">
+                <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+                  Add Skill Filter:
+                </label>
+                <select
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      addSkill(e.target.value);
+                      e.target.value = '';
+                    }
+                  }}
+                  className={`w-full px-3 py-2 rounded-lg border ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500`}
+                >
+                  <option value="">Select a skill to filter...</option>
+                  {allAvailableSkills
+                    .filter(skill => !selectedSkills.includes(skill))
+                    .map(skill => (
+                      <option key={skill} value={skill}>{skill}</option>
+                    ))}
+                </select>
+              </div>
+              
+              {/* Selected Skills */}
+              {selectedSkills.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {selectedSkills.map(skill => (
+                    <button
+                      key={skill}
+                      onClick={() => removeSkill(skill)}
+                      className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 ${isDark ? 'bg-blue-900/30 text-blue-300' : 'bg-blue-100 text-blue-800'}`}
+                    >
+                      {skill}
+                      <XMarkIcon className="h-4 w-4" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Loading State */}
@@ -252,11 +367,19 @@ const FindFreelancers: React.FC = () => {
             <p className={isDark ? 'text-gray-300' : 'text-gray-600'}>{t('noFreelancersFound')}</p>
           </div>
         )}
+        
+        {/* Empty State for Pagination */}
+        {!loading && !error && freelancers.length > 0 && paginatedFreelancers.length === 0 && (
+          <div className="text-center py-12">
+            <p className={isDark ? 'text-gray-300' : 'text-gray-600'}>No freelancers on this page.</p>
+          </div>
+        )}
 
         {/* Freelancers Grid */}
-        {!loading && !error && freelancers.length > 0 && (
+        {!loading && !error && paginatedFreelancers.length > 0 && (
+          <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {freelancers.map((freelancer, index) => (
+            {paginatedFreelancers.map((freelancer, index) => (
               <MotionWrapper
                 key={freelancer.id}
                 type="fadeIn"
@@ -349,6 +472,30 @@ const FindFreelancers: React.FC = () => {
               </MotionWrapper>
             ))}
           </div>
+          
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="mt-8 flex items-center justify-center gap-2">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className={`px-4 py-2 rounded-lg ${isDark ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700'} border ${isDark ? 'border-gray-700' : 'border-gray-300'} disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700`}
+              >
+                <ChevronLeftIcon className="h-5 w-5" />
+              </button>
+              <span className={`px-4 py-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className={`px-4 py-2 rounded-lg ${isDark ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700'} border ${isDark ? 'border-gray-700' : 'border-gray-300'} disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700`}
+              >
+                <ChevronRightIcon className="h-5 w-5" />
+              </button>
+            </div>
+          )}
+          </>
         )}
 
         {/* Notification Banner */}
@@ -363,8 +510,16 @@ const FindFreelancers: React.FC = () => {
 
         {/* Assignment Modal */}
         {isAssignModalOpen && selectedFreelancer && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" role="dialog">
-            <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto`}>
+          <div className="fixed inset-0 overflow-y-auto z-50" role="dialog">
+            <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+              <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div className="absolute inset-0 bg-gray-500 opacity-75" onClick={() => {
+                  setIsAssignModalOpen(false);
+                  setSelectedFreelancer(null);
+                }}></div>
+              </div>
+              <span className="hidden sm:inline-block sm:align-middle sm:h-screen"></span>&#8203;
+              <div className={`inline-block align-bottom ${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full relative max-h-[80vh] overflow-y-auto`}>
               <div className="p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
@@ -444,6 +599,7 @@ const FindFreelancers: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
         )}
       </div>
     </div>

@@ -19,9 +19,9 @@ export declare class RatingsService {
         id: string;
         createdAt: Date;
         clientId: string;
-        freelancerId: string;
         score: number;
         comment: string | null;
+        freelancerId: string;
     })[]>;
     checkRatingExists(clientId: string, freelancerId: string): Promise<{
         exists: boolean;
@@ -29,9 +29,9 @@ export declare class RatingsService {
             id: string;
             createdAt: Date;
             clientId: string;
-            freelancerId: string;
             score: number;
             comment: string | null;
+            freelancerId: string;
         } | null;
     }>;
     private updateFreelancerRating;

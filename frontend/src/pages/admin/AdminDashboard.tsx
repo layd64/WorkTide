@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { API_ENDPOINTS } from '../../config/api';
 import { useTheme } from '../../contexts/ThemeContext';
-import { Users, Briefcase, CheckCircle, TrendingUp, PieChart as PieChartIcon, BarChart as BarChartIcon } from 'lucide-react';
+import { Users, CheckCircle, TrendingUp, PieChart as PieChartIcon, BarChart as BarChartIcon } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, Legend } from 'recharts';
 
 interface DashboardStats {
@@ -63,7 +63,7 @@ const AdminDashboard: React.FC = () => {
             <h2 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>Dashboard Overview</h2>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow flex items-center`}>
                     <div className={`p-3 rounded-full ${isDark ? 'bg-blue-900 text-blue-300' : 'bg-blue-100 text-blue-600'} mr-4`}>
                         <Users className="h-8 w-8" />
@@ -78,17 +78,7 @@ const AdminDashboard: React.FC = () => {
                 </div>
 
                 <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow flex items-center`}>
-                    <div className={`p-3 rounded-full ${isDark ? 'bg-green-900 text-green-300' : 'bg-green-100 text-green-600'} mr-4`}>
-                        <Briefcase className="h-8 w-8" />
-                    </div>
-                    <div>
-                        <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Total Projects</p>
-                        <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>{stats.totalProjects}</p>
-                    </div>
-                </div>
-
-                <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow flex items-center`}>
-                    <div className={`p-3 rounded-full ${isDark ? 'bg-purple-900 text-purple-300' : 'bg-purple-100 text-purple-600'} mr-4`}>
+                    <div className={`p-3 rounded-full ${isDark ? 'bg-indigo-900 text-indigo-300' : 'bg-indigo-100 text-indigo-600'} mr-4`}>
                         <CheckCircle className="h-8 w-8" />
                     </div>
                     <div>

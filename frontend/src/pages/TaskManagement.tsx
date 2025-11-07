@@ -8,6 +8,7 @@ import RatingComponent from '../components/RatingComponent';
 import CreateTaskForm from '../components/CreateTaskForm';
 import MotionWrapper from '../components/common/MotionWrapper';
 import ErrorBoundary from '../components/common/ErrorBoundary';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
 interface Freelancer {
   id: string;
@@ -95,6 +96,8 @@ const TaskManagement: React.FC = () => {
   const [recommendationsError, setRecommendationsError] = useState<string | null>(null);
   const [recommendationsPage, setRecommendationsPage] = useState(1);
   const [sendingRequestFor, setSendingRequestFor] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
 
   const handleTaskCreated = () => {
     setIsCreateTaskModalOpen(false);
@@ -132,6 +135,7 @@ const TaskManagement: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         setTasks(data);
+        setCurrentPage(1); // Reset to first page when tasks are fetched
       } else {
         setError('Failed to fetch your tasks. Please try again.');
       }
@@ -142,6 +146,12 @@ const TaskManagement: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  // Pagination calculations
+  const totalPages = Math.ceil(tasks.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedTasks = tasks.slice(startIndex, endIndex);
 
   useEffect(() => {
     fetchClientTasks();
@@ -311,9 +321,9 @@ const TaskManagement: React.FC = () => {
       case 'open':
         return 'bg-green-100 text-green-800';
       case 'in_progress':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-indigo-100 text-indigo-800';
       case 'completed':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-indigo-100 text-indigo-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -322,7 +332,7 @@ const TaskManagement: React.FC = () => {
   const getApplicationStatusBadgeClass = (status: string) => {
     switch (status) {
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-indigo-100 text-indigo-800';
       case 'accepted':
         return 'bg-green-100 text-green-800';
       case 'rejected':
@@ -651,8 +661,9 @@ const TaskManagement: React.FC = () => {
               </button>
             </div>
           ) : (
+            <>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {tasks.map((task, index) => (
+              {paginatedTasks.map((task, index) => (
                 <MotionWrapper
                   key={task.id}
                   type="fadeIn"
@@ -839,6 +850,30 @@ const TaskManagement: React.FC = () => {
                 </MotionWrapper>
               ))}
             </div>
+            
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-8 flex items-center justify-center gap-2">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                  className={`px-4 py-2 rounded-lg ${isDark ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700'} border ${isDark ? 'border-gray-700' : 'border-gray-300'} disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700`}
+                >
+                  <ChevronLeftIcon className="h-5 w-5" />
+                </button>
+                <span className={`px-4 py-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                  className={`px-4 py-2 rounded-lg ${isDark ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700'} border ${isDark ? 'border-gray-700' : 'border-gray-300'} disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700`}
+                >
+                  <ChevronRightIcon className="h-5 w-5" />
+                </button>
+              </div>
+            )}
+            </>
           )}
         </div>
 
@@ -950,6 +985,9 @@ const TaskManagement: React.FC = () => {
           isRecommendationsModalOpen && selectedTaskId && (
             <div className="fixed inset-0 overflow-y-auto z-50" style={{ pointerEvents: 'auto' }} role="dialog">
               <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+                  <div className="absolute inset-0 bg-gray-500 opacity-75" onClick={closeRecommendationsModal}></div>
+                </div>
                 <span className="hidden sm:inline-block sm:align-middle sm:h-screen"></span>&#8203;
                 <div className={`inline-block align-bottom ${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full relative`}>
                   {/* Close button at top-right */}

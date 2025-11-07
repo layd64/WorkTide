@@ -124,4 +124,31 @@ export declare class AdminController {
         status: string;
         clientId: string;
     }>;
+    getAllRatings(): Promise<({
+        freelancer: {
+            id: string;
+            email: string;
+            fullName: string;
+        };
+        client: {
+            id: string;
+            email: string;
+            fullName: string;
+        };
+    } & {
+        id: string;
+        createdAt: Date;
+        clientId: string;
+        score: number;
+        comment: string | null;
+        freelancerId: string;
+    })[]>;
+    deleteRating(id: string, req: any): Promise<{
+        id: string;
+        createdAt: Date;
+        clientId: string;
+        score: number;
+        comment: string | null;
+        freelancerId: string;
+    }>;
 }

@@ -97,7 +97,7 @@ const TaskRequestsPage: React.FC = () => {
 
             // Navigate to chat after a brief delay
             setTimeout(() => {
-                navigate(`/ chat / ${clientId} `);
+                navigate(`/chat/${clientId}`);
             }, 1500);
         } catch (err: any) {
             console.error('Error accepting request:', err);
@@ -149,11 +149,11 @@ const TaskRequestsPage: React.FC = () => {
     };
 
     return (
-        <div className={`min - h - screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} py - 8`}>
+        <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} py-8`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="mb-8">
-                    <h1 className={`text - 3xl font - bold ${isDark ? 'text-white' : 'text-gray-900'} `}>{t('taskRequestsTitle')}</h1>
-                    <p className={`mt - 2 ${isDark ? 'text-gray-400' : 'text-gray-600'} `}>
+                    <h1 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('taskRequestsTitle')}</h1>
+                    <p className={`mt-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                         {t('taskRequestsDesc')}
                     </p>
                 </div>
@@ -161,8 +161,8 @@ const TaskRequestsPage: React.FC = () => {
                 {/* Notification Banner */}
                 {notification && (
                     <div
-                        className={`mb - 6 px - 6 py - 4 rounded - lg shadow - lg ${notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'
-                            } text - white`}
+                        className={`mb-6 px-6 py-4 rounded-lg shadow-lg ${notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+                            } text-white`}
                     >
                         {notification.message}
                     </div>
@@ -171,17 +171,17 @@ const TaskRequestsPage: React.FC = () => {
                 {/* Loading State */}
                 {loading && (
                     <div className="text-center py-12">
-                        <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 dark:border-blue-400 border-r-transparent" role="status">
+                        <div className={`inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid ${isDark ? 'border-indigo-400' : 'border-indigo-600'} border-r-transparent`} role="status">
                             <span className="sr-only">{t('loading')}</span>
                         </div>
-                        <p className="mt-4 text-gray-600 dark:text-gray-400">{t('loadingRequests')}</p>
+                        <p className={`mt-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t('loadingRequests')}</p>
                     </div>
                 )}
 
                 {/* Error State */}
                 {error && !loading && (
                     <div className="text-center py-12">
-                        <div className={`${isDark ? 'bg-red-900/20 border-red-500 text-red-300' : 'bg-red-100 border-red-400 text-red-700'} border px - 4 py - 3 rounded`}>
+                        <div className={`${isDark ? 'bg-red-900/20 border-red-500 text-red-300' : 'bg-red-100 border-red-400 text-red-700'} border px-4 py-3 rounded`}>
                             <p>{error}</p>
                         </div>
                     </div>
@@ -216,7 +216,7 @@ const TaskRequestsPage: React.FC = () => {
                         {requests.map(request => (
                             <div
                                 key={request.id}
-                                className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded - lg shadow - sm p - 6 hover: shadow - md transition - shadow`}
+                                className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow`}
                             >
                                 <div className="flex items-start justify-between">
                                     <div className="flex-1">
@@ -227,41 +227,41 @@ const TaskRequestsPage: React.FC = () => {
                                                     <img
                                                         src={request.task.imageUrl}
                                                         alt={request.task.title}
-                                                        className={`w - 12 h - 12 rounded - md object - cover ring - 2 ${isDark ? 'ring-gray-800' : 'ring-white'} z - 10`}
+                                                        className={`w-12 h-12 rounded-md object-cover ring-2 ${isDark ? 'ring-gray-800' : 'ring-white'} z-10`}
                                                     />
                                                 )}
                                                 {request.client.imageUrl ? (
                                                     <img
                                                         src={request.client.imageUrl}
                                                         alt={request.client.fullName}
-                                                        className={`w - 12 h - 12 rounded - full object - cover ring - 2 ${isDark ? 'ring-gray-800' : 'ring-white'} z - 20`}
+                                                        className={`w-12 h-12 rounded-full object-cover ring-2 ${isDark ? 'ring-gray-800' : 'ring-white'} z-20`}
                                                     />
                                                 ) : (
-                                                    <div className={`w - 12 h - 12 rounded - full ${isDark ? 'bg-gray-700' : 'bg-gray-200'} flex items - center justify - center ring - 2 ${isDark ? 'ring-gray-800' : 'ring-white'} z - 20`}>
-                                                        <span className={`text - lg font - medium ${isDark ? 'text-gray-300' : 'text-gray-600'} `}>
+                                                    <div className={`w-12 h-12 rounded-full ${isDark ? 'bg-gray-700' : 'bg-gray-200'} flex items-center justify-center ring-2 ${isDark ? 'ring-gray-800' : 'ring-white'} z-20`}>
+                                                        <span className={`text-lg font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
                                                             {request.client.fullName.charAt(0)}
                                                         </span>
                                                     </div>
                                                 )}
                                             </div>
                                             <div>
-                                                <p className={`text - sm ${isDark ? 'text-gray-400' : 'text-gray-600'} `}>{t('requestFrom')}</p>
-                                                <p className={`font - semibold ${isDark ? 'text-white' : 'text-gray-900'} `}>{request.client.fullName}</p>
+                                                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t('requestFrom')}</p>
+                                                <p className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{request.client.fullName}</p>
                                             </div>
                                         </div>
 
                                         {/* Task Info */}
-                                        <div className={`border - t ${isDark ? 'border-gray-700' : 'border-gray-200'} pt - 4`}>
-                                            <h3 className={`text - lg font - semibold ${isDark ? 'text-white' : 'text-gray-900'} mb - 2`}>
+                                        <div className={`border-t ${isDark ? 'border-gray-700' : 'border-gray-200'} pt-4`}>
+                                            <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-2`}>
                                                 {request.task.title}
                                             </h3>
-                                            <p className={`${isDark ? 'text-gray-300' : 'text-gray-700'} mb - 3`}>{request.task.description}</p>
+                                            <p className={`${isDark ? 'text-gray-300' : 'text-gray-700'} mb-3`}>{request.task.description}</p>
 
                                             <div className="flex items-center gap-4 mb-3">
-                                                <span className={`text - lg font - semibold ${isDark ? 'text-green-400' : 'text-green-600'} `}>
+                                                <span className={`text-lg font-semibold ${isDark ? 'text-green-400' : 'text-green-600'}`}>
                                                     ${request.task.budget}
                                                 </span>
-                                                <span className={`text - sm ${isDark ? 'text-gray-400' : 'text-gray-500'} `}>
+                                                <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                                                     {t('requestedOn')} {new Date(request.createdAt).toLocaleDateString()}
                                                 </span>
                                             </div>
@@ -271,7 +271,7 @@ const TaskRequestsPage: React.FC = () => {
                                                 {request.task.skills.map(skill => (
                                                     <span
                                                         key={skill}
-                                                        className={`px - 3 py - 1 ${isDark ? 'bg-blue-900/30 text-blue-300' : 'bg-blue-100 text-blue-800'} rounded - full text - sm`}
+                                                        className={`px-3 py-1 ${isDark ? 'bg-indigo-900/30 text-indigo-300' : 'bg-indigo-100 text-indigo-800'} rounded-full text-sm`}
                                                     >
                                                         {skill}
                                                     </span>

@@ -5,6 +5,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import MotionWrapper from '../components/common/MotionWrapper';
+import { FunnelIcon, XMarkIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
 interface Task {
   id: string;
@@ -41,11 +42,33 @@ const FindWork: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [availableSkills, setAvailableSkills] = useState<string[]>([]);
+  const [allAvailableSkills, setAllAvailableSkills] = useState<string[]>([]);
   const [myApplications, setMyApplications] = useState<TaskApplication[]>([]);
   const [isApplying, setIsApplying] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [coverLetter, setCoverLetter] = useState('');
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [minPrice, setMinPrice] = useState<number | null>(null);
+  const [maxPrice, setMaxPrice] = useState<number | null>(null);
+  const [showSkillsFilter, setShowSkillsFilter] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
+
+  // Fetch all skills on mount
+  useEffect(() => {
+    const fetchSkills = async () => {
+      try {
+        const response = await fetch(`${API_ENDPOINTS.auth.me.replace('/auth/me', '/skills')}`);
+        if (response.ok) {
+          const data = await response.json();
+          setAllAvailableSkills(data.map((s: { name: string }) => s.name));
+        }
+      } catch (err) {
+        console.error('Error fetching skills:', err);
+      }
+    };
+    fetchSkills();
+  }, []);
 
   const fetchTasks = async () => {
     setIsLoading(true);
@@ -61,8 +84,18 @@ const FindWork: React.FC = () => {
       );
 
       if (response.ok) {
-        const data = await response.json();
+        let data = await response.json();
+        
+        // Apply price filters
+        if (minPrice !== null) {
+          data = data.filter((task: Task) => task.budget >= minPrice);
+        }
+        if (maxPrice !== null) {
+          data = data.filter((task: Task) => task.budget <= maxPrice);
+        }
+        
         setTasks(data);
+        setCurrentPage(1); // Reset to first page when filters change
 
         // Extract unique skills from tasks for filtering
         const skills = new Set<string>();
@@ -105,14 +138,16 @@ const FindWork: React.FC = () => {
     if (user) {
       fetchMyApplications();
     }
-  }, [searchQuery, selectedSkills, user?.id]);
+  }, [searchQuery, selectedSkills, minPrice, maxPrice, user?.id]);
 
-  const toggleSkillFilter = (skill: string) => {
-    setSelectedSkills((prev) =>
-      prev.includes(skill)
-        ? prev.filter((s) => s !== skill)
-        : [...prev, skill]
-    );
+  const addSkill = (skill: string) => {
+    if (!selectedSkills.includes(skill)) {
+      setSelectedSkills(prev => [...prev, skill]);
+    }
+  };
+
+  const removeSkill = (skill: string) => {
+    setSelectedSkills(prev => prev.filter(s => s !== skill));
   };
 
   const handleApply = (taskId: string) => {
@@ -165,6 +200,12 @@ const FindWork: React.FC = () => {
     return myApplications.some(app => app.taskId === taskId);
   };
 
+  // Pagination calculations
+  const totalPages = Math.ceil(tasks.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedTasks = tasks.slice(startIndex, endIndex);
+
   // Ensure modals are properly cleaned up when unmounted
   useEffect(() => {
     return () => {
@@ -199,29 +240,79 @@ const FindWork: React.FC = () => {
                 />
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <svg className={`h-5 w-5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-              </svg>
-              <span className={isDark ? 'text-gray-300' : 'text-gray-600'}>{t('filterBySkillsLabel')}</span>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setShowSkillsFilter(!showSkillsFilter)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg ${isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'} transition-colors`}
+              >
+                <FunnelIcon className={`h-5 w-5 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
+                <span className={isDark ? 'text-gray-300' : 'text-gray-600'}>{t('filterBySkillsLabel')}</span>
+              </button>
+              
+              {/* Price Filter */}
+              <div className="flex items-center gap-2">
+                <label className={isDark ? 'text-gray-300' : 'text-gray-600'}>Price:</label>
+                <input
+                  type="number"
+                  placeholder="Min"
+                  value={minPrice || ''}
+                  onChange={(e) => setMinPrice(e.target.value ? parseFloat(e.target.value) : null)}
+                  className={`w-24 px-3 py-2 rounded-lg border ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500`}
+                />
+                <span className={isDark ? 'text-gray-300' : 'text-gray-600'}>-</span>
+                <input
+                  type="number"
+                  placeholder="Max"
+                  value={maxPrice || ''}
+                  onChange={(e) => setMaxPrice(e.target.value ? parseFloat(e.target.value) : null)}
+                  className={`w-24 px-3 py-2 rounded-lg border ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500`}
+                />
+              </div>
             </div>
           </div>
 
-          {/* Skills Filter */}
-          <div className="mt-4 flex flex-wrap gap-2">
-            {availableSkills.map(skill => (
-              <button
-                key={skill}
-                onClick={() => toggleSkillFilter(skill)}
-                className={`px-3 py-1 rounded-full text-sm font-medium ${selectedSkills.includes(skill)
-                  ? isDark ? 'bg-blue-900/30 text-blue-300' : 'bg-blue-100 text-blue-800'
-                  : isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                  }`}
-              >
-                {skill}
-              </button>
-            ))}
-          </div>
+          {/* Skills Filter Dropdown */}
+          {showSkillsFilter && (
+            <div className="mt-4">
+              <div className="mb-3">
+                <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+                  Add Skill Filter:
+                </label>
+                <select
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      addSkill(e.target.value);
+                      e.target.value = '';
+                    }
+                  }}
+                  className={`w-full px-3 py-2 rounded-lg border ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500`}
+                >
+                  <option value="">Select a skill to filter...</option>
+                  {allAvailableSkills
+                    .filter(skill => !selectedSkills.includes(skill))
+                    .map(skill => (
+                      <option key={skill} value={skill}>{skill}</option>
+                    ))}
+                </select>
+              </div>
+              
+              {/* Selected Skills */}
+              {selectedSkills.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {selectedSkills.map(skill => (
+                    <button
+                      key={skill}
+                      onClick={() => removeSkill(skill)}
+                      className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 ${isDark ? 'bg-blue-900/30 text-blue-300' : 'bg-blue-100 text-blue-800'}`}
+                    >
+                      {skill}
+                      <XMarkIcon className="h-4 w-4" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Success Message */}
@@ -258,9 +349,10 @@ const FindWork: React.FC = () => {
         )}
 
         {/* Tasks Grid */}
-        {!isLoading && !error && tasks.length > 0 && (
+        {!isLoading && !error && paginatedTasks.length > 0 && (
+          <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {tasks.map((task, index) => (
+            {paginatedTasks.map((task, index) => (
               <MotionWrapper
                 key={task.id}
                 type="fadeIn"
@@ -352,6 +444,37 @@ const FindWork: React.FC = () => {
                 </div>
               </MotionWrapper>
             ))}
+          </div>
+          
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="mt-8 flex items-center justify-center gap-2">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className={`px-4 py-2 rounded-lg ${isDark ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700'} border ${isDark ? 'border-gray-700' : 'border-gray-300'} disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700`}
+              >
+                <ChevronLeftIcon className="h-5 w-5" />
+              </button>
+              <span className={`px-4 py-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className={`px-4 py-2 rounded-lg ${isDark ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700'} border ${isDark ? 'border-gray-700' : 'border-gray-300'} disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700`}
+              >
+                <ChevronRightIcon className="h-5 w-5" />
+              </button>
+            </div>
+          )}
+          </>
+        )}
+        
+        {/* Empty State for Pagination */}
+        {!isLoading && !error && tasks.length > 0 && paginatedTasks.length === 0 && (
+          <div className="text-center py-12">
+            <p className={isDark ? 'text-gray-300' : 'text-gray-600'}>No tasks on this page.</p>
           </div>
         )}
 

@@ -59,8 +59,8 @@ export declare class TasksController {
             updatedAt: Date;
             status: string;
             clientId: string;
-            taskId: string;
             freelancerId: string;
+            taskId: string;
         })[];
     } & {
         id: string;

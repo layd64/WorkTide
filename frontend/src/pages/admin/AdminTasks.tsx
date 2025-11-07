@@ -76,11 +76,11 @@ const AdminTasks: React.FC = () => {
             case 'open':
                 return isDark ? 'bg-green-900/20 text-green-300' : 'bg-green-100 text-green-800';
             case 'in_progress':
-                return isDark ? 'bg-blue-900/20 text-blue-300' : 'bg-blue-100 text-blue-800';
+                return isDark ? 'bg-indigo-900/20 text-indigo-300' : 'bg-indigo-100 text-indigo-800';
             case 'completed':
-                return isDark ? 'bg-purple-900/20 text-purple-300' : 'bg-purple-100 text-purple-800';
+                return isDark ? 'bg-indigo-900/20 text-indigo-300' : 'bg-indigo-100 text-indigo-800';
             case 'pending':
-                return isDark ? 'bg-yellow-900/20 text-yellow-300' : 'bg-yellow-100 text-yellow-800';
+                return isDark ? 'bg-indigo-900/20 text-indigo-300' : 'bg-indigo-100 text-indigo-800';
             default:
                 return isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-800';
         }
@@ -148,8 +148,9 @@ const AdminTasks: React.FC = () => {
 
             {/* Delete Confirmation Modal */}
             {taskToDelete && (
-                <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg w-full max-w-md p-6 relative`}>
+                <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center">
+                    <div className="fixed inset-0 bg-gray-500 opacity-75" onClick={() => setTaskToDelete(null)}></div>
+                    <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg w-full max-w-md p-6 relative z-10`}>
                         <button
                             onClick={() => setTaskToDelete(null)}
                             className={`absolute top-4 right-4 ${isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'}`}

@@ -48,6 +48,12 @@ let AdminController = class AdminController {
     async deleteTask(id, req) {
         return this.adminService.deleteTask(id, req.user.sub);
     }
+    async getAllRatings() {
+        return this.adminService.getAllRatings();
+    }
+    async deleteRating(id, req) {
+        return this.adminService.deleteRating(id, req.user.sub);
+    }
 };
 exports.AdminController = AdminController;
 __decorate([
@@ -106,6 +112,20 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "deleteTask", null);
+__decorate([
+    (0, common_1.Get)('ratings'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "getAllRatings", null);
+__decorate([
+    (0, common_1.Delete)('ratings/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "deleteRating", null);
 exports.AdminController = AdminController = __decorate([
     (0, common_1.Controller)('admin'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),

@@ -50,5 +50,15 @@ export class AdminController {
     async deleteTask(@Param('id') id: string, @Request() req) {
         return this.adminService.deleteTask(id, req.user.sub);
     }
+
+    @Get('ratings')
+    async getAllRatings() {
+        return this.adminService.getAllRatings();
+    }
+
+    @Delete('ratings/:id')
+    async deleteRating(@Param('id') id: string, @Request() req) {
+        return this.adminService.deleteRating(id, req.user.sub);
+    }
 }
 

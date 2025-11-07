@@ -185,6 +185,11 @@ const Chat: React.FC = () => {
         navigate(`/chat/${partnerId}`);
     };
 
+    const handleBackToChatList = () => {
+        setActiveChat(null);
+        navigate('/chat');
+    };
+
     const handleNavigateToProfile = (partnerId: string) => {
         // Unified profile route for all user types
         navigate(`/profile/${partnerId}`);
@@ -193,9 +198,9 @@ const Chat: React.FC = () => {
     if (!user) return <div className="p-4">{t('pleaseLoginChat')}</div>;
 
     return (
-        <div className={`flex h-[calc(100vh-64px)] ${isDark ? 'bg-gray-900' : 'bg-gray-100'}`}>
+        <div className={`flex h-[calc(100vh-64px)] ${isDark ? 'bg-gray-900' : 'bg-gray-100'} relative`}>
             {/* Sidebar */}
-            <div className={`w-1/3 border-r ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'} overflow-y-auto`}>
+            <div className={`${activeChat ? 'hidden sm:block' : 'block'} sm:w-1/3 ${!activeChat ? 'absolute inset-0 z-10 sm:relative sm:z-auto' : ''} border-r ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'} overflow-y-auto`}>
                 <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                     <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>{t('messages')}</h2>
                 </div>
@@ -243,11 +248,20 @@ const Chat: React.FC = () => {
             </div>
 
             {/* Chat Window */}
-            <div className={`flex-1 flex flex-col ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
+            <div className={`${activeChat ? 'flex-1' : 'hidden sm:flex sm:flex-1'} flex flex-col ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
                 {activeChat ? (
                     <>
                         {/* Header */}
                         <div className={`p-4 ${isDark ? 'bg-gray-800' : 'bg-white'} border-b ${isDark ? 'border-gray-700' : 'border-gray-200'} flex items-center space-x-3`}>
+                            <button
+                                onClick={handleBackToChatList}
+                                className={`sm:hidden p-2 rounded-md ${isDark ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                                aria-label="Back to conversations"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                </svg>
+                            </button>
                             {currentPartner ? (
                                 <>
                                     <div
@@ -409,8 +423,10 @@ const Chat: React.FC = () => {
                         </form>
                     </>
                 ) : (
-                    <div className={`flex-1 flex items-center justify-center ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                        {t('selectChat')}
+                    <div className={`flex-1 flex items-center justify-center ${isDark ? 'text-gray-400' : 'text-gray-500'} p-4`}>
+                        <div className="text-center">
+                            <p>{t('selectChat')}</p>
+                        </div>
                     </div>
                 )}
             </div>

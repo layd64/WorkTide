@@ -122,5 +122,32 @@ export declare class AdminService {
         targetId: string | null;
         details: string | null;
     })[]>;
+    getAllRatings(): Promise<({
+        client: {
+            id: string;
+            email: string;
+            fullName: string;
+        };
+        freelancer: {
+            id: string;
+            email: string;
+            fullName: string;
+        };
+    } & {
+        id: string;
+        createdAt: Date;
+        clientId: string;
+        score: number;
+        comment: string | null;
+        freelancerId: string;
+    })[]>;
+    deleteRating(ratingId: string, adminId: string): Promise<{
+        id: string;
+        createdAt: Date;
+        clientId: string;
+        score: number;
+        comment: string | null;
+        freelancerId: string;
+    }>;
     private logAction;
 }
