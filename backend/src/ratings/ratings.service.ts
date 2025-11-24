@@ -15,12 +15,10 @@ export class RatingsService {
   async createRating(params: CreateRatingParams) {
     const { clientId, freelancerId, score, comment } = params;
 
-    // Validate score is between 1 and 5
     if (score < 1 || score > 5) {
       throw new BadRequestException('Rating score must be between 1 and 5');
     }
 
-    // Check if the person being rated exists
     const freelancer = await this.prisma.user.findUnique({
       where: { id: freelancerId },
     });
@@ -29,7 +27,6 @@ export class RatingsService {
       throw new BadRequestException('User not found');
     }
 
-    // Check if the person giving the rating exists
     const client = await this.prisma.user.findUnique({
       where: { id: clientId },
     });
@@ -38,33 +35,49 @@ export class RatingsService {
       throw new BadRequestException('User not found');
     }
 
-    // Check if rating already exists
-    const existingRating = await this.prisma.rating.findUnique({
-      where: {
-        clientId_freelancerId: {
-          clientId,
-          freelancerId,
+    const result = await this.prisma.$transaction(async (prisma) => {
+      const existingRating = await prisma.rating.findUnique({
+        where: {
+          clientId_freelancerId: {
+            clientId,
+            freelancerId,
+          },
         },
-      },
+      });
+
+      let rating;
+      if (existingRating) {
+        rating = await prisma.rating.update({
+          where: { id: existingRating.id },
+          data: { score, comment },
+        });
+      } else {
+        rating = await prisma.rating.create({
+          data: { clientId, freelancerId, score, comment },
+        });
+      }
+
+      const ratingResult = await prisma.rating.aggregate({
+        where: { freelancerId },
+        _avg: { score: true },
+        _count: { score: true },
+      });
+
+      const avgRating = ratingResult._avg.score;
+      const ratingCount = ratingResult._count.score;
+
+      await prisma.user.update({
+        where: { id: freelancerId },
+        data: {
+          rating: avgRating,
+          completedJobs: ratingCount,
+        },
+      });
+
+      return rating;
     });
 
-    // If rating exists, update it, otherwise create it
-    let rating;
-    if (existingRating) {
-      rating = await this.prisma.rating.update({
-        where: { id: existingRating.id },
-        data: { score, comment },
-      });
-    } else {
-      rating = await this.prisma.rating.create({
-        data: { clientId, freelancerId, score, comment },
-      });
-    }
-
-    // Update freelancer's average rating
-    await this.updateFreelancerRating(freelancerId);
-
-    return rating;
+    return result;
   }
 
   async getFreelancerRatings(freelancerId: string) {
@@ -99,7 +112,6 @@ export class RatingsService {
   }
 
   private async updateFreelancerRating(freelancerId: string) {
-    // Calculate average rating
     const result = await this.prisma.rating.aggregate({
       where: { freelancerId },
       _avg: { score: true },
@@ -109,12 +121,11 @@ export class RatingsService {
     const avgRating = result._avg.score;
     const ratingCount = result._count.score;
 
-    // Update freelancer's rating
     await this.prisma.user.update({
       where: { id: freelancerId },
       data: {
         rating: avgRating,
-        completedJobs: ratingCount, // Assuming each rating corresponds to a completed job
+        completedJobs: ratingCount,
       },
     });
 

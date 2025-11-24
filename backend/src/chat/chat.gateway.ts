@@ -25,12 +25,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const userId = client.handshake.query.userId as string;
         if (userId) {
             client.join(userId);
-            console.log(`Client connected: ${client.id}, User: ${userId}`);
         }
     }
 
     handleDisconnect(client: Socket) {
-        console.log(`Client disconnected: ${client.id}`);
     }
 
     @SubscribeMessage('sendMessage')
@@ -45,9 +43,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             data.attachments,
         );
 
-        // Emit to receiver
         this.server.to(data.receiverId).emit('newMessage', message);
-        // Emit back to sender (for confirmation/update if needed, though optimistic UI might handle it)
         this.server.to(data.senderId).emit('newMessage', message);
 
         return message;

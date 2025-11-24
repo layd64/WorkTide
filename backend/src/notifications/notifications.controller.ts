@@ -19,8 +19,6 @@ export class NotificationsController {
 
     @Delete(':id')
     async deleteNotification(@Param('id') id: string) {
-        console.log('Received delete request for notification:', id);
-        // Trigger reload
         return this.notificationsService.deleteNotification(id);
     }
 }

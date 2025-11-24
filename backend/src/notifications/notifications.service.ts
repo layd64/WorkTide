@@ -26,7 +26,6 @@ export class NotificationsService {
             },
         });
 
-        // Send real-time notification
         this.chatGateway.sendNotification(userId, notification);
 
         return notification;
@@ -52,9 +51,8 @@ export class NotificationsService {
                 where: { id },
             });
         } catch (error) {
-            // P2025 is Prisma's "Record to delete does not exist" error
             if (error.code === 'P2025') {
-                return null; // Or throw NotFoundException if you prefer 404
+                return null;
             }
             throw error;
         }

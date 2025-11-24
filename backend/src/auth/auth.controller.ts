@@ -1,7 +1,9 @@
-import { Controller, Post, Body, Get, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Request, BadRequestException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { LoginAttemptsGuard } from './guards/login-attempts.guard';
 import { PrismaService } from '../prisma/prisma.service';
+import { validateEmail, validatePassword, validateFullName, validateEnum } from '../utils/validation';
 
 @Controller('auth')
 export class AuthController {
@@ -21,13 +23,24 @@ export class AuthController {
       isHidden?: boolean;
     },
   ) {
+    validateEmail(data.email);
+    validatePassword(data.password);
+    validateFullName(data.fullName);
+    validateEnum(data.userType, 'User type', ['freelancer', 'client']);
+    
     return this.authService.register(data);
   }
 
   @Post('login')
+  @UseGuards(LoginAttemptsGuard)
   async login(
     @Body() data: { email: string; password: string },
   ) {
+    validateEmail(data.email);
+    if (!data.password || typeof data.password !== 'string' || data.password.trim().length === 0) {
+      throw new BadRequestException('Password is required');
+    }
+    
     const user = await this.authService.validateUser(data.email, data.password);
     return this.authService.login(user);
   }
@@ -64,8 +77,6 @@ export class AuthController {
       return null;
     }
 
-    // Map skills relation to string array for frontend compatibility
-    // We need to cast to any because the type inference from select doesn't automatically pick up the relation structure perfectly here
     const userWithSkills = {
       ...user,
       skills: (user.skills as any[]).map(s => s.name),

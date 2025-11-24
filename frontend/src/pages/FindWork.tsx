@@ -54,7 +54,6 @@ const FindWork: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
 
-  // Fetch all skills on mount
   useEffect(() => {
     const fetchSkills = async () => {
       try {
@@ -86,7 +85,6 @@ const FindWork: React.FC = () => {
       if (response.ok) {
         let data = await response.json();
         
-        // Apply price filters
         if (minPrice !== null) {
           data = data.filter((task: Task) => task.budget >= minPrice);
         }
@@ -95,9 +93,8 @@ const FindWork: React.FC = () => {
         }
         
         setTasks(data);
-        setCurrentPage(1); // Reset to first page when filters change
+        setCurrentPage(1);
 
-        // Extract unique skills from tasks for filtering
         const skills = new Set<string>();
         data.forEach((task: Task) => {
           task.skills.forEach((skill) => skills.add(skill));
@@ -480,39 +477,45 @@ const FindWork: React.FC = () => {
 
         {/* Application Modal */}
         {isApplying && selectedTaskId && (
-          <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" role="dialog">
-            <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-xl max-w-md w-full mx-4`}>
-              <div className={`px-6 py-4 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
-                <h3 className={`text-lg font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('applyForThisTask')}</h3>
+          <div className="fixed inset-0 overflow-y-auto z-50" role="dialog">
+            <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+              <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div className="absolute inset-0 bg-gray-500 opacity-75" onClick={closeApplyModal}></div>
               </div>
-              <div className="p-6">
-                <div className="mb-4">
-                  <label htmlFor="coverLetter" className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-1`}>{t('coverLetter')}</label>
-                  <textarea
-                    id="coverLetter"
-                    rows={4}
-                    className={`w-full ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500`}
-                    placeholder={t('tellClientWhyYoureGoodFit')}
-                    value={coverLetter}
-                    onChange={(e) => setCoverLetter(e.target.value)}
-                  ></textarea>
+              <span className="hidden sm:inline-block sm:align-middle sm:h-screen"></span>&#8203;
+              <div className={`inline-block align-bottom ${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full relative`}>
+                <div className={`px-6 py-4 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+                  <h3 className={`text-lg font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('applyForThisTask')}</h3>
                 </div>
-              </div>
-              <div className={`px-6 py-4 border-t ${isDark ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'} flex justify-end space-x-3`}>
-                <button
-                  type="button"
-                  onClick={closeApplyModal}
-                  className={`px-4 py-2 border rounded-md shadow-sm text-sm font-medium ${isDark ? 'bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'}`}
-                >
-                  {t('cancel')}
-                </button>
-                <button
-                  type="button"
-                  onClick={submitApplication}
-                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
-                >
-                  {t('submit')}
-                </button>
+                <div className="p-6">
+                  <div className="mb-4">
+                    <label htmlFor="coverLetter" className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>{t('coverLetter')}</label>
+                    <textarea
+                      id="coverLetter"
+                      rows={4}
+                      className={`w-full px-4 py-2 ${isDark ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'border-gray-300'} rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500`}
+                      placeholder={t('tellClientWhyYoureGoodFit')}
+                      value={coverLetter}
+                      onChange={(e) => setCoverLetter(e.target.value)}
+                    ></textarea>
+                  </div>
+                </div>
+                <div className={`px-6 py-4 border-t ${isDark ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'} flex justify-end space-x-3`}>
+                  <button
+                    type="button"
+                    onClick={closeApplyModal}
+                    className={`px-4 py-2 border rounded-md shadow-sm text-sm font-medium ${isDark ? 'bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'}`}
+                  >
+                    {t('cancel')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={submitApplication}
+                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+                  >
+                    {t('submit')}
+                  </button>
+                </div>
               </div>
             </div>
           </div>

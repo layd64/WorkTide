@@ -5,6 +5,7 @@ import { EnvelopeIcon, LockClosedIcon, UserIcon, BriefcaseIcon } from '@heroicon
 import { API_ENDPOINTS } from '../../config/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
+import { validateEmail, validatePassword, validateFullName } from '../../utils/validation';
 
 const SignUp: React.FC = () => {
     const { t } = useTranslation();
@@ -38,6 +39,25 @@ const SignUp: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+
+        // Validate input
+        const emailError = validateEmail(formData.email);
+        if (emailError) {
+            setError(emailError);
+            return;
+        }
+
+        const passwordError = validatePassword(formData.password);
+        if (passwordError) {
+            setError(passwordError);
+            return;
+        }
+
+        const fullNameError = validateFullName(formData.fullName);
+        if (fullNameError) {
+            setError(fullNameError);
+            return;
+        }
 
         try {
             const response = await fetch(API_ENDPOINTS.auth.signup, {

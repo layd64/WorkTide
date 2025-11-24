@@ -7,9 +7,7 @@ export class UsersController {
 
     @Get(':id')
     async findOne(@Param('id') id: string) {
-        console.log('UsersController: Fetching user with ID:', id);
         const user = await this.usersService.findOne(id);
-        console.log('UsersController: User found:', user);
         if (!user) {
             throw new NotFoundException(`User with ID ${id} not found`);
         }

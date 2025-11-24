@@ -33,15 +33,12 @@ import AdminLogs from './pages/admin/AdminLogs'
 import AdminRoute from './components/auth/AdminRoute'
 import ReadingGuide from './components/accessibility/ReadingGuide'
 
-// Component to detect and cleanup any lingering overlay elements
 const OverlayCleanup: React.FC = () => {
   useEffect(() => {
     const cleanup = () => {
-      // Find and remove any fixed position elements that might be blocking interactions
       const fixedElements = document.querySelectorAll('.fixed.inset-0');
 
       fixedElements.forEach(el => {
-        // Only remove elements that might be blocking interactions but are not part of active modals
         const isPartOfActiveModal = el.closest('[role="dialog"]') ||
           el.parentElement?.classList.contains('z-50');
 
@@ -51,17 +48,15 @@ const OverlayCleanup: React.FC = () => {
       });
     };
 
-    // Run cleanup on mount and set interval to check periodically
     cleanup();
     const interval = setInterval(cleanup, 1000);
 
     return () => clearInterval(interval);
   }, []);
 
-  return null; // This component doesn't render anything
+  return null;
 };
 
-// AppContent to use useLocation hook
 const AppContent: React.FC = () => {
   const location = useLocation();
   const isChatPage = location.pathname.startsWith('/chat');

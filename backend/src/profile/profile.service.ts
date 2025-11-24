@@ -17,7 +17,6 @@ export class ProfileService {
             throw new NotFoundException('User not found');
         }
 
-        // Map skills relation to string array for frontend compatibility
         const userWithSkills = {
             ...user,
             skills: user.skills.map(s => s.name),
@@ -27,7 +26,6 @@ export class ProfileService {
     }
 
     async getPublicProfile(userId: string) {
-        // This is for retrieving profiles of other users - same info but no email
         const user = await this.prisma.user.findUnique({
             where: { id: userId },
             include: {
@@ -39,12 +37,10 @@ export class ProfileService {
             throw new NotFoundException('User not found');
         }
 
-        // Hide avatar if isAvatarVisible is false
         if (!user.isAvatarVisible) {
             user.imageUrl = null;
         }
 
-        // Map skills relation to string array for frontend compatibility
         const userWithSkills = {
             ...user,
             skills: user.skills.map(s => s.name),
@@ -84,7 +80,6 @@ export class ProfileService {
             },
         });
 
-        // Filter avatars and map skills
         return freelancers.map(f => {
             if (!f.isAvatarVisible) {
                 f.imageUrl = null;
@@ -97,7 +92,6 @@ export class ProfileService {
     }
 
     async updateProfile(userId: string, profileData: any) {
-        // Find the user first to check if it exists
         const user = await this.prisma.user.findUnique({
             where: { id: userId },
         });
@@ -106,27 +100,13 @@ export class ProfileService {
             throw new NotFoundException('User not found');
         }
 
-        // Determine if isHidden should be updated (allow for all user types)
         const isHiddenUpdate = profileData.isHidden !== undefined
             ? { isHidden: profileData.isHidden }
             : {};
 
-        // Handle skills update
         let skillsUpdate = {};
         if (profileData.skills) {
-            // Disconnect all existing skills and connect new ones
-            // We need to find the Skill entities first
             const skillNames = profileData.skills as string[];
-
-            // Upsert skills to ensure they exist (optional, but requested "predetermined tags", 
-            // so maybe we should only connect existing ones? 
-            // The requirement says "predetermined tags that user chooses instead of typing them out".
-            // But if we want to allow new skills to be added by admin only, we should just connect.
-            // If we want to allow users to add new skills to the "huge list", we should upsert.
-            // Given "huge list for all kinds of skills", it implies a fixed set.
-            // However, for robustness, I will just connect to existing skills.
-            // But wait, if the user sends a skill that doesn't exist, it will fail.
-            // So I should probably find the skills first.
 
             const skills = await this.prisma.skill.findMany({
                 where: {
@@ -144,7 +124,6 @@ export class ProfileService {
             };
         }
 
-        // Update the user profile fields
         const updatedUser = await this.prisma.user.update({
             where: { id: userId },
             data: {
@@ -162,13 +141,6 @@ export class ProfileService {
             include: {
                 skills: true,
             },
-        });
-
-        // Log the updated user data for debugging
-        console.log('Profile updated:', {
-            userId,
-            isHidden: updatedUser.isHidden,
-            userType: updatedUser.userType
         });
 
         return {

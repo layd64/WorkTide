@@ -5,6 +5,7 @@ import { API_ENDPOINTS } from '../config/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Avatar from '../components/Avatar';
+import { validateNumberRange, validateTextLength } from '../utils/validation';
 
 interface RatingProps {
   freelancerId: string;
@@ -87,7 +88,25 @@ const RatingComponent: React.FC<RatingProps> = ({
   };
 
   const handleSubmitRating = async () => {
-    if (!userRating) return;
+    if (!userRating) {
+      setError('Please select a rating');
+      return;
+    }
+
+    // Validate input
+    const scoreError = validateNumberRange(userRating, 'Rating', 1, 5);
+    if (scoreError) {
+      setError(scoreError);
+      return;
+    }
+
+    if (comment) {
+      const commentError = validateTextLength(comment, 'Comment', 0, 1000);
+      if (commentError) {
+        setError(commentError);
+        return;
+      }
+    }
 
     setLoading(true);
     setError('');

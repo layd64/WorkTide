@@ -57,18 +57,12 @@ const Profile: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
-    // Assignment modal state
     const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
     const [clientTasks, setClientTasks] = useState<Task[]>([]);
     const [loadingTasks, setLoadingTasks] = useState(false);
     const [assigningTask, setAssigningTask] = useState(false);
     const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-    // Determine if viewing own profile
-    // If id is present in params, check against user.id. If no id in params, it's own profile (handled by route wrapper usually, but good to be safe)
-    // Actually, the route is /profile/:id. If /profile is accessed, it might redirect or handle it.
-    // Let's assume id is always passed or we use user.id if id is missing/undefined (though route usually requires it).
-    // Wait, App.tsx has <Route path="/profile" ... /> which renders <Profile /> without id.
     const targetId = id || user?.id;
     const isOwnProfile = user && targetId === user.id;
 

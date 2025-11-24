@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { API_ENDPOINTS } from '../config/api';
 import SkillSelector from './SkillSelector';
+import { validateTextLength, validateNumberRange, validateArrayLength, validateFile } from '../utils/validation';
 
 interface CreateTaskFormProps {
   onTaskCreated: () => void;
@@ -23,13 +24,10 @@ const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ onTaskCreated }) => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
-  // Suppress unused warning
-  useEffect(() => { if (uploadingImage) console.log('Uploading...'); }, [uploadingImage]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  // Ensure user is authenticated
   if (!user) {
     return null;
   }
@@ -53,7 +51,6 @@ const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ onTaskCreated }) => {
     const file = e.target.files?.[0];
     if (file) {
       setImageFile(file);
-      // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
@@ -68,19 +65,42 @@ const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ onTaskCreated }) => {
     setError(null);
     setSuccess(null);
 
+    const titleError = validateTextLength(formData.title, 'Title', 3, 200);
+    if (titleError) {
+      setError(titleError);
+      setIsSubmitting(false);
+      return;
+    }
+
+    const descriptionError = validateTextLength(formData.description, 'Description', 10, 5000);
+    if (descriptionError) {
+      setError(descriptionError);
+      setIsSubmitting(false);
+      return;
+    }
+
+    const budgetError = validateNumberRange(formData.budget, 'Budget', 1, 1000000);
+    if (budgetError) {
+      setError(budgetError);
+      setIsSubmitting(false);
+      return;
+    }
+
     // Filter out empty skills (should not be needed with SkillSelector, but kept for safety)
     const filteredSkills = formData.skills.filter((skill) => skill.trim() !== '');
 
     // Validate that at least one skill is selected
-    if (filteredSkills.length === 0) {
-      setError('Please select at least one skill for your task.');
+    const skillsError = validateArrayLength(filteredSkills, 'Skills', 1, 20);
+    if (skillsError) {
+      setError(skillsError);
       setIsSubmitting(false);
       return;
     }
 
     // Validate that an image is selected
-    if (!imageFile) {
-      setError('Please upload a task image.');
+    const fileError = validateFile(imageFile, 5);
+    if (fileError) {
+      setError(fileError);
       setIsSubmitting(false);
       return;
     }
@@ -138,7 +158,6 @@ const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ onTaskCreated }) => {
       }
     } catch (err) {
       setError(t('errorOccurred'));
-      console.error(err);
     } finally {
       setIsSubmitting(false);
     }
@@ -320,6 +339,7 @@ const CreateTaskForm: React.FC<CreateTaskFormProps> = ({ onTaskCreated }) => {
               <SkillSelector
                 selectedSkills={formData.skills}
                 onChange={handleSkillsChange}
+                isDark={isDark}
               />
               <p className={`mt-2 text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                 {t('skillsHint')}

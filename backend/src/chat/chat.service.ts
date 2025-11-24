@@ -57,7 +57,6 @@ export class ChatService {
     }
 
     async getConversations(userId: string) {
-        // Get all messages where user is sender or receiver
         const messages = await this.prisma.message.findMany({
             where: {
                 OR: [{ senderId: userId }, { receiverId: userId }],
@@ -83,7 +82,6 @@ export class ChatService {
             },
         });
 
-        // Group by conversation partner
         const conversations = new Map();
 
         messages.forEach((msg) => {
@@ -100,14 +98,12 @@ export class ChatService {
     }
 
     async createInitialChatMessage(freelancerId: string, clientId: string) {
-        // Create initial system message from freelancer to client
-        // This ensures the conversation appears in both users' conversation lists
         return this.sendMessage(
             freelancerId,
             clientId,
             'This chat has been started since both participants decided to work together.',
             [],
-            true // Mark as system message
+            true
         );
     }
 }

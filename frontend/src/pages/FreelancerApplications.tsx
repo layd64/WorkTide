@@ -97,28 +97,54 @@ const FreelancerApplications: React.FC = () => {
   });
 
   const getStatusBadgeClass = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return 'bg-indigo-100 text-indigo-800';
-      case 'accepted':
-        return 'bg-green-100 text-green-800';
-      case 'rejected':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+    if (isDark) {
+      switch (status) {
+        case 'pending':
+          return 'bg-indigo-900 text-indigo-200';
+        case 'accepted':
+          return 'bg-green-900 text-green-200';
+        case 'rejected':
+          return 'bg-red-900 text-red-200';
+        default:
+          return 'bg-gray-700 text-gray-200';
+      }
+    } else {
+      switch (status) {
+        case 'pending':
+          return 'bg-indigo-100 text-indigo-800';
+        case 'accepted':
+          return 'bg-green-100 text-green-800';
+        case 'rejected':
+          return 'bg-red-100 text-red-800';
+        default:
+          return 'bg-gray-100 text-gray-800';
+      }
     }
   };
 
   const getTaskStatusBadgeClass = (status: string) => {
-    switch (status) {
-      case 'open':
-        return 'bg-green-100 text-green-800';
-      case 'in_progress':
-        return 'bg-indigo-100 text-indigo-800';
-      case 'completed':
-        return 'bg-indigo-100 text-indigo-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+    if (isDark) {
+      switch (status) {
+        case 'open':
+          return 'bg-green-900 text-green-200';
+        case 'in_progress':
+          return 'bg-indigo-900 text-indigo-200';
+        case 'completed':
+          return 'bg-indigo-900 text-indigo-200';
+        default:
+          return 'bg-gray-700 text-gray-200';
+      }
+    } else {
+      switch (status) {
+        case 'open':
+          return 'bg-green-100 text-green-800';
+        case 'in_progress':
+          return 'bg-indigo-100 text-indigo-800';
+        case 'completed':
+          return 'bg-indigo-100 text-indigo-800';
+        default:
+          return 'bg-gray-100 text-gray-800';
+      }
     }
   };
 
@@ -140,8 +166,8 @@ const FreelancerApplications: React.FC = () => {
             <button
               onClick={() => setActiveTab('all')}
               className={`py-4 px-1 text-sm font-medium ${activeTab === 'all'
-                ? 'border-indigo-500 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 border-b-2'
-                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                ? `border-indigo-500 ${isDark ? 'text-indigo-400' : 'text-indigo-600'} border-b-2`
+                : `border-transparent ${isDark ? 'text-gray-400 hover:text-gray-300 hover:border-gray-600' : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'}`
                 }`}
             >
               {t('allApplications')}
@@ -149,8 +175,8 @@ const FreelancerApplications: React.FC = () => {
             <button
               onClick={() => setActiveTab('pending')}
               className={`py-4 px-1 text-sm font-medium ${activeTab === 'pending'
-                ? 'border-indigo-500 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 border-b-2'
-                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                ? `border-indigo-500 ${isDark ? 'text-indigo-400' : 'text-indigo-600'} border-b-2`
+                : `border-transparent ${isDark ? 'text-gray-400 hover:text-gray-300 hover:border-gray-600' : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'}`
                 }`}
             >
               {t('pending')}
@@ -158,8 +184,8 @@ const FreelancerApplications: React.FC = () => {
             <button
               onClick={() => setActiveTab('accepted')}
               className={`py-4 px-1 text-sm font-medium ${activeTab === 'accepted'
-                ? 'border-indigo-500 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 border-b-2'
-                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                ? `border-indigo-500 ${isDark ? 'text-indigo-400' : 'text-indigo-600'} border-b-2`
+                : `border-transparent ${isDark ? 'text-gray-400 hover:text-gray-300 hover:border-gray-600' : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'}`
                 }`}
             >
               {t('inProgress')}
@@ -167,8 +193,8 @@ const FreelancerApplications: React.FC = () => {
             <button
               onClick={() => setActiveTab('completed')}
               className={`py-4 px-1 text-sm font-medium ${activeTab === 'completed'
-                ? 'border-indigo-500 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 border-b-2'
-                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                ? `border-indigo-500 ${isDark ? 'text-indigo-400' : 'text-indigo-600'} border-b-2`
+                : `border-transparent ${isDark ? 'text-gray-400 hover:text-gray-300 hover:border-gray-600' : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'}`
                 }`}
             >
               {t('completed')}
@@ -180,7 +206,11 @@ const FreelancerApplications: React.FC = () => {
         <div className="mt-4 flex justify-end">
           <button
             onClick={() => fetchApplications()}
-            className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-xs font-medium rounded text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className={`inline-flex items-center px-3 py-1.5 border text-xs font-medium rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+              isDark 
+                ? 'border-gray-600 text-gray-200 bg-gray-800 hover:bg-gray-700' 
+                : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
+            }`}
           >
             {t('refresh')}
           </button>
@@ -189,15 +219,15 @@ const FreelancerApplications: React.FC = () => {
         {/* Applications List */}
         {loading ? (
           <div className="text-center py-12">
-            <p className="text-gray-500 dark:text-gray-400">{t('loadingApplications')}</p>
+            <p className={isDark ? 'text-gray-400' : 'text-gray-500'}>{t('loadingApplications')}</p>
           </div>
         ) : error ? (
           <div className="text-center py-12">
-            <p className="text-red-500 dark:text-red-400">{error}</p>
+            <p className={isDark ? 'text-red-400' : 'text-red-500'}>{error}</p>
           </div>
         ) : filteredApplications.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500 dark:text-gray-400">{t('noApplicationsFound')}</p>
+            <p className={isDark ? 'text-gray-400' : 'text-gray-500'}>{t('noApplicationsFound')}</p>
             {activeTab === 'all' && (
               <button
                 onClick={() => navigate('/find-work')}
@@ -212,14 +242,14 @@ const FreelancerApplications: React.FC = () => {
             {filteredApplications.map((application) => (
               <div
                 key={application.id}
-                className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg"
+                className={`${isDark ? 'bg-gray-800' : 'bg-white'} shadow overflow-hidden sm:rounded-lg`}
               >
                 <div className="px-4 py-5 sm:px-6 flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                    <h3 className={`text-lg leading-6 font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
                       {application.task.title}
                     </h3>
-                    <p className="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+                    <p className={`mt-1 max-w-2xl text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                       {t('appliedOn')} {new Date(application.createdAt).toLocaleDateString()}
                     </p>
                   </div>
@@ -233,12 +263,12 @@ const FreelancerApplications: React.FC = () => {
                     </span>
                   </div>
                 </div>
-                <div className="border-t border-gray-200 dark:border-gray-700">
+                <div className={`border-t ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
                   <dl>
-                    <div className="bg-gray-50 dark:bg-gray-700 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('client')}</dt>
+                    <div className={`${isDark ? 'bg-gray-700' : 'bg-gray-50'} px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6`}>
+                      <dt className={`text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t('client')}</dt>
                       <dd
-                        className="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2 flex items-center cursor-pointer hover:opacity-80"
+                        className={`mt-1 text-sm ${isDark ? 'text-white' : 'text-gray-900'} sm:mt-0 sm:col-span-2 flex items-center cursor-pointer hover:opacity-80`}
                         onClick={() => navigate(`/profile/${application.task.client.id}`)}
                       >
                         <div className="flex items-center -space-x-2 mr-3">
@@ -256,42 +286,42 @@ const FreelancerApplications: React.FC = () => {
                               className="h-10 w-10 rounded-full object-cover ring-2 ring-white z-20"
                             />
                           ) : (
-                            <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center ring-2 ring-white z-20">
-                              <span className="text-xs font-medium text-gray-600">
+                            <div className={`h-10 w-10 rounded-full ${isDark ? 'bg-gray-600' : 'bg-gray-300'} flex items-center justify-center ring-2 ring-white z-20`}>
+                              <span className={`text-xs font-medium ${isDark ? 'text-gray-200' : 'text-gray-600'}`}>
                                 {application.task.client.fullName.charAt(0)}
                               </span>
                             </div>
                           )}
                         </div>
                         <div className="flex flex-col">
-                          <span className="font-medium hover:text-blue-600 dark:hover:text-blue-400">{application.task.client.fullName}</span>
+                          <span className={`font-medium ${isDark ? 'hover:text-blue-400' : 'hover:text-blue-600'}`}>{application.task.client.fullName}</span>
                         </div>
                       </dd>
                     </div>
-                    <div className="bg-white dark:bg-gray-800 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('budget')}</dt>
-                      <dd className="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                    <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6`}>
+                      <dt className={`text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t('budget')}</dt>
+                      <dd className={`mt-1 text-sm ${isDark ? 'text-white' : 'text-gray-900'} sm:mt-0 sm:col-span-2`}>
                         ${application.task.budget}
                       </dd>
                     </div>
-                    <div className="bg-gray-50 dark:bg-gray-700 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('projectStatus')}</dt>
-                      <dd className="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                    <div className={`${isDark ? 'bg-gray-700' : 'bg-gray-50'} px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6`}>
+                      <dt className={`text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t('projectStatus')}</dt>
+                      <dd className={`mt-1 text-sm ${isDark ? 'text-white' : 'text-gray-900'} sm:mt-0 sm:col-span-2`}>
                         {application.task.status === 'completed' ? (
-                          <span className="font-medium text-indigo-600 dark:text-indigo-400">{t('completed')}</span>
+                          <span className={`font-medium ${isDark ? 'text-indigo-400' : 'text-indigo-600'}`}>{t('completed')}</span>
                         ) : (
                           application.task.status.charAt(0).toUpperCase() + application.task.status.slice(1).replace('_', ' ')
                         )}
                       </dd>
                     </div>
-                    <div className="bg-white dark:bg-gray-800 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('skillsRequired')}</dt>
-                      <dd className="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                    <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6`}>
+                      <dt className={`text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t('skillsRequired')}</dt>
+                      <dd className={`mt-1 text-sm ${isDark ? 'text-white' : 'text-gray-900'} sm:mt-0 sm:col-span-2`}>
                         <div className="flex flex-wrap gap-2">
                           {application.task.skills.map((skill) => (
                             <span
                               key={skill}
-                              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-800'}`}
                             >
                               {skill}
                             </span>
@@ -299,26 +329,26 @@ const FreelancerApplications: React.FC = () => {
                         </div>
                       </dd>
                     </div>
-                    <div className="bg-gray-50 dark:bg-gray-700 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('description')}</dt>
-                      <dd className="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                    <div className={`${isDark ? 'bg-gray-700' : 'bg-gray-50'} px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6`}>
+                      <dt className={`text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t('description')}</dt>
+                      <dd className={`mt-1 text-sm ${isDark ? 'text-white' : 'text-gray-900'} sm:mt-0 sm:col-span-2`}>
                         {application.task.description}
                       </dd>
                     </div>
                     {application.coverLetter && (
-                      <div className="bg-white dark:bg-gray-800 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('yourCoverLetter')}</dt>
-                        <dd className="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                      <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6`}>
+                        <dt className={`text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t('yourCoverLetter')}</dt>
+                        <dd className={`mt-1 text-sm ${isDark ? 'text-white' : 'text-gray-900'} sm:mt-0 sm:col-span-2`}>
                           {application.coverLetter}
                         </dd>
                       </div>
                     )}
                   </dl>
                 </div>
-                <div className="bg-gray-50 dark:bg-gray-700 px-4 py-4 sm:px-6">
+                <div className={`${isDark ? 'bg-gray-700' : 'bg-gray-50'} px-4 py-4 sm:px-6`}>
                   <button
                     onClick={() => navigate(`/find-work`)}
-                    className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300"
+                    className={`text-sm font-medium ${isDark ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-600 hover:text-indigo-500'}`}
                   >
                     {t('findMoreProjects')}
                   </button>

@@ -1,6 +1,7 @@
 import { Controller, Post, Get, Param, Body, UseGuards, Request, Put, ForbiddenException } from '@nestjs/common';
 import { TaskApplicationsService } from './task-applications.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { validateId, validateTextLength, validateEnum } from '../utils/validation';
 
 @Controller('task-applications')
 export class TaskApplicationsController {
@@ -13,6 +14,12 @@ export class TaskApplicationsController {
     @Param('taskId') taskId: string,
     @Body() data: { coverLetter?: string }
   ) {
+    // Validate input
+    validateId(taskId, 'Task ID');
+    if (data.coverLetter !== undefined && data.coverLetter !== null) {
+      validateTextLength(data.coverLetter, 'Cover letter', 0, 2000);
+    }
+    
     return this.taskApplicationsService.applyToTask(
       req.user.sub, 
       taskId, 
@@ -42,9 +49,9 @@ export class TaskApplicationsController {
     @Param('applicationId') applicationId: string,
     @Body() data: { status: 'accepted' | 'rejected' }
   ) {
-    if (!data.status || !['accepted', 'rejected'].includes(data.status)) {
-      throw new ForbiddenException('Invalid status');
-    }
+    // Validate input
+    validateId(applicationId, 'Application ID');
+    validateEnum(data.status, 'Status', ['accepted', 'rejected']);
     
     return this.taskApplicationsService.updateApplicationStatus(
       applicationId,

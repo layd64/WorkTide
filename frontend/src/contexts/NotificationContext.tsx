@@ -34,7 +34,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         if (!token) return;
         try {
             setIsLoading(true);
-            const response = await axios.get('http://localhost:3000/api/notifications', {
+            const response = await axios.get(`${API_BASE_URL}/notifications`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setNotifications(response.data);
@@ -72,7 +72,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     const markAsRead = async (id: string) => {
         try {
-            await axios.patch(`http://localhost:3000/api/notifications/${id}/read`, {}, {
+            await axios.patch(`${API_BASE_URL}/notifications/${id}/read`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setNotifications(prev =>
@@ -86,7 +86,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const deleteNotification = async (id: string) => {
         console.log('Deleting notification:', id);
         try {
-            await axios.delete(`http://localhost:3000/api/notifications/${id}`, {
+            await axios.delete(`${API_BASE_URL}/notifications/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             console.log('Notification deleted successfully');

@@ -10,9 +10,6 @@ export class TasksService {
     private loggingService: LoggingService
   ) { }
 
-  /**
-   * Create a new task for the given client
-   */
   async createTask(
     userId: string,
     data: {
@@ -23,7 +20,6 @@ export class TasksService {
       imageUrl: string;
     },
   ) {
-    // Verify user exists
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
@@ -32,12 +28,10 @@ export class TasksService {
       throw new ForbiddenException('User not found');
     }
 
-    // Validate imageUrl is provided
     if (!data.imageUrl) {
       throw new BadRequestException('Task image is required');
     }
 
-    // Create the task
     const task = await this.prisma.task.create({
       data: {
         ...data,
@@ -57,10 +51,8 @@ export class TasksService {
   }) {
     const where: Prisma.TaskWhereInput = {};
 
-    // Add status filter if provided, default to 'open' if not provided
     where.status = filters?.status || 'open';
 
-    // Add search filter if provided
     if (filters?.search) {
       where.OR = [
         { title: { contains: filters.search, mode: 'insensitive' } },
@@ -68,7 +60,6 @@ export class TasksService {
       ];
     }
 
-    // Add skills filter if provided
     if (filters?.skills && filters.skills.length > 0) {
       where.skills = {
         hasSome: filters.skills,
@@ -93,7 +84,6 @@ export class TasksService {
   }
 
   async getRecommendedFreelancersForTask(taskId: string, limit = 10) {
-    // 1. Load the target task and ensure it exists and is open
     const task = await this.prisma.task.findUnique({
       where: { id: taskId },
     });
@@ -103,14 +93,11 @@ export class TasksService {
     }
 
     if (task.status !== 'open') {
-      // We only recommend for open tasks to avoid suggesting for already assigned / completed work
       throw new BadRequestException('Recommendations are only available for open tasks');
     }
 
     const taskSkills = task.skills || [];
 
-    // 2. Find "similar" tasks by overlapping skills and that have been worked on
-    //    We also fetch createdAt so we can apply recency weighting.
     const similarTasks = await this.prisma.task.findMany({
       where: {
         id: {
@@ -148,14 +135,7 @@ export class TasksService {
       },
     });
 
-    // 3. Build a collaborative score per freelancer based on similar tasks
-    //
-    // We use a lightweight, implicit-feedback collaborative filtering heuristic:
-    // - Each accepted interaction contributes to a freelancer's score.
-    // - Contributions are weighted by:
-    //   - Skill similarity between the current task and the historical task (Jaccard-like).
-    //   - Recency of the historical task (newer tasks matter more).
-    //   - Type of interaction (accepted application vs accepted direct request).
+    // collaborative filtering: score = skill_similarity * recency * interaction_type
     const freelancerScores: Record<string, number> = {};
     const freelancerInteractionCounts: Record<string, number> = {};
     const now = new Date();
@@ -163,7 +143,7 @@ export class TasksService {
     for (const similar of similarTasks) {
       const similarSkills = similar.skills || [];
 
-      // Skill similarity (Jaccard-style: overlap / union), fall back to 1 if we have no skills data.
+      // jaccard similarity: overlap / union
       const overlapCount =
         taskSkills.length && similarSkills.length
           ? similarSkills.filter((s) => taskSkills.includes(s)).length
@@ -172,15 +152,12 @@ export class TasksService {
       const skillSimilarity =
         overlapCount > 0 && unionCount > 0 ? overlapCount / unionCount : taskSkills.length === 0 ? 1 : 0.2;
 
-      // Recency weight: newer tasks contribute more.
       const ageMs = now.getTime() - similar.createdAt.getTime();
       const ageDays = ageMs / (1000 * 60 * 60 * 24);
-      // Within ~30 days => strong weight, then decays.
       const recencyWeight = 1 / (1 + Math.max(ageDays, 0) / 30);
 
-      // Base weights for different interactions
-      const applicationWeight = 3; // accepted application from freelancer
-      const requestWeight = 2; // accepted direct task request to freelancer
+      const applicationWeight = 3;
+      const requestWeight = 2;
 
       for (const app of similar.applications || []) {
         const freelancerId = app.freelancerId;
@@ -202,10 +179,8 @@ export class TasksService {
       }
     }
 
-    // If we have no collaborative signal yet, just fall back to a simple skill-based search
     const hasCollaborativeSignal = Object.keys(freelancerScores).length > 0;
 
-    // 4. Fetch candidate freelancers
     const candidates = await this.prisma.user.findMany({
       where: {
         id: {
@@ -257,9 +232,7 @@ export class TasksService {
           ? allSkills.filter((s) => taskSkills.includes(s)).length
           : 0;
 
-      // Base score from collaborative filtering if available.
-      // We lightly normalize by the square root of the number of interactions
-      // to reduce pure popularity bias (many small interactions).
+      // normalize by sqrt(interactions) to reduce popularity bias
       const rawCollaborative = freelancerScores[c.id] || 0;
       const interactionCount = freelancerInteractionCounts[c.id] || 0;
       const normalizedCollaborative =
@@ -267,10 +240,7 @@ export class TasksService {
           ? rawCollaborative / Math.sqrt(interactionCount)
           : rawCollaborative;
 
-      // Weight for skill match – still important even without collaborative signal
       const skillScore = skillOverlap * 2;
-
-      // Boost for higher ratings (normalized: 0-5 -> 0-2.0)
       const ratingScore = c.rating ? c.rating * 0.4 : 0;
 
       const totalScore =
@@ -292,7 +262,6 @@ export class TasksService {
       };
     });
 
-    // 5. Sort by score desc, then rating desc, then completed jobs desc
     enriched.sort((a, b) => {
       if (b.score !== a.score) {
         return b.score - a.score;
@@ -307,8 +276,6 @@ export class TasksService {
       return jobsB - jobsA;
     });
 
-    // 6. If we had absolutely no collaborative / rating / skill signal,
-    // we still return some freelancers so the UI is not empty.
     const result = enriched.slice(0, limit);
 
     return result;
@@ -384,7 +351,6 @@ export class TasksService {
       throw new ForbiddenException('You can only update your own tasks');
     }
 
-    // Update the task
     const updatedTask = await this.prisma.task.update({
       where: { id: taskId },
       data,
@@ -398,7 +364,6 @@ export class TasksService {
   }
 
   async deleteTask(taskId: string, userId: string) {
-    // Verify task exists and belongs to user
     const task = await this.prisma.task.findUnique({
       where: { id: taskId },
     });
@@ -411,17 +376,14 @@ export class TasksService {
       throw new ForbiddenException('You can only delete your own tasks');
     }
 
-    // Only allow deletion of tasks with 'open' status
     if (task.status !== 'open') {
       throw new ForbiddenException('Only tasks with "open" status can be deleted');
     }
 
-    // Delete all related TaskApplications first to avoid foreign key constraint violation
     await this.prisma.taskApplication.deleteMany({
       where: { taskId },
     });
 
-    // Now delete the task
     const deletedTask = await this.prisma.task.delete({
       where: { id: taskId },
     });

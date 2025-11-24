@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
+import { API_BASE_URL } from '../config/api';
 
 interface Attachment {
     url: string;
@@ -34,6 +35,35 @@ interface ChatContextType {
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
+const normalizeAttachments = (attachments: any): Attachment[] => {
+    if (!attachments) return [];
+    
+    if (typeof attachments === 'string') {
+        try {
+            attachments = JSON.parse(attachments);
+        } catch (e) {
+            return [];
+        }
+    }
+    
+    if (!Array.isArray(attachments)) {
+        return [];
+    }
+    
+    return attachments.map((att: any) => ({
+        url: att.url || '',
+        type: att.type || '',
+        name: att.name || 'Attachment',
+    })).filter((att: Attachment) => att.url);
+};
+
+const normalizeMessage = (msg: any): Message => {
+    return {
+        ...msg,
+        attachments: normalizeAttachments(msg.attachments),
+    };
+};
+
 export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const { user, token } = useAuth();
     const [socket, setSocket] = useState<Socket | null>(null);
@@ -42,36 +72,31 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     useEffect(() => {
         if (user?.id && token) {
-            console.log('Initializing socket for user:', user.id);
-            const newSocket = io('http://localhost:3000', {
+            const socketUrl = API_BASE_URL.replace('/api', '');
+            const newSocket = io(socketUrl, {
                 query: { userId: user.id },
             });
 
             setSocket(newSocket);
 
             newSocket.on('connect', () => {
-                console.log('Socket connected');
             });
 
             newSocket.on('disconnect', () => {
-                console.log('Socket disconnected');
             });
 
             newSocket.on('newMessage', (message: Message) => {
-                console.log('New message received:', message);
-                // Deduplicate messages by checking if message with this ID already exists
+                const normalizedMessage = normalizeMessage(message);
                 setMessages((prev) => {
-                    const exists = prev.find(m => m.id === message.id);
+                    const exists = prev.find(m => m.id === normalizedMessage.id);
                     if (exists) {
-                        console.log('Message already exists, skipping:', message.id);
                         return prev;
                     }
-                    return [...prev, message];
+                    return [...prev, normalizedMessage];
                 });
             });
 
             return () => {
-                console.log('Cleaning up socket');
                 newSocket.close();
             };
         }
@@ -91,7 +116,7 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const loadHistory = React.useCallback(async (otherUserId: string) => {
         if (!user || !token) return;
         try {
-            const response = await fetch(`http://localhost:3000/api/chat/history/${user.id}/${otherUserId}`, {
+            const response = await fetch(`${API_BASE_URL}/chat/history/${user.id}/${otherUserId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -99,14 +124,14 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             if (response.ok) {
                 const history = await response.json();
                 if (Array.isArray(history)) {
-                    setMessages(history);
+                    // Normalize all messages to ensure attachments are properly formatted
+                    const normalizedHistory = history.map(normalizeMessage);
+                    setMessages(normalizedHistory);
                 } else {
-                    console.error('Invalid history format:', history);
                     setMessages([]);
                 }
             }
         } catch (error) {
-            console.error('Failed to load chat history', error);
         }
     }, [user, token]);
 

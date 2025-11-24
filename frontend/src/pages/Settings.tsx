@@ -8,6 +8,7 @@ import { SunIcon, MoonIcon, XCircleIcon, PlusIcon, CameraIcon } from '@heroicons
 import { useAccessibility } from '../contexts/AccessibilityContext';
 import Avatar from '../components/Avatar';
 import SkillSelector from '../components/SkillSelector';
+import { validateTextLength, validateNumberRange, validateArrayLength, validateFile } from '../utils/validation';
 
 interface Education {
   institution: string;
@@ -39,10 +40,8 @@ const Settings: React.FC = () => {
   } = useAccessibility();
   const navigate = useNavigate();
 
-  // Add loading state
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Profile form state
   const [title, setTitle] = useState<string>('');
   const [bio, setBio] = useState<string>('');
   const [location, setLocation] = useState<string>('');
@@ -72,11 +71,8 @@ const Settings: React.FC = () => {
       setEducation(user.education || []);
       setExperience(user.experience || []);
 
-      // Ensure isHidden is properly initialized as a boolean
       const hiddenValue = user.isHidden === true;
       setIsHidden(hiddenValue);
-
-      // Initialize isAvatarVisible
       const avatarVisibleValue = user.isAvatarVisible !== undefined ? user.isAvatarVisible : true;
       setIsAvatarVisible(avatarVisibleValue);
 
@@ -172,6 +168,70 @@ const Settings: React.FC = () => {
     setSaving(true);
     setSaveError('');
     setSaveSuccess(false);
+
+    // Validate input
+    if (title) {
+      const titleError = validateTextLength(title, 'Title', 0, 200);
+      if (titleError) {
+        setSaveError(titleError);
+        setSaving(false);
+        return;
+      }
+    }
+
+    if (bio) {
+      const bioError = validateTextLength(bio, 'Bio', 0, 2000);
+      if (bioError) {
+        setSaveError(bioError);
+        setSaving(false);
+        return;
+      }
+    }
+
+    if (location) {
+      const locationError = validateTextLength(location, 'Location', 0, 200);
+      if (locationError) {
+        setSaveError(locationError);
+        setSaving(false);
+        return;
+      }
+    }
+
+    if (hourlyRate) {
+      const hourlyRateError = validateNumberRange(hourlyRate, 'Hourly rate', 0, 10000);
+      if (hourlyRateError) {
+        setSaveError(hourlyRateError);
+        setSaving(false);
+        return;
+      }
+    }
+
+    if (skills.length > 0) {
+      const skillsError = validateArrayLength(skills, 'Skills', 0, 50);
+      if (skillsError) {
+        setSaveError(skillsError);
+        setSaving(false);
+        return;
+      }
+    }
+
+    if (languages.length > 0) {
+      const languagesError = validateArrayLength(languages, 'Languages', 0, 20);
+      if (languagesError) {
+        setSaveError(languagesError);
+        setSaving(false);
+        return;
+      }
+    }
+
+    if (avatarFile) {
+      const fileError = validateFile(avatarFile, 5);
+      if (fileError) {
+        setSaveError(fileError);
+        setSaving(false);
+        return;
+      }
+    }
 
     try {
       // Upload avatar if selected
@@ -541,7 +601,7 @@ const Settings: React.FC = () => {
 
                 {/* Profile Picture Section */}
                 <div className="mb-8">
-                  <h3 className={`text-lg font-medium ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>{t('profilePicture') || 'Profile Picture'}</h3>
+                  <h3 className={`text-lg font-medium ${isDark ? 'text-white' : 'text-gray-900'} mb-6`}>{t('profilePicture') || 'Profile Picture'}</h3>
                   <div className="flex flex-col sm:flex-row items-center gap-6">
                     <div className="relative">
                       <Avatar
@@ -566,7 +626,7 @@ const Settings: React.FC = () => {
 
                     <div className="flex-1">
                       <div className="flex items-center justify-between max-w-md">
-                        <div className="flex flex-col">
+                        <div className="flex flex-col gap-1">
                           <span className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                             {t('showAvatarToOthers') || 'Show profile picture to others'}
                           </span>
@@ -593,27 +653,29 @@ const Settings: React.FC = () => {
                 </div>
 
                 {/* Profile Information Section */}
-                <div className={`border-t ${isDark ? 'border-gray-700' : 'border-gray-200'} pt-6`}>
-                  <h3 className={`text-lg font-medium ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>{t('profileInformation')}</h3>
+                <div className={`border-t ${isDark ? 'border-gray-700' : 'border-gray-200'} pt-8 mt-8`}>
+                  <h3 className={`text-lg font-medium ${isDark ? 'text-white' : 'text-gray-900'} mb-6`}>{t('profileInformation')}</h3>
                   <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                    <div className="sm:col-span-4">
-                      <label htmlFor="title" className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                        {t('professionalTitle')}
-                      </label>
-                      <div className="mt-1">
-                        <input
-                          type="text"
-                          id="title"
-                          value={title}
-                          onChange={(e) => setTitle(e.target.value)}
-                          className={`shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-md px-4 py-2`}
-                          placeholder="UI/UX Designer"
-                        />
+                    <div className="sm:col-span-6 flex justify-center">
+                      <div className="w-full max-w-md">
+                        <label htmlFor="title" className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2 text-center`}>
+                          {t('professionalTitle')}
+                        </label>
+                        <div className="mt-1">
+                          <input
+                            type="text"
+                            id="title"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            className={`shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-md px-4 py-2`}
+                            placeholder="UI/UX Designer"
+                          />
+                        </div>
                       </div>
                     </div>
 
                     <div className="sm:col-span-6">
-                      <label htmlFor="bio" className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <label htmlFor="bio" className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                         {t('aboutMe')}
                       </label>
                       <div className="mt-1">
@@ -629,7 +691,7 @@ const Settings: React.FC = () => {
                     </div>
 
                     <div className="sm:col-span-3">
-                      <label htmlFor="location" className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <label htmlFor="location" className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                         {t('location')}
                       </label>
                       <div className="mt-1">
@@ -645,7 +707,7 @@ const Settings: React.FC = () => {
                     </div>
 
                     <div className="sm:col-span-3">
-                      <label htmlFor="hourlyRate" className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <label htmlFor="hourlyRate" className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                         {t('hourlyRate')} (USD)
                       </label>
                       <div className="mt-1 relative rounded-md shadow-sm">
@@ -668,19 +730,20 @@ const Settings: React.FC = () => {
                 </div>
 
                 {/* Skills Section */}
-                <div>
-                  <h2 className={`text-lg font-medium ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>{t('skills')}</h2>
+                <div className={`border-t ${isDark ? 'border-gray-700' : 'border-gray-200'} pt-8 mt-8`}>
+                  <h2 className={`text-lg font-medium ${isDark ? 'text-white' : 'text-gray-900'} mb-6`}>{t('skills')}</h2>
                   <div className="space-y-4">
                     <SkillSelector
                       selectedSkills={skills}
                       onChange={setSkills}
+                      isDark={isDark}
                     />
                   </div>
                 </div>
 
                 {/* Languages Section */}
-                <div>
-                  <h2 className={`text-lg font-medium ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>{t('languages')}</h2>
+                <div className={`border-t ${isDark ? 'border-gray-700' : 'border-gray-200'} pt-8 mt-8`}>
+                  <h2 className={`text-lg font-medium ${isDark ? 'text-white' : 'text-gray-900'} mb-6`}>{t('languages')}</h2>
                   <div className="space-y-4">
                     <div className="flex">
                       <input
@@ -723,8 +786,8 @@ const Settings: React.FC = () => {
                 </div>
 
                 {/* Education Section */}
-                <div>
-                  <div className="flex justify-between items-center mb-4">
+                <div className={`border-t ${isDark ? 'border-gray-700' : 'border-gray-200'} pt-8 mt-8`}>
+                  <div className="flex justify-between items-center mb-6">
                     <h2 className={`text-lg font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('education')}</h2>
                     <button
                       type="button"
@@ -738,8 +801,8 @@ const Settings: React.FC = () => {
 
                   <div className="space-y-4">
                     {education.map((edu, index) => (
-                      <div key={index} className={`border ${isDark ? 'border-gray-700' : 'border-gray-200'} rounded-md p-4`}>
-                        <div className="flex justify-between items-start mb-4">
+                      <div key={index} className={`border ${isDark ? 'border-gray-700' : 'border-gray-200'} rounded-md p-6`}>
+                        <div className="flex justify-between items-start mb-6">
                           <h3 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                             {t('educationNumber')}{index + 1}
                           </h3>
@@ -754,7 +817,7 @@ const Settings: React.FC = () => {
 
                         <div className="grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-6">
                           <div className="sm:col-span-3">
-                            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                               {t('institution')}
                             </label>
                             <input
@@ -766,7 +829,7 @@ const Settings: React.FC = () => {
                           </div>
 
                           <div className="sm:col-span-3">
-                            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                               {t('year')}
                             </label>
                             <input
@@ -778,7 +841,7 @@ const Settings: React.FC = () => {
                           </div>
 
                           <div className="sm:col-span-6">
-                            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                               {t('degree')}
                             </label>
                             <input
@@ -795,8 +858,8 @@ const Settings: React.FC = () => {
                 </div>
 
                 {/* Experience Section */}
-                <div>
-                  <div className="flex justify-between items-center mb-4">
+                <div className={`border-t ${isDark ? 'border-gray-700' : 'border-gray-200'} pt-8 mt-8`}>
+                  <div className="flex justify-between items-center mb-6">
                     <h2 className={`text-lg font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('workExperience')}</h2>
                     <button
                       type="button"
@@ -810,8 +873,8 @@ const Settings: React.FC = () => {
 
                   <div className="space-y-4">
                     {experience.map((exp, index) => (
-                      <div key={index} className={`border ${isDark ? 'border-gray-700' : 'border-gray-200'} rounded-md p-4`}>
-                        <div className="flex justify-between items-start mb-4">
+                      <div key={index} className={`border ${isDark ? 'border-gray-700' : 'border-gray-200'} rounded-md p-6`}>
+                        <div className="flex justify-between items-start mb-6">
                           <h3 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                             {t('experienceNumber')}{index + 1}
                           </h3>
@@ -826,51 +889,51 @@ const Settings: React.FC = () => {
 
                         <div className="grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-6">
                           <div className="sm:col-span-3">
-                            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                               {t('company')}
                             </label>
                             <input
                               type="text"
                               value={exp.company}
                               onChange={(e) => handleExperienceChange(index, 'company', e.target.value)}
-                              className={`mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-md`}
+                              className={`mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-md px-4 py-2`}
                             />
                           </div>
 
                           <div className="sm:col-span-3">
-                            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                               {t('period')}
                             </label>
                             <input
                               type="text"
                               value={exp.period}
                               onChange={(e) => handleExperienceChange(index, 'period', e.target.value)}
-                              className={`mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-md`}
+                              className={`mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-md px-4 py-2`}
                               placeholder="2019-2022"
                             />
                           </div>
 
                           <div className="sm:col-span-6">
-                            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                               {t('role')}
                             </label>
                             <input
                               type="text"
                               value={exp.role}
                               onChange={(e) => handleExperienceChange(index, 'role', e.target.value)}
-                              className={`mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-md`}
+                              className={`mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-md px-4 py-2`}
                             />
                           </div>
 
                           <div className="sm:col-span-6">
-                            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                               {t('description')}
                             </label>
                             <textarea
                               rows={3}
                               value={exp.description}
                               onChange={(e) => handleExperienceChange(index, 'description', e.target.value)}
-                              className={`mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-md`}
+                              className={`mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'} rounded-md px-4 py-2`}
                             />
                           </div>
                         </div>

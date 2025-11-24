@@ -2,7 +2,7 @@ import React from 'react';
 import { getInitialsAvatar } from '../utils/avatar';
 
 interface AvatarProps {
-  fullName: string;
+  fullName?: string;
   className?: string;
   textSize?: string;
   imageUrl?: string | null;
@@ -10,13 +10,13 @@ interface AvatarProps {
 }
 
 const Avatar: React.FC<AvatarProps> = ({
-  fullName,
+  fullName = '',
   className = 'w-10 h-10',
   textSize = 'text-sm',
   imageUrl,
   onClick
 }) => {
-  const { initials, bgColor } = getInitialsAvatar(fullName);
+  const { initials, bgColor } = getInitialsAvatar(fullName || '');
   const cursorClass = onClick ? 'cursor-pointer' : '';
 
   if (imageUrl) {

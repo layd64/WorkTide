@@ -12,7 +12,6 @@ export class AdminController {
 
     @Get('users')
     async getAllUsers() {
-        console.log('GET /admin/users hit');
         return this.adminService.getAllUsers();
     }
 

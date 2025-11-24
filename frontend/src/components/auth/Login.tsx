@@ -5,6 +5,7 @@ import { EnvelopeIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import { API_ENDPOINTS } from '../../config/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
+import { validateEmail } from '../../utils/validation';
 
 const Login: React.FC = () => {
     const { t } = useTranslation();
@@ -30,6 +31,18 @@ const Login: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+
+        // Validate input
+        const emailError = validateEmail(formData.email);
+        if (emailError) {
+            setError(emailError);
+            return;
+        }
+
+        if (!formData.password || formData.password.trim().length === 0) {
+            setError('Password is required');
+            return;
+        }
 
         try {
             const response = await fetch(API_ENDPOINTS.auth.login, {

@@ -35,6 +35,11 @@ export const getAvatarBgColor = (name: string): string => {
     'bg-pink-500',
   ];
   
+  // Handle empty or undefined names
+  if (!name || name.trim() === '') {
+    return colors[0]; // Default to first color
+  }
+  
   // Use the sum of character codes to deterministically generate a color
   const charCodeSum = name.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
   return colors[charCodeSum % colors.length];
@@ -44,8 +49,8 @@ export const getAvatarBgColor = (name: string): string => {
  * Creates an Avatar component with user's initials and background color
  */
 export const getInitialsAvatar = (fullName: string): { initials: string, bgColor: string } => {
-  const initials = getInitials(fullName);
-  const bgColor = getAvatarBgColor(fullName);
+  const initials = getInitials(fullName) || '?';
+  const bgColor = getAvatarBgColor(fullName || '');
   
   return { initials, bgColor };
 }; 

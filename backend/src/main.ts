@@ -11,14 +11,18 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
 
-  // Enable CORS
   app.enableCors({
     origin: 'http://localhost:5173', // Vite's default port
     credentials: true,
   });
 
-  // Add global prefix
   app.setGlobalPrefix('api');
+
+  app.use((req, res, next) => {
+    res.charset = 'utf-8';
+    res.setHeader('Content-Type', res.getHeader('Content-Type') || 'application/json; charset=utf-8');
+    next();
+  });
 
   const port = process.env.PORT ?? 3000;
   await app.listen(port);

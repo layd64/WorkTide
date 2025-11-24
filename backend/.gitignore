@@ -5,6 +5,7 @@
 
 # Production
 /build
+/dist
 
 # Testing
 /coverage

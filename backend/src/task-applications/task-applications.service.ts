@@ -13,7 +13,6 @@ export class TaskApplicationsService {
   ) { }
 
   async applyToTask(freelancerId: string, taskId: string, coverLetter?: string) {
-    // Verify user exists
     const user = await this.prisma.user.findUnique({
       where: { id: freelancerId },
     });
@@ -22,7 +21,6 @@ export class TaskApplicationsService {
       throw new ForbiddenException('User not found');
     }
 
-    // Verify task exists and is open
     const task = await this.prisma.task.findUnique({
       where: { id: taskId },
     });
@@ -35,7 +33,6 @@ export class TaskApplicationsService {
       throw new ForbiddenException('Cannot apply to a task that is not open');
     }
 
-    // Check if the freelancer has already applied to this task
     const existingApplication = await this.prisma.taskApplication.findUnique({
       where: {
         taskId_freelancerId: {
@@ -49,20 +46,17 @@ export class TaskApplicationsService {
       throw new ConflictException('You have already applied to this task');
     }
 
-    // Create the application
     const data: any = {
       task: { connect: { id: taskId } },
       freelancer: { connect: { id: freelancerId } },
     };
 
-    // Only add coverLetter if it's provided
     if (coverLetter) {
       data.coverLetter = coverLetter;
     }
 
     const application = await this.prisma.taskApplication.create({ data });
 
-    // Notify the client
     await this.notificationsService.createNotification(
       task.clientId,
       'APPLICATION_RECEIVED',
@@ -75,7 +69,6 @@ export class TaskApplicationsService {
   }
 
   async getTaskApplications(taskId: string, clientId: string) {
-    // Verify task exists and belongs to the client
     const task = await this.prisma.task.findUnique({
       where: { id: taskId },
     });
@@ -88,7 +81,6 @@ export class TaskApplicationsService {
       throw new ForbiddenException('You can only view applications for your own tasks');
     }
 
-    // Get the applications with freelancer information
     return this.prisma.taskApplication.findMany({
       where: { taskId },
       include: {
@@ -138,7 +130,6 @@ export class TaskApplicationsService {
     clientId: string,
     status: 'accepted' | 'rejected'
   ) {
-    // Find the application
     const application = await this.prisma.taskApplication.findUnique({
       where: { id: applicationId },
       include: { task: true },
@@ -153,7 +144,6 @@ export class TaskApplicationsService {
       throw new ForbiddenException('You can only update applications for your own tasks');
     }
 
-    // Notify the freelancer
     if (application) {
       const title = status === 'accepted' ? 'Application Accepted' : 'Application Declined';
       const message = status === 'accepted'
@@ -169,7 +159,6 @@ export class TaskApplicationsService {
       );
     }
 
-    // Update the application status
     return this.prisma.taskApplication.update({
       where: { id: applicationId },
       data: { status },
@@ -180,7 +169,6 @@ export class TaskApplicationsService {
     applicationId: string,
     clientId: string
   ) {
-    // Find the application
     const application = await this.prisma.taskApplication.findUnique({
       where: { id: applicationId },
       include: { task: true },
@@ -195,16 +183,12 @@ export class TaskApplicationsService {
       throw new ForbiddenException('You can only assign freelancers to your own tasks');
     }
 
-    // Update the application status to 'accepted' and the task status to 'in_progress'
-    // Use a transaction to ensure both updates succeed or fail together
     const result = await this.prisma.$transaction(async (prisma) => {
-      // Update the application status
       const updatedApplication = await prisma.taskApplication.update({
         where: { id: applicationId },
         data: { status: 'accepted' },
       });
 
-      // Update the task status
       const updatedTask = await prisma.task.update({
         where: { id: application.taskId },
         data: { status: 'in_progress' },
@@ -216,7 +200,6 @@ export class TaskApplicationsService {
       };
     });
 
-    // Create initial chat message between client and freelancer
     await this.chatService.createInitialChatMessage(
       application.freelancerId,
       clientId
@@ -231,7 +214,6 @@ export class TaskApplicationsService {
       application.id,
     );
 
-    // Return result with freelancer ID for frontend navigation
     return {
       ...result,
       freelancerId: application.freelancerId,

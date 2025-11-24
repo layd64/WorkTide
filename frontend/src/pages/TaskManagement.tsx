@@ -882,13 +882,15 @@ const TaskManagement: React.FC = () => {
           isViewingApplications && selectedTaskId && (
             <div className="fixed inset-0 overflow-y-auto z-50" style={{ pointerEvents: 'auto' }} role="dialog">
               <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-
+                <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+                  <div className="absolute inset-0 bg-gray-500 opacity-75" onClick={closeApplicationsModal}></div>
+                </div>
                 <span className="hidden sm:inline-block sm:align-middle sm:h-screen"></span>&#8203;
-                <div className={`inline-block align-bottom ${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full`}>
+                <div className={`inline-block align-bottom ${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full relative`}>
                   <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} px-4 pt-5 pb-4 sm:p-6 sm:pb-4`}>
                     <div className="sm:flex sm:items-start">
                       <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                        <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                        <h3 className={`text-lg leading-6 font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
                           Applications for: {getSelectedTask()?.title}
                         </h3>
 
@@ -898,7 +900,7 @@ const TaskManagement: React.FC = () => {
                           </div>
                         ) : (
                           <div className="mt-6">
-                            <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+                            <ul className={`divide-y ${isDark ? 'divide-gray-700' : 'divide-gray-200'}`}>
                               {applications.map((application) => (
                                 <li key={application.id} className="py-4">
                                   <div className="flex items-center justify-between">
@@ -913,14 +915,14 @@ const TaskManagement: React.FC = () => {
                                           className="h-10 w-10 rounded-full mr-3"
                                         />
                                       ) : (
-                                        <div className="h-10 w-10 rounded-full bg-gray-300 mr-3 flex items-center justify-center">
-                                          <span className="text-sm font-medium text-gray-600">
+                                        <div className={`h-10 w-10 rounded-full mr-3 flex items-center justify-center ${isDark ? 'bg-gray-700' : 'bg-gray-300'}`}>
+                                          <span className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
                                             {application.freelancer.fullName.charAt(0)}
                                           </span>
                                         </div>
                                       )}
                                       <div>
-                                        <h4 className="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400">
+                                        <h4 className={`text-sm font-medium ${isDark ? 'text-white hover:text-blue-400' : 'text-gray-900 hover:text-blue-600'}`}>
                                           {application.freelancer.fullName}
                                         </h4>
                                         <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -937,13 +939,13 @@ const TaskManagement: React.FC = () => {
                                     <div className="flex space-x-2">
                                       <Link
                                         to={`/profile/${application.freelancer.id}`}
-                                        className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                        className={`inline-flex items-center px-2.5 py-1.5 border text-xs font-medium rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${isDark ? 'border-gray-600 text-gray-200 bg-gray-700 hover:bg-gray-600' : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'}`}
                                       >
                                         View Profile
                                       </Link>
                                       <button
                                         onClick={() => handleViewApplicationDetails(application)}
-                                        className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                        className={`inline-flex items-center px-2.5 py-1.5 border text-xs font-medium rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${isDark ? 'border-gray-600 text-gray-200 bg-gray-700 hover:bg-gray-600' : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'}`}
                                       >
                                         View Application
                                       </button>
@@ -965,11 +967,11 @@ const TaskManagement: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                  <div className={`${isDark ? 'bg-gray-700' : 'bg-gray-50'} px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse`}>
                     <button
                       type="button"
                       onClick={closeApplicationsModal}
-                      className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
+                      className={`mt-3 w-full inline-flex justify-center rounded-md border shadow-sm px-4 py-2 text-base font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm ${isDark ? 'border-gray-600 bg-gray-800 text-gray-200 hover:bg-gray-700' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'}`}
                     >
                       Close
                     </button>

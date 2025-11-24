@@ -6,7 +6,7 @@ import { NotificationsService } from '../notifications/notifications.service';
 export class AdminService {
     constructor(
         private prisma: PrismaService,
-        private notificationsService: NotificationsService, // Inject NotificationsService
+        private notificationsService: NotificationsService,
     ) { }
 
     async getAllUsers() {
@@ -20,7 +20,6 @@ export class AdminService {
                 createdAt: true,
             },
         });
-        console.log(`Found ${users.length} users`);
         return users;
     }
 
@@ -94,12 +93,10 @@ export class AdminService {
             throw new Error('Task not found');
         }
 
-        // Delete all related TaskApplications first
         await this.prisma.taskApplication.deleteMany({
             where: { taskId },
         });
 
-        // Delete all related TaskRequests
         await this.prisma.taskRequest.deleteMany({
             where: { taskId },
         });
@@ -114,14 +111,11 @@ export class AdminService {
 
     async getAnalytics() {
         const totalUsers = await this.prisma.user.count();
-        const totalProjects = await this.prisma.project.count();
         const totalTasks = await this.prisma.task.count();
 
-        // Users by type
         const freelancers = await this.prisma.user.count({ where: { userType: 'freelancer' } });
         const clients = await this.prisma.user.count({ where: { userType: 'client' } });
 
-        // Task Status Distribution
         const tasksByStatus = await this.prisma.task.groupBy({
             by: ['status'],
             _count: {
@@ -134,10 +128,9 @@ export class AdminService {
             value: item._count.status,
         }));
 
-        // User Growth (Last 6 months)
         const sixMonthsAgo = new Date();
         sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
-        sixMonthsAgo.setDate(1); // Start of the month
+        sixMonthsAgo.setDate(1);
 
         const users = await this.prisma.user.findMany({
             where: {
@@ -172,7 +165,6 @@ export class AdminService {
 
         return {
             totalUsers,
-            totalProjects,
             totalTasks,
             userBreakdown: {
                 freelancers,
@@ -256,7 +248,6 @@ export class AdminService {
                 data: { rating: Math.round(avgRating * 10) / 10 },
             });
         } else {
-            // No ratings left, set to null
             await this.prisma.user.update({
                 where: { id: rating.freelancerId },
                 data: { rating: null },
@@ -267,7 +258,7 @@ export class AdminService {
         return deletedRating;
     }
 
-    private async logAction(userId: string, action: string, targetId?: string, details?: string) {
+    private async logAction(userId: string, action: string, targetId?: string, details?: string): Promise<void> {
         await this.prisma.actionLog.create({
             data: {
                 userId,

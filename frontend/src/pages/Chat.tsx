@@ -5,6 +5,7 @@ import { useChat } from '../contexts/ChatContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useParams, useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../config/api';
 
 interface Conversation {
     partner: {
@@ -31,11 +32,9 @@ const Chat: React.FC = () => {
     const [newMessage, setNewMessage] = useState('');
     const [currentPartner, setCurrentPartner] = useState<{ id: string; fullName: string; imageUrl?: string; userType?: string } | null>(null);
 
-    // Fetch conversations - use useCallback to make it stable
     const fetchConversations = React.useCallback(() => {
         if (user && token) {
-            console.log('Fetching conversations for user:', user.id);
-            fetch(`http://localhost:3000/api/chat/conversations/${user.id}`, {
+            fetch(`${API_BASE_URL}/chat/conversations/${user.id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -45,16 +44,13 @@ const Chat: React.FC = () => {
                     return res.json();
                 })
                 .then((data) => {
-                    console.log('Conversations fetched:', data);
                     if (Array.isArray(data)) {
                         setConversations(data);
                     } else {
-                        console.error('Conversations data is not an array:', data);
                         setConversations([]);
                     }
                 })
                 .catch((err) => {
-                    console.error('Error fetching conversations:', err);
                     setConversations([]);
                 });
         }
@@ -71,37 +67,29 @@ const Chat: React.FC = () => {
         }
     }, [userId, setActiveChat]);
 
-    // Fetch partner details when activeChat changes
     useEffect(() => {
         if (activeChat && token) {
-            // First try to find partner in existing conversations
             const existingConv = conversations.find(c => c.partner.id === activeChat);
             if (existingConv) {
                 setCurrentPartner(existingConv.partner);
             } else {
-                // If not found (new chat), fetch user details
-                console.log('Fetching user details for:', activeChat);
-                fetch(`http://localhost:3000/api/users/${activeChat}`, {
+                fetch(`${API_BASE_URL}/users/${activeChat}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 })
                     .then(res => {
-                        console.log('User fetch response status:', res.status);
                         if (!res.ok) throw new Error('Failed to fetch user');
                         return res.json();
                     })
                     .then(data => {
-                        console.log('User data received:', data);
                         if (data && data.fullName) {
                             setCurrentPartner(data);
                         } else {
-                            console.error('Invalid user data:', data);
                             setCurrentPartner({ id: activeChat, fullName: t('unknownUser') });
                         }
                     })
                     .catch(err => {
-                        console.error('Failed to fetch partner details:', err);
                         setCurrentPartner({ id: activeChat, fullName: t('unknownUser') });
                     });
             }
@@ -141,23 +129,73 @@ const Chat: React.FC = () => {
         };
     }, [showEmojiPicker]);
 
+    // Cleanup any stuck overlays when component mounts or unmounts
+    useEffect(() => {
+        // Remove any fixed overlays that might be stuck
+        const cleanup = () => {
+            const stuckOverlays = document.querySelectorAll('.fixed.inset-0:not([role="dialog"])');
+            stuckOverlays.forEach(overlay => {
+                // Only remove if it's not part of an active modal
+                const isPartOfModal = overlay.closest('[role="dialog"]') || 
+                                      overlay.parentElement?.querySelector('[role="dialog"]');
+                if (!isPartOfModal && !overlay.classList.contains('emoji-picker-container')) {
+                    overlay.remove();
+                }
+            });
+        };
+
+        cleanup();
+        const interval = setInterval(cleanup, 2000);
+
+        return () => {
+            clearInterval(interval);
+        };
+    }, []);
+
 
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
+            
+            // Validate file extension (client-side check)
+            const fileName = file.name.toLowerCase();
+            const dangerousExtensions = ['.exe', '.bat', '.cmd', '.com', '.pif', '.scr', '.vbs', '.js', '.jar', '.msi', '.dll', '.sh', '.ps1'];
+            const fileExtension = fileName.substring(fileName.lastIndexOf('.'));
+            
+            if (dangerousExtensions.includes(fileExtension)) {
+                alert('This file type is not allowed for security reasons.');
+                if (fileInputRef.current) fileInputRef.current.value = '';
+                return;
+            }
+            
+            // Check file size (10MB max for documents, 5MB for images)
+            const maxSize = file.type.startsWith('image/') ? 5 * 1024 * 1024 : 10 * 1024 * 1024;
+            if (file.size > maxSize) {
+                const maxSizeMB = (maxSize / (1024 * 1024)).toFixed(0);
+                alert(`File size must not exceed ${maxSizeMB} MB`);
+                if (fileInputRef.current) fileInputRef.current.value = '';
+                return;
+            }
+            
             setIsUploading(true);
             const formData = new FormData();
             formData.append('file', file);
 
             try {
-                const res = await fetch('http://localhost:3000/api/upload', {
+                const res = await fetch(`${API_BASE_URL}/upload`, {
                     method: 'POST',
                     body: formData,
                 });
+                
+                if (!res.ok) {
+                    const errorData = await res.json().catch(() => ({ message: 'Upload failed' }));
+                    throw new Error(errorData.message || 'Upload failed');
+                }
+                
                 const data = await res.json();
                 setAttachments([...attachments, data]);
             } catch (err) {
-                console.error('Upload failed', err);
+                alert(err instanceof Error ? err.message : 'File upload failed. Please try again.');
             } finally {
                 setIsUploading(false);
                 if (fileInputRef.current) fileInputRef.current.value = '';
@@ -200,7 +238,7 @@ const Chat: React.FC = () => {
     return (
         <div className={`flex h-[calc(100vh-64px)] ${isDark ? 'bg-gray-900' : 'bg-gray-100'} relative`}>
             {/* Sidebar */}
-            <div className={`${activeChat ? 'hidden sm:block' : 'block'} sm:w-1/3 ${!activeChat ? 'absolute inset-0 z-10 sm:relative sm:z-auto' : ''} border-r ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'} overflow-y-auto`}>
+            <div className={`${activeChat ? 'hidden sm:block' : 'block'} sm:w-1/3 ${!activeChat ? 'absolute inset-0 z-10 sm:relative sm:z-auto' : ''} border-r ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'} overflow-y-auto`} style={{ maxHeight: 'calc(100vh - 64px)' }}>
                 <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                     <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>{t('messages')}</h2>
                 </div>
@@ -248,7 +286,7 @@ const Chat: React.FC = () => {
             </div>
 
             {/* Chat Window */}
-            <div className={`${activeChat ? 'flex-1' : 'hidden sm:flex sm:flex-1'} flex flex-col ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
+            <div className={`${activeChat ? 'flex-1' : 'hidden sm:flex sm:flex-1'} flex flex-col ${isDark ? 'bg-gray-900' : 'bg-gray-50'} relative z-0`}>
                 {activeChat ? (
                     <>
                         {/* Header */}
@@ -321,20 +359,48 @@ const Chat: React.FC = () => {
                                                 }`}
                                         >
                                             <p>{msg.content}</p>
-                                            {msg.attachments && msg.attachments.length > 0 && (
+                                            {msg.attachments && Array.isArray(msg.attachments) && msg.attachments.length > 0 && (
                                                 <div className="mt-2 space-y-2">
-                                                    {msg.attachments.map((att: any, idx: number) => (
-                                                        <div key={idx}>
-                                                            {att.type.startsWith('image/') ? (
-                                                                <img src={`http://localhost:3000${att.url}`} alt={att.name} className="max-w-full rounded" />
-                                                            ) : (
-                                                                <a href={`http://localhost:3000${att.url}`} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-2 text-blue-500 hover:underline">
-                                                                    <span className="text-xl">📎</span>
-                                                                    <span className="break-all">{att.name}</span>
-                                                                </a>
-                                                            )}
-                                                        </div>
-                                                    ))}
+                                                    {msg.attachments.map((att: any, idx: number) => {
+                                                        if (!att || !att.url) return null;
+                                                        
+                                                        const attachmentType = att.type || '';
+                                                        const attachmentUrl = att.url.startsWith('http') ? att.url : `${API_BASE_URL.replace('/api', '')}${att.url}`;
+                                                        const attachmentName = att.name || 'Attachment';
+                                                        
+                                                        // Extract filename from URL for download endpoint
+                                                        const urlParts = attachmentUrl.split('/');
+                                                        const storedFilename = urlParts[urlParts.length - 1];
+                                                        
+                                                        const isImage = attachmentType && attachmentType.startsWith('image/');
+                                                        
+                                                        return (
+                                                            <div key={idx}>
+                                                                {isImage ? (
+                                                                    <img src={attachmentUrl} alt={attachmentName} className="max-w-full rounded cursor-pointer" onClick={() => window.open(attachmentUrl, '_blank')} onError={(e) => {
+                                                                        // If image fails to load, show as file attachment
+                                                                        const target = e.target as HTMLImageElement;
+                                                                        target.style.display = 'none';
+                                                                        const parent = target.parentElement;
+                                                                        if (parent) {
+                                                                            parent.innerHTML = `<a href="${API_BASE_URL}/upload/download/${storedFilename}" download="${attachmentName}" class="flex items-center space-x-2 ${isMe ? 'text-blue-200' : 'text-blue-500'} hover:underline"><span class="text-xl">📎</span><span class="break-all">${attachmentName}</span></a>`;
+                                                                        }
+                                                                    }} />
+                                                                ) : (
+                                                                    <a 
+                                                                        href={`${API_BASE_URL}/upload/download/${storedFilename}?originalName=${encodeURIComponent(attachmentName)}`}
+                                                                        download={attachmentName}
+                                                                        target="_blank" 
+                                                                        rel="noopener noreferrer" 
+                                                                        className={`flex items-center space-x-2 ${isMe ? 'text-blue-200 hover:text-blue-100' : 'text-blue-500 hover:text-blue-700'} hover:underline`}
+                                                                    >
+                                                                        <span className="text-xl">📎</span>
+                                                                        <span className="break-all">{attachmentName}</span>
+                                                                    </a>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
                                                 </div>
                                             )}
                                             <p className={`text-xs mt-1 ${isMe ? 'text-blue-200' : isDark ? 'text-gray-500' : 'text-gray-400'}`}>
@@ -355,11 +421,15 @@ const Chat: React.FC = () => {
                                     ref={fileInputRef}
                                     onChange={handleFileSelect}
                                     className="hidden"
-                                    accept="image/png,image/jpeg,application/pdf,application/zip"
+                                    accept="image/png,image/jpeg,image/jpg,image/gif,image/webp,application/pdf,application/zip,application/x-zip-compressed,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                                 />
                                 <button
                                     type="button"
-                                    onClick={() => fileInputRef.current?.click()}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        fileInputRef.current?.click();
+                                    }}
                                     className={`p-2 transition-colors ${isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'}`}
                                     title="Attach file"
                                 >

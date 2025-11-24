@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { LoggingService } from '../logging/logging.service';
+import { LoginAttemptsGuard } from './guards/login-attempts.guard';
 
 @Injectable()
 export class AuthService {
@@ -10,6 +11,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private loggingService: LoggingService,
+    private loginAttemptsGuard: LoginAttemptsGuard,
   ) { }
 
   async validateUser(email: string, password: string): Promise<any> {
@@ -18,6 +20,7 @@ export class AuthService {
     });
 
     if (!user) {
+      this.loginAttemptsGuard.recordFailedAttempt(email);
       throw new UnauthorizedException('Invalid credentials');
     }
 
@@ -28,8 +31,11 @@ export class AuthService {
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
+      this.loginAttemptsGuard.recordFailedAttempt(email);
       throw new UnauthorizedException('Invalid credentials');
     }
+
+    this.loginAttemptsGuard.recordSuccessfulAttempt(email);
 
     const { password: _, ...result } = user;
     return result;
@@ -38,7 +44,6 @@ export class AuthService {
   async register(userData: any) {
     const { email, password, fullName, userType } = userData;
 
-    // Check if user already exists
     const existingUser = await this.prisma.user.findUnique({
       where: { email },
     });
@@ -47,11 +52,9 @@ export class AuthService {
       throw new BadRequestException('User already exists');
     }
 
-    // Create hash for password
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create new user
     const newUser = await this.prisma.user.create({
       data: {
         email: userData.email,
@@ -77,7 +80,7 @@ export class AuthService {
 
     return {
       access_token: this.jwtService.sign(payload),
-      token: this.jwtService.sign(payload), // Keep for backward compatibility
+      token: this.jwtService.sign(payload),
       user: user
     };
   }

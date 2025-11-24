@@ -15,7 +15,6 @@ export class TaskRequestsService {
     ) { }
 
     async createRequest(clientId: string, taskId: string, freelancerId: string) {
-        // Verify task exists and belongs to client
         const task = await this.prisma.task.findUnique({
             where: { id: taskId },
         });
@@ -28,17 +27,14 @@ export class TaskRequestsService {
             throw new ForbiddenException('You can only assign your own tasks');
         }
 
-        // Task must be open to send a request
         if (task.status !== 'open') {
             throw new BadRequestException('Only open tasks can be assigned to freelancers');
         }
 
-        // Prevent self-assignment
         if (clientId === freelancerId) {
             throw new BadRequestException('You cannot send a task request to yourself');
         }
 
-        // Check if there's already a pending request for this freelancer on this task
         const existingRequest = await this.prisma.taskRequest.findFirst({
             where: {
                 taskId,
@@ -51,7 +47,6 @@ export class TaskRequestsService {
             throw new BadRequestException('You have already sent a request to this person for this task');
         }
 
-        // Verify freelancer exists
         const freelancer = await this.prisma.user.findUnique({
             where: { id: freelancerId },
         });
@@ -60,36 +55,38 @@ export class TaskRequestsService {
             throw new NotFoundException('User not found');
         }
 
-        // Create the request and update task status to pending
-        const request = await this.prisma.taskRequest.create({
-            data: {
-                taskId,
-                freelancerId,
-                clientId,
-            },
-            include: {
-                task: true,
-                freelancer: {
-                    select: {
-                        id: true,
-                        fullName: true,
-                        imageUrl: true,
+        const request = await this.prisma.$transaction(async (prisma) => {
+            const newRequest = await prisma.taskRequest.create({
+                data: {
+                    taskId,
+                    freelancerId,
+                    clientId,
+                },
+                include: {
+                    task: true,
+                    freelancer: {
+                        select: {
+                            id: true,
+                            fullName: true,
+                            imageUrl: true,
+                        },
+                    },
+                    client: {
+                        select: {
+                            id: true,
+                            fullName: true,
+                            imageUrl: true,
+                        },
                     },
                 },
-                client: {
-                    select: {
-                        id: true,
-                        fullName: true,
-                        imageUrl: true,
-                    },
-                },
-            },
-        });
+            });
 
-        // Update task status to pending
-        await this.prisma.task.update({
-            where: { id: taskId },
-            data: { status: 'pending' },
+            await prisma.task.update({
+                where: { id: taskId },
+                data: { status: 'pending' },
+            });
+
+            return newRequest;
         });
 
         await this.loggingService.logAction(
@@ -99,7 +96,6 @@ export class TaskRequestsService {
             `Task request sent to ${freelancer.fullName} for task: ${task.title}`,
         );
 
-        // Notify the freelancer
         await this.notificationsService.createNotification(
             freelancerId,
             'REQUEST_RECEIVED',
@@ -134,7 +130,6 @@ export class TaskRequestsService {
     }
 
     async acceptRequest(requestId: string, freelancerId: string) {
-        // Find the request
         const request = await this.prisma.taskRequest.findUnique({
             where: { id: requestId },
             include: {
@@ -158,29 +153,31 @@ export class TaskRequestsService {
             throw new BadRequestException('This request has already been processed');
         }
 
-        // Update request status to accepted
-        await this.prisma.taskRequest.update({
-            where: { id: requestId },
-            data: { status: 'accepted' },
+        const result = await this.prisma.$transaction(async (prisma) => {
+            const updatedRequest = await prisma.taskRequest.update({
+                where: { id: requestId },
+                data: { status: 'accepted' },
+            });
+
+            await prisma.task.update({
+                where: { id: request.taskId },
+                data: { status: 'in_progress' },
+            });
+
+            const systemMessage = await prisma.message.create({
+                data: {
+                    senderId: request.clientId,
+                    receiverId: freelancerId,
+                    content: `This chat has been started since both participants decided to work together on ${request.task.title}`,
+                    isSystem: true,
+                },
+            });
+
+            return { updatedRequest, systemMessage };
         });
 
-        // Update task status to in_progress
-        await this.prisma.task.update({
-            where: { id: request.taskId },
-            data: { status: 'in_progress' },
-        });
+        const { systemMessage } = result;
 
-        // Create system message in chat
-        const systemMessage = await this.prisma.message.create({
-            data: {
-                senderId: request.clientId,
-                receiverId: freelancerId,
-                content: `This chat has been started since both participants decided to work together on ${request.task.title}`,
-                isSystem: true,
-            },
-        });
-
-        // Emit the system message to both users via WebSocket
         this.chatGateway.server.to(request.clientId).emit('newMessage', systemMessage);
         this.chatGateway.server.to(freelancerId).emit('newMessage', systemMessage);
 
@@ -191,7 +188,6 @@ export class TaskRequestsService {
             `Accepted task request for: ${request.task.title}`,
         );
 
-        // Notify the client
         await this.notificationsService.createNotification(
             request.clientId,
             'REQUEST_ACCEPTED',
@@ -210,7 +206,6 @@ export class TaskRequestsService {
     }
 
     async rejectRequest(requestId: string, freelancerId: string) {
-        // Find the request
         const request = await this.prisma.taskRequest.findUnique({
             where: { id: requestId },
             include: {
@@ -232,16 +227,16 @@ export class TaskRequestsService {
             throw new BadRequestException('This request has already been processed');
         }
 
-        // Update request status to rejected
-        await this.prisma.taskRequest.update({
-            where: { id: requestId },
-            data: { status: 'rejected' },
-        });
+        await this.prisma.$transaction(async (prisma) => {
+            await prisma.taskRequest.update({
+                where: { id: requestId },
+                data: { status: 'rejected' },
+            });
 
-        // Update task status back to open
-        await this.prisma.task.update({
-            where: { id: request.taskId },
-            data: { status: 'open' },
+            await prisma.task.update({
+                where: { id: request.taskId },
+                data: { status: 'open' },
+            });
         });
 
         await this.loggingService.logAction(
@@ -255,7 +250,6 @@ export class TaskRequestsService {
     }
 
     async cancelRequest(requestId: string, clientId: string) {
-        // Find the request
         const request = await this.prisma.taskRequest.findUnique({
             where: { id: requestId },
             include: {
@@ -267,7 +261,6 @@ export class TaskRequestsService {
             throw new NotFoundException('Request not found');
         }
 
-        // Verify the client owns this request
         if (request.clientId !== clientId) {
             throw new ForbiddenException('You can only cancel your own requests');
         }
@@ -277,15 +270,15 @@ export class TaskRequestsService {
             throw new BadRequestException('This request has already been processed');
         }
 
-        // Delete the request
-        await this.prisma.taskRequest.delete({
-            where: { id: requestId },
-        });
+        await this.prisma.$transaction(async (prisma) => {
+            await prisma.taskRequest.delete({
+                where: { id: requestId },
+            });
 
-        // Update task status back to open
-        await this.prisma.task.update({
-            where: { id: request.taskId },
-            data: { status: 'open' },
+            await prisma.task.update({
+                where: { id: request.taskId },
+                data: { status: 'open' },
+            });
         });
 
         await this.loggingService.logAction(
