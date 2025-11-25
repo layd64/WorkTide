@@ -106,7 +106,7 @@ const SignUp: React.FC = () => {
                     className="absolute inset-0 w-full h-full object-cover"
                 />
                 {/* Overlay with branding */}
-                <div className="absolute bottom-0 left-0 right-0 p-12 bg-gradient-to-t from-black/60 to-transparent">
+                <div className="absolute inset-0 flex flex-col justify-center items-center p-12 bg-black/40 text-center">
                     <h1 className="text-4xl font-bold text-white mb-4">Join WorkTide</h1>
                     <p className="text-lg text-white/90">Start your journey as a freelancer or find the perfect talent</p>
                 </div>

@@ -97,19 +97,19 @@ const FindFreelancers: React.FC = () => {
         let filteredData = user && user.isHidden
           ? data.filter((f: Freelancer) => f.id !== user.id)
           : data;
-        
+
         // Apply rating filter
         if (minRating !== null) {
           filteredData = filteredData.filter((f: Freelancer) => (f.rating || 0) >= minRating);
         }
-        
+
         // Sort by rating
         filteredData.sort((a: Freelancer, b: Freelancer) => {
           const ratingA = a.rating || 0;
           const ratingB = b.rating || 0;
           return sortOrder === 'desc' ? ratingB - ratingA : ratingA - ratingB;
         });
-        
+
         setFreelancers(filteredData);
         setCurrentPage(1); // Reset to first page when filters change
       } catch (err) {
@@ -128,13 +128,7 @@ const FindFreelancers: React.FC = () => {
     return () => clearTimeout(timeoutId);
   }, [searchQuery, selectedSkills, minRating, sortOrder]);
 
-  const toggleSkill = (skill: string) => {
-    setSelectedSkills(prev =>
-      prev.includes(skill)
-        ? prev.filter(s => s !== skill)
-        : [...prev, skill]
-    );
-  };
+
 
   const addSkill = (skill: string) => {
     if (!selectedSkills.includes(skill)) {
@@ -266,7 +260,7 @@ const FindFreelancers: React.FC = () => {
                 <FunnelIcon className={`h-5 w-5 ${isDark ? 'text-gray-300' : 'text-gray-600'}`} />
                 <span className={isDark ? 'text-gray-300' : 'text-gray-600'}>{t('filterBySkillsLabel')}</span>
               </button>
-              
+
               {/* Rating Filter */}
               <div className="flex items-center gap-2">
                 <label className={isDark ? 'text-gray-300' : 'text-gray-600'}>Min Rating:</label>
@@ -282,7 +276,7 @@ const FindFreelancers: React.FC = () => {
                   <option value="4.5">4.5+</option>
                 </select>
               </div>
-              
+
               {/* Sort Order */}
               <div className="flex items-center gap-2">
                 <label className={isDark ? 'text-gray-300' : 'text-gray-600'}>Sort by Rating:</label>
@@ -322,7 +316,7 @@ const FindFreelancers: React.FC = () => {
                     ))}
                 </select>
               </div>
-              
+
               {/* Selected Skills */}
               {selectedSkills.length > 0 && (
                 <div className="flex flex-wrap gap-2">
@@ -367,7 +361,7 @@ const FindFreelancers: React.FC = () => {
             <p className={isDark ? 'text-gray-300' : 'text-gray-600'}>{t('noFreelancersFound')}</p>
           </div>
         )}
-        
+
         {/* Empty State for Pagination */}
         {!loading && !error && freelancers.length > 0 && paginatedFreelancers.length === 0 && (
           <div className="text-center py-12">
@@ -378,123 +372,123 @@ const FindFreelancers: React.FC = () => {
         {/* Freelancers Grid */}
         {!loading && !error && paginatedFreelancers.length > 0 && (
           <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {paginatedFreelancers.map((freelancer, index) => (
-              <MotionWrapper
-                key={freelancer.id}
-                type="fadeIn"
-                delay={index * 0.1} // Stagger effect
-                className="h-full"
-              >
-                <div
-                  className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow h-full`}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {paginatedFreelancers.map((freelancer, index) => (
+                <MotionWrapper
+                  key={freelancer.id}
+                  type="fadeIn"
+                  delay={index * 0.1} // Stagger effect
+                  className="h-full"
                 >
-                  <div className="p-6 flex flex-col h-full">
-                    <div
-                      className="cursor-pointer"
-                      onClick={() => handleViewProfile(freelancer.id)}
-                    >
-                      <div className="flex items-center gap-4">
-                        <Avatar
-                          fullName={freelancer.fullName}
-                          imageUrl={freelancer.imageUrl}
-                          className="w-16 h-16"
-                          textSize="text-base"
-                        />
-                        <div>
-                          <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{freelancer.fullName}</h3>
-                          <p className={isDark ? 'text-gray-300' : 'text-gray-600'}>{freelancer.title || t('freelancer')}</p>
-                        </div>
-                      </div>
-
-                      <div className="mt-4">
-                        <div className={`flex items-center gap-2 text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                          <span>⭐ {freelancer.rating || 'N/A'}</span>
-                          <span>•</span>
-                          <span>{freelancer.completedJobs || 0} {t('jobsCompleted')}</span>
-                          <span>•</span>
-                          <span>{freelancer.location || t('remote')}</span>
-                        </div>
-                      </div>
-
-                      {/* Profile Visibility for all users */}
-                      <div className="mb-6">
-                        <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'} line-clamp-3`}>
-                          {freelancer.bio}
-                        </p>
-                      </div>
-
-                      <div className="mt-4">
-                        <div className="flex flex-wrap gap-2">
-                          {freelancer.skills && freelancer.skills.map(skill => (
-                            <span
-                              key={skill}
-                              className={`px-2 py-1 ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-800'} rounded-full text-sm`}
-                            >
-                              {skill}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="mt-4">
-                        <span className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                          ${freelancer.hourlyRate || 0}/{t('perHour')}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="mt-auto pt-4 flex gap-2">
-                      <button
-                        className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleViewProfile(freelancer.id);
-                        }}
+                  <div
+                    className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow h-full`}
+                  >
+                    <div className="p-6 flex flex-col h-full">
+                      <div
+                        className="cursor-pointer"
+                        onClick={() => handleViewProfile(freelancer.id)}
                       >
-                        {t('viewProfile')}
-                      </button>
-                      {user && user.id !== freelancer.id && (
+                        <div className="flex items-center gap-4">
+                          <Avatar
+                            fullName={freelancer.fullName}
+                            imageUrl={freelancer.imageUrl}
+                            className="w-16 h-16"
+                            textSize="text-base"
+                          />
+                          <div>
+                            <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{freelancer.fullName}</h3>
+                            <p className={isDark ? 'text-gray-300' : 'text-gray-600'}>{freelancer.title || t('freelancer')}</p>
+                          </div>
+                        </div>
+
+                        <div className="mt-4">
+                          <div className={`flex items-center gap-2 text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                            <span>⭐ {freelancer.rating || 'N/A'}</span>
+                            <span>•</span>
+                            <span>{freelancer.completedJobs || 0} {t('jobsCompleted')}</span>
+                            <span>•</span>
+                            <span>{freelancer.location || t('remote')}</span>
+                          </div>
+                        </div>
+
+                        {/* Profile Visibility for all users */}
+                        <div className="mb-6">
+                          <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'} line-clamp-3`}>
+                            {freelancer.bio}
+                          </p>
+                        </div>
+
+                        <div className="mt-4">
+                          <div className="flex flex-wrap gap-2">
+                            {freelancer.skills && freelancer.skills.map(skill => (
+                              <span
+                                key={skill}
+                                className={`px-2 py-1 ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-800'} rounded-full text-sm`}
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="mt-4">
+                          <span className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                            ${freelancer.hourlyRate || 0}/{t('perHour')}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="mt-auto pt-4 flex gap-2">
                         <button
-                          className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleOpenAssignModal(freelancer);
+                            handleViewProfile(freelancer.id);
                           }}
                         >
-                          Send A Request
+                          {t('viewProfile')}
                         </button>
-                      )}
+                        {user && user.id !== freelancer.id && (
+                          <button
+                            className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenAssignModal(freelancer);
+                            }}
+                          >
+                            {t('sendARequest')}
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </MotionWrapper>
-            ))}
-          </div>
-          
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="mt-8 flex items-center justify-center gap-2">
-              <button
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-                className={`px-4 py-2 rounded-lg ${isDark ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700'} border ${isDark ? 'border-gray-700' : 'border-gray-300'} disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700`}
-              >
-                <ChevronLeftIcon className="h-5 w-5" />
-              </button>
-              <span className={`px-4 py-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                Page {currentPage} of {totalPages}
-              </span>
-              <button
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                disabled={currentPage === totalPages}
-                className={`px-4 py-2 rounded-lg ${isDark ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700'} border ${isDark ? 'border-gray-700' : 'border-gray-300'} disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700`}
-              >
-                <ChevronRightIcon className="h-5 w-5" />
-              </button>
+                </MotionWrapper>
+              ))}
             </div>
-          )}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-8 flex items-center justify-center gap-2">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                  className={`px-4 py-2 rounded-lg ${isDark ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700'} border ${isDark ? 'border-gray-700' : 'border-gray-300'} disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700`}
+                >
+                  <ChevronLeftIcon className="h-5 w-5" />
+                </button>
+                <span className={`px-4 py-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                  className={`px-4 py-2 rounded-lg ${isDark ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700'} border ${isDark ? 'border-gray-700' : 'border-gray-300'} disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700`}
+                >
+                  <ChevronRightIcon className="h-5 w-5" />
+                </button>
+              </div>
+            )}
           </>
         )}
 
@@ -520,86 +514,86 @@ const FindFreelancers: React.FC = () => {
               </div>
               <span className="hidden sm:inline-block sm:align-middle sm:h-screen"></span>&#8203;
               <div className={`inline-block align-bottom ${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full relative max-h-[80vh] overflow-y-auto`}>
-              <div className="p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                    Assign Task to {selectedFreelancer.fullName}
-                  </h2>
-                  <button
-                    onClick={() => {
-                      setIsAssignModalOpen(false);
-                      setSelectedFreelancer(null);
-                    }}
-                    className={isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'}
-                  >
-                    <XMarkIcon className="h-6 w-6" />
-                  </button>
-                </div>
+                <div className="p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                      Assign Task to {selectedFreelancer.fullName}
+                    </h2>
+                    <button
+                      onClick={() => {
+                        setIsAssignModalOpen(false);
+                        setSelectedFreelancer(null);
+                      }}
+                      className={isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'}
+                    >
+                      <XMarkIcon className="h-6 w-6" />
+                    </button>
+                  </div>
 
-                <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'} mb-6`}>
-                  Select one of your available tasks to assign to this freelancer:
-                </p>
+                  <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'} mb-6`}>
+                    Select one of your available tasks to assign to this freelancer:
+                  </p>
 
-                {loadingTasks ? (
-                  <div className="text-center py-12">
-                    <div className={`inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid ${isDark ? 'border-blue-400' : 'border-blue-600'} border-r-transparent`} role="status">
-                      <span className="sr-only">Loading...</span>
+                  {loadingTasks ? (
+                    <div className="text-center py-12">
+                      <div className={`inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid ${isDark ? 'border-blue-400' : 'border-blue-600'} border-r-transparent`} role="status">
+                        <span className="sr-only">Loading...</span>
+                      </div>
+                      <p className={`mt-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Loading your tasks...</p>
                     </div>
-                    <p className={`mt-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Loading your tasks...</p>
-                  </div>
-                ) : clientTasks.length === 0 ? (
-                  <div className="text-center py-12">
-                    <p className={isDark ? 'text-gray-300' : 'text-gray-600'}>You don't have any available tasks to assign.</p>
-                    <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-2`}>Create a new task in the "My Tasks" section.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {clientTasks.map(task => (
-                      <div
-                        key={task.id}
-                        className={`border ${isDark ? 'border-gray-700 hover:border-blue-500' : 'border-gray-200 hover:border-blue-500'} rounded-lg p-4 transition-colors`}
-                      >
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{task.title}</h3>
-                            <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'} mt-1 line-clamp-2`}>{task.description}</p>
-                            <div className="flex items-center gap-4 mt-2">
-                              <span className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                                ${task.budget}
-                              </span>
-                              <div className="flex flex-wrap gap-1">
-                                {task.skills.slice(0, 3).map(skill => (
-                                  <span
-                                    key={skill}
-                                    className={`px-2 py-0.5 ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'} rounded text-xs`}
-                                  >
-                                    {skill}
-                                  </span>
-                                ))}
-                                {task.skills.length > 3 && (
-                                  <span className={`px-2 py-0.5 ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'} rounded text-xs`}>
-                                    +{task.skills.length - 3} more
-                                  </span>
-                                )}
+                  ) : clientTasks.length === 0 ? (
+                    <div className="text-center py-12">
+                      <p className={isDark ? 'text-gray-300' : 'text-gray-600'}>You don't have any available tasks to assign.</p>
+                      <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-2`}>Create a new task in the "My Tasks" section.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {clientTasks.map(task => (
+                        <div
+                          key={task.id}
+                          className={`border ${isDark ? 'border-gray-700 hover:border-blue-500' : 'border-gray-200 hover:border-blue-500'} rounded-lg p-4 transition-colors`}
+                        >
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{task.title}</h3>
+                              <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'} mt-1 line-clamp-2`}>{task.description}</p>
+                              <div className="flex items-center gap-4 mt-2">
+                                <span className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                  ${task.budget}
+                                </span>
+                                <div className="flex flex-wrap gap-1">
+                                  {task.skills.slice(0, 3).map(skill => (
+                                    <span
+                                      key={skill}
+                                      className={`px-2 py-0.5 ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'} rounded text-xs`}
+                                    >
+                                      {skill}
+                                    </span>
+                                  ))}
+                                  {task.skills.length > 3 && (
+                                    <span className={`px-2 py-0.5 ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'} rounded text-xs`}>
+                                      +{task.skills.length - 3} more
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                             </div>
+                            <button
+                              onClick={() => handleAssignTask(task.id)}
+                              disabled={assigningTask}
+                              className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                            >
+                              {assigningTask ? 'Assigning...' : 'Assign'}
+                            </button>
                           </div>
-                          <button
-                            onClick={() => handleAssignTask(task.id)}
-                            disabled={assigningTask}
-                            className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-                          >
-                            {assigningTask ? 'Assigning...' : 'Assign'}
-                          </button>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
         )}
       </div>
     </div>

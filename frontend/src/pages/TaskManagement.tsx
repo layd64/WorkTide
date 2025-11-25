@@ -662,217 +662,217 @@ const TaskManagement: React.FC = () => {
             </div>
           ) : (
             <>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {paginatedTasks.map((task, index) => (
-                <MotionWrapper
-                  key={task.id}
-                  type="fadeIn"
-                  delay={index * 0.1}
-                  className="h-full"
-                >
-                  <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border ${isDark ? 'border-gray-700' : 'border-gray-100'} h-full`}>
-                    {/* Task Image */}
-                    {task.imageUrl && (
-                      <div className="w-full h-48 overflow-hidden">
-                        <img
-                          src={task.imageUrl}
-                          alt={task.title}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    )}
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {paginatedTasks.map((task, index) => (
+                  <MotionWrapper
+                    key={task.id}
+                    type="fadeIn"
+                    delay={index * 0.1}
+                    className="h-full"
+                  >
+                    <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border ${isDark ? 'border-gray-700' : 'border-gray-100'} h-full`}>
+                      {/* Task Image */}
+                      {task.imageUrl && (
+                        <div className="w-full h-48 overflow-hidden">
+                          <img
+                            src={task.imageUrl}
+                            alt={task.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
 
-                    {/* Card Header */}
-                    <div className="p-6 pb-4">
-                      <div className="flex justify-between items-start mb-3">
-                        <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'} line-clamp-2 flex-1 mr-2`}>
-                          {task.title}
-                        </h3>
-                        <span
-                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${getStatusBadgeClass(
-                            task.status
-                          )}`}
-                        >
-                          {task.status.replace('_', ' ')}
-                        </span>
-                      </div>
-
-                      <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'} line-clamp-2 mb-4`}>
-                        {task.description}
-                      </p>
-
-                      {/* Skills */}
-                      <div className="flex flex-wrap gap-1.5 mb-4">
-                        {task.skills.slice(0, 4).map((skill) => (
+                      {/* Card Header */}
+                      <div className="p-6 pb-4">
+                        <div className="flex justify-between items-start mb-3">
+                          <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'} line-clamp-2 flex-1 mr-2`}>
+                            {task.title}
+                          </h3>
                           <span
-                            key={skill}
-                            className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100"
+                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${getStatusBadgeClass(
+                              task.status
+                            )}`}
                           >
-                            {skill}
+                            {task.status.replace('_', ' ')}
                           </span>
-                        ))}
-                        {task.skills.length > 4 && (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">
-                            +{task.skills.length - 4} more
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Info Row */}
-                      <div className="flex items-center justify-between text-sm border-t border-gray-100 pt-4">
-                        <div className="flex items-center text-indigo-600 font-semibold">
-                          <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          ${task.budget}
                         </div>
-                        <div className="flex items-center text-gray-500 text-xs">
-                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                          {new Date(task.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                        </div>
-                      </div>
-                    </div>
 
-                    {/* Card Actions */}
-                    <div className={`${isDark ? 'bg-gray-700' : 'bg-gray-50'} px-6 py-3 border-t ${isDark ? 'border-gray-600' : 'border-gray-100'}`}>
-                      <div className="flex items-center justify-between gap-2">
-                        <button
-                          onClick={() => fetchApplications(task.id)}
-                          className="flex-1 inline-flex items-center justify-center px-3 py-2 text-xs font-medium rounded-lg text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors"
-                        >
-                          <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                          </svg>
-                          {t('applications')}
-                        </button>
+                        <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'} line-clamp-2 mb-4`}>
+                          {task.description}
+                        </p>
 
-                        {task.status === 'open' && (
-                          <button
-                            onClick={() => fetchRecommendations(task.id)}
-                            className="flex-1 inline-flex items-center justify-center px-3 py-2 text-xs font-medium rounded-lg text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors"
-                          >
-                            <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7H7m6 4H7m6 4H7m8-8h2m-2 4h2m-2 4h2M5 6h14a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z" />
-                            </svg>
-                            {t('recommendations')}
-                          </button>
-                        )}
-
-                        {task.status === 'in_progress' && (
-                          <button
-                            onClick={() => handleCompleteTask(task.id)}
-                            className="flex-1 inline-flex items-center justify-center px-3 py-2 text-xs font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 transition-colors"
-                          >
-                            <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            {t('complete')}
-                          </button>
-                        )}
-
-                        {task.status === 'pending' && (
-                          <button
-                            onClick={() => {
-                              // For pending status, we need to find and cancel the request
-                              // Since we canceled based on task status, we'll just show the option
-                              if (window.confirm('Cancel this task request? The task will return to open status.')) {
-                                // We'll need to fetch the request ID from the backend
-                                // For now, just refresh - a better approach would be to store request ID with task
-                                fetch(`${API_ENDPOINTS.tasks.getById(task.id)}`, {
-                                  headers: { Authorization: `Bearer ${token}` }
-                                })
-                                  .then(res => res.json())
-                                  .then(taskData => {
-                                    if (taskData.taskRequests && taskData.taskRequests.length > 0) {
-                                      handleCancelRequest(taskData.taskRequests[0].id);
-                                    }
-                                  })
-                                  .catch(err => console.error(err));
-                              }
-                            }}
-                            disabled={cancellingRequestId !== null}
-                            className="flex-1 inline-flex items-center justify-center px-3 py-2 text-xs font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 transition-colors disabled:bg-gray-400"
-                          >
-                            <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                            {cancellingRequestId ? t('cancelling') : t('cancelRequest')}
-                          </button>
-                        )}
-
-
-                        {/* Only show 3-dot menu for tasks with "open" status */}
-                        {task.status === 'open' && (
-                          <div className="relative">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setOpenDropdownTaskId(openDropdownTaskId === task.id ? null : task.id);
-                              }}
-                              className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                        {/* Skills */}
+                        <div className="flex flex-wrap gap-1.5 mb-4">
+                          {task.skills.slice(0, 4).map((skill) => (
+                            <span
+                              key={skill}
+                              className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100"
                             >
-                              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 01 0 4z" />
-                              </svg>
-                            </button>
+                              {skill}
+                            </span>
+                          ))}
+                          {task.skills.length > 4 && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">
+                              +{task.skills.length - 4} more
+                            </span>
+                          )}
+                        </div>
 
-                            {/* Dropdown Menu */}
-                            {openDropdownTaskId === task.id && (
-                              <div
-                                className="absolute right-0 bottom-full mb-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <div className="py-1">
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      // Close dropdown immediately before showing confirmation
-                                      setOpenDropdownTaskId(null);
-                                      // Use setTimeout to ensure state update completes before showing dialog
-                                      setTimeout(() => {
-                                        handleDeleteTask(task.id);
-                                      }, 0);
-                                    }}
-                                    className="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50"
-                                  >
-                                    Delete Task
-                                  </button>
-                                </div>
-                              </div>
-                            )}
+                        {/* Info Row */}
+                        <div className="flex items-center justify-between text-sm border-t border-gray-100 pt-4">
+                          <div className="flex items-center text-indigo-600 font-semibold">
+                            <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            ${task.budget}
                           </div>
-                        )}
+                          <div className="flex items-center text-gray-500 text-xs">
+                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            {new Date(task.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Card Actions */}
+                      <div className={`${isDark ? 'bg-gray-700' : 'bg-gray-50'} px-6 py-3 border-t ${isDark ? 'border-gray-600' : 'border-gray-100'}`}>
+                        <div className="flex items-center justify-between gap-2">
+                          <button
+                            onClick={() => fetchApplications(task.id)}
+                            className="flex-1 inline-flex items-center justify-center px-3 py-2 text-xs font-medium rounded-lg text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors"
+                          >
+                            <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            {t('applications')}
+                          </button>
+
+                          {task.status === 'open' && (
+                            <button
+                              onClick={() => fetchRecommendations(task.id)}
+                              className="flex-1 inline-flex items-center justify-center px-3 py-2 text-xs font-medium rounded-lg text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors"
+                            >
+                              <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7H7m6 4H7m6 4H7m8-8h2m-2 4h2m-2 4h2M5 6h14a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z" />
+                              </svg>
+                              {t('recommendations')}
+                            </button>
+                          )}
+
+                          {task.status === 'in_progress' && (
+                            <button
+                              onClick={() => handleCompleteTask(task.id)}
+                              className="flex-1 inline-flex items-center justify-center px-3 py-2 text-xs font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 transition-colors"
+                            >
+                              <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              {t('complete')}
+                            </button>
+                          )}
+
+                          {task.status === 'pending' && (
+                            <button
+                              onClick={() => {
+                                // For pending status, we need to find and cancel the request
+                                // Since we canceled based on task status, we'll just show the option
+                                if (window.confirm('Cancel this task request? The task will return to open status.')) {
+                                  // We'll need to fetch the request ID from the backend
+                                  // For now, just refresh - a better approach would be to store request ID with task
+                                  fetch(`${API_ENDPOINTS.tasks.getById(task.id)}`, {
+                                    headers: { Authorization: `Bearer ${token}` }
+                                  })
+                                    .then(res => res.json())
+                                    .then(taskData => {
+                                      if (taskData.taskRequests && taskData.taskRequests.length > 0) {
+                                        handleCancelRequest(taskData.taskRequests[0].id);
+                                      }
+                                    })
+                                    .catch(err => console.error(err));
+                                }
+                              }}
+                              disabled={cancellingRequestId !== null}
+                              className="flex-1 inline-flex items-center justify-center px-3 py-2 text-xs font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 transition-colors disabled:bg-gray-400"
+                            >
+                              <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                              {cancellingRequestId ? t('cancelling') : t('cancelRequest')}
+                            </button>
+                          )}
+
+
+                          {/* Only show 3-dot menu for tasks with "open" status */}
+                          {task.status === 'open' && (
+                            <div className="relative">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setOpenDropdownTaskId(openDropdownTaskId === task.id ? null : task.id);
+                                }}
+                                className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                              >
+                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                  <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 01 0 4z" />
+                                </svg>
+                              </button>
+
+                              {/* Dropdown Menu */}
+                              {openDropdownTaskId === task.id && (
+                                <div
+                                  className="absolute right-0 bottom-full mb-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <div className="py-1">
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        // Close dropdown immediately before showing confirmation
+                                        setOpenDropdownTaskId(null);
+                                        // Use setTimeout to ensure state update completes before showing dialog
+                                        setTimeout(() => {
+                                          handleDeleteTask(task.id);
+                                        }, 0);
+                                      }}
+                                      className="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50"
+                                    >
+                                      Delete Task
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </MotionWrapper>
-              ))}
-            </div>
-            
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="mt-8 flex items-center justify-center gap-2">
-                <button
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                  disabled={currentPage === 1}
-                  className={`px-4 py-2 rounded-lg ${isDark ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700'} border ${isDark ? 'border-gray-700' : 'border-gray-300'} disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700`}
-                >
-                  <ChevronLeftIcon className="h-5 w-5" />
-                </button>
-                <span className={`px-4 py-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Page {currentPage} of {totalPages}
-                </span>
-                <button
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                  disabled={currentPage === totalPages}
-                  className={`px-4 py-2 rounded-lg ${isDark ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700'} border ${isDark ? 'border-gray-700' : 'border-gray-300'} disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700`}
-                >
-                  <ChevronRightIcon className="h-5 w-5" />
-                </button>
+                  </MotionWrapper>
+                ))}
               </div>
-            )}
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="mt-8 flex items-center justify-center gap-2">
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                    className={`px-4 py-2 rounded-lg ${isDark ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700'} border ${isDark ? 'border-gray-700' : 'border-gray-300'} disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700`}
+                  >
+                    <ChevronLeftIcon className="h-5 w-5" />
+                  </button>
+                  <span className={`px-4 py-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                    className={`px-4 py-2 rounded-lg ${isDark ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700'} border ${isDark ? 'border-gray-700' : 'border-gray-300'} disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700`}
+                  >
+                    <ChevronRightIcon className="h-5 w-5" />
+                  </button>
+                </div>
+              )}
             </>
           )}
         </div>
@@ -1186,15 +1186,15 @@ const TaskManagement: React.FC = () => {
               <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
 
                 <span className="hidden sm:inline-block sm:align-middle sm:h-screen"></span>&#8203;
-                <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                  <div className="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className={`inline-block align-bottom ${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full`}>
+                  <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} px-4 pt-5 pb-4 sm:p-6 sm:pb-4`}>
                     <div className="sm:flex sm:items-start">
                       <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                        <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
-                          Application Details
+                        <h3 className={`text-lg leading-6 font-medium ${isDark ? 'text-white border-gray-700 bg-gray-800' : 'text-gray-900 border-gray-200 bg-gray-50'} p-4 border-b`}>
+                          {t('applicationDetails')}
                         </h3>
-                        <div className="mt-4">
-                          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Applicant:</h4>
+                        <div className="p-4">
+                          <h4 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>{t('applicant')}</h4>
                           <div
                             className="flex items-center cursor-pointer hover:opacity-80"
                             onClick={() => navigate(`/profile/${selectedApplication.freelancer.id}`)}
@@ -1206,17 +1206,17 @@ const TaskManagement: React.FC = () => {
                                 className="h-10 w-10 rounded-full mr-3"
                               />
                             ) : (
-                              <div className="h-10 w-10 rounded-full bg-gray-300 mr-3 flex items-center justify-center">
-                                <span className="text-sm font-medium text-gray-600">
+                              <div className={`h-10 w-10 rounded-full ${isDark ? 'bg-gray-700' : 'bg-gray-300'} mr-3 flex items-center justify-center`}>
+                                <span className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
                                   {selectedApplication.freelancer.fullName.charAt(0)}
                                 </span>
                               </div>
                             )}
                             <div>
-                              <p className="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400">
+                              <p className={`text-sm font-medium ${isDark ? 'text-white hover:text-blue-400' : 'text-gray-900 hover:text-blue-600'}`}>
                                 {selectedApplication.freelancer.fullName}
                               </p>
-                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                              <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                                 {selectedApplication.freelancer.title || 'Freelancer'}
                               </p>
                             </div>
@@ -1225,47 +1225,47 @@ const TaskManagement: React.FC = () => {
 
                         {selectedApplication.coverLetter && (
                           <div className="mt-4">
-                            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Cover Letter:</h4>
-                            <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line bg-gray-50 dark:bg-gray-700 p-3 rounded">
+                            <h4 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>{t('coverLetter')}</h4>
+                            <p className={`text-sm ${isDark ? 'text-gray-300 bg-gray-700' : 'text-gray-600 bg-gray-50'} whitespace-pre-line p-3 rounded`}>
                               {selectedApplication.coverLetter}
                             </p>
                           </div>
                         )}
 
                         <div className="mt-4">
-                          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Applied on:</h4>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                          <h4 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>{t('appliedOn')}</h4>
+                          <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                             {new Date(selectedApplication.createdAt).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
-
-                      {selectedApplication.status === 'pending' && (
-                        <div className="mt-6 flex justify-between">
-                          <button
-                            onClick={() => handleAssignFreelancer(selectedApplication.id)}
-                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                          >
-                            Assign to Task
-                          </button>
-                          <button
-                            onClick={() => handleUpdateApplicationStatus(selectedApplication.id, 'rejected')}
-                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                          >
-                            Reject
-                          </button>
-                        </div>
-                      )}
                     </div>
+
                   </div>
-                  <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                  <div className={`${isDark ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'} px-4 py-3 sm:px-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t`}>
                     <button
                       type="button"
                       onClick={closeApplicationDetailsModal}
-                      className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
+                      className={`w-full inline-flex justify-center rounded-md border shadow-sm px-4 py-2 text-base font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto sm:text-sm ${isDark ? 'border-gray-600 bg-gray-800 text-gray-200 hover:bg-gray-700' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'}`}
                     >
-                      Close
+                      {t('close')}
                     </button>
+                    {selectedApplication.status === 'pending' && (
+                      <>
+                        <button
+                          onClick={() => handleUpdateApplicationStatus(selectedApplication.id, 'rejected')}
+                          className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:w-auto"
+                        >
+                          {t('reject')}
+                        </button>
+                        <button
+                          onClick={() => handleAssignFreelancer(selectedApplication.id)}
+                          className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto"
+                        >
+                          {t('assignToTask')}
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>

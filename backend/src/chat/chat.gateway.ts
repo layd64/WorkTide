@@ -10,6 +10,8 @@ import {
 import { ChatService } from './chat.service';
 import { Server, Socket } from 'socket.io';
 
+import { JwtService } from '@nestjs/jwt';
+
 @WebSocketGateway({
     cors: {
         origin: '*',
@@ -19,12 +21,32 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
     server: Server;
 
-    constructor(private readonly chatService: ChatService) { }
+    constructor(
+        private readonly chatService: ChatService,
+        private readonly jwtService: JwtService,
+    ) { }
 
-    handleConnection(client: Socket) {
-        const userId = client.handshake.query.userId as string;
-        if (userId) {
-            client.join(userId);
+    async handleConnection(client: Socket) {
+        try {
+            const token = client.handshake.auth?.token || client.handshake.query?.token as string;
+
+            if (!token) {
+                client.disconnect();
+                return;
+            }
+
+            const payload = this.jwtService.verify(token);
+            const userId = payload.sub || payload.userId; // Handle standard sub or custom userId claim
+
+            if (userId) {
+                client.join(userId);
+                // Store userId in socket instance for later use if needed
+                (client as any).userId = userId;
+            } else {
+                client.disconnect();
+            }
+        } catch (error) {
+            client.disconnect();
         }
     }
 

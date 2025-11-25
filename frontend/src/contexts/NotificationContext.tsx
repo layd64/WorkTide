@@ -3,6 +3,7 @@ import { useAuth } from './AuthContext';
 import { useChat } from './ChatContext';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { API_BASE_URL } from '../config/api';
 
 interface Notification {
     id: string;
@@ -30,27 +31,37 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
-    const fetchNotifications = async () => {
-        if (!token) return;
-        try {
-            setIsLoading(true);
-            const response = await axios.get(`${API_BASE_URL}/notifications`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setNotifications(response.data);
-        } catch (error) {
-            console.error('Failed to fetch notifications:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     useEffect(() => {
-        if (user) {
-            fetchNotifications();
-        } else {
-            setNotifications([]);
-        }
+        let isMounted = true;
+
+        const fetchNotifications = async () => {
+            if (!user || !token) {
+                setNotifications([]);
+                return;
+            }
+
+            try {
+                if (isMounted) setIsLoading(true);
+                const response = await axios.get(`${API_BASE_URL}/notifications`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                if (isMounted) {
+                    setNotifications(response.data);
+                }
+            } catch (error) {
+                console.error('Failed to fetch notifications:', error);
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        fetchNotifications();
+
+        return () => {
+            isMounted = false;
+        };
     }, [user, token]);
 
     useEffect(() => {

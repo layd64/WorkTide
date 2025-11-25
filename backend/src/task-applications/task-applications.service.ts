@@ -60,8 +60,11 @@ export class TaskApplicationsService {
     await this.notificationsService.createNotification(
       task.clientId,
       'APPLICATION_RECEIVED',
-      'New Application',
-      `You have received a new application for your task: ${task.title}`,
+      'NOTIFICATION_APPLICATION_RECEIVED_TITLE',
+      JSON.stringify({
+        key: 'NOTIFICATION_APPLICATION_RECEIVED_MSG',
+        params: { taskTitle: task.title }
+      }),
       application.id,
     );
 
@@ -146,15 +149,18 @@ export class TaskApplicationsService {
 
     if (application) {
       const title = status === 'accepted' ? 'Application Accepted' : 'Application Declined';
-      const message = status === 'accepted'
-        ? `Your application for "${application.task.title}" has been accepted!`
-        : `Your application for "${application.task.title}" has been declined.`;
+      const notificationType = status === 'accepted' ? 'APPLICATION_ACCEPTED' : 'APPLICATION_DECLINED';
+      const notificationTitleKey = status === 'accepted' ? 'NOTIFICATION_APPLICATION_ACCEPTED_TITLE' : 'NOTIFICATION_APPLICATION_DECLINED_TITLE';
+      const notificationMessageKey = status === 'accepted' ? 'NOTIFICATION_APPLICATION_ACCEPTED_MSG' : 'NOTIFICATION_APPLICATION_DECLINED_MSG';
 
       await this.notificationsService.createNotification(
         application.freelancerId,
-        status === 'accepted' ? 'APPLICATION_ACCEPTED' : 'APPLICATION_DECLINED',
-        title,
-        message,
+        notificationType,
+        notificationTitleKey,
+        JSON.stringify({
+          key: notificationMessageKey,
+          params: { taskTitle: application.task.title }
+        }),
         application.id,
       );
     }
@@ -209,8 +215,11 @@ export class TaskApplicationsService {
     await this.notificationsService.createNotification(
       application.freelancerId,
       'APPLICATION_ACCEPTED',
-      'Application Accepted',
-      `You have been assigned to the task: ${application.task.title}`,
+      'NOTIFICATION_APPLICATION_ACCEPTED_TITLE',
+      JSON.stringify({
+        key: 'NOTIFICATION_APPLICATION_ACCEPTED_MSG',
+        params: { taskTitle: application.task.title }
+      }),
       application.id,
     );
 

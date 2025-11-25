@@ -26,6 +26,19 @@ export default {
     'myApplications': 'My Applications',
     'requests': 'Requests',
     'notifications': 'Notifications',
+    'sendARequest': 'Send A Request',
+    'NOTIFICATION_APPLICATION_RECEIVED_TITLE': 'Application Received',
+    'NOTIFICATION_APPLICATION_RECEIVED_MSG': 'You have received a new application for your task: {{taskTitle}}',
+    'NOTIFICATION_APPLICATION_ACCEPTED_TITLE': 'Application Accepted',
+    'NOTIFICATION_APPLICATION_ACCEPTED_MSG': 'Your application for task "{{taskTitle}}" has been accepted',
+    'NOTIFICATION_APPLICATION_DECLINED_TITLE': 'Application Declined',
+    'NOTIFICATION_APPLICATION_DECLINED_MSG': 'Your application for task "{{taskTitle}}" has been declined',
+    'NOTIFICATION_REQUEST_RECEIVED_TITLE': 'Request Received',
+    'NOTIFICATION_REQUEST_RECEIVED_MSG': 'You have received a new request for task: {{taskTitle}}',
+    'NOTIFICATION_REQUEST_ACCEPTED_TITLE': 'Request Accepted',
+    'NOTIFICATION_REQUEST_ACCEPTED_MSG': '{{freelancerName}} has accepted your request for task: {{taskTitle}}',
+    'NOTIFICATION_REQUEST_REJECTED_TITLE': 'Request Rejected',
+    'NOTIFICATION_REQUEST_REJECTED_MSG': '{{freelancerName}} has rejected your request for task: {{taskTitle}}',
     'adminPanel': 'Admin Panel',
 
     // Settings page
@@ -126,8 +139,8 @@ export default {
     'createProfileDesc': 'Sign up and build your professional profile highlighting your skills and experience.',
     'findOpportunities': 'Find Opportunities',
     'findOpportunitiesDesc': 'Browse available projects or submit proposals for jobs that match your expertise.',
-    'getPaid': 'Get Paid',
-    'getPaidDesc': 'Complete your work and receive payment directly through our secure platform.',
+    'getPaid': 'Complete Tasks',
+    'getPaidDesc': 'Work on projects and complete tasks directly through our platform.',
 
     'testimonials': 'Testimonials',
     'whatUsersSay': 'What Our Users Say',
@@ -313,6 +326,13 @@ export default {
     'skillsRequired': 'Skills Required',
     'yourCoverLetter': 'Your Cover Letter',
     'findMoreProjects': 'Find More Projects',
+
+    // Application Details Modal
+    'applicationDetails': 'Application Details',
+    'applicant': 'Applicant:',
+    'assignToTask': 'Assign to Task',
+    'reject': 'Reject',
+    'close': 'Close',
 
     // Requests Page
     'taskRequestsTitle': 'Task Requests',

@@ -25,7 +25,6 @@ export default {
     'myTasks': 'Мої завдання',
     'myApplications': 'Мої заявки',
     'requests': 'Запити',
-    'notifications': 'Сповіщення',
     'adminPanel': 'Панель адміністратора',
 
     // Settings page
@@ -126,8 +125,8 @@ export default {
     'createProfileDesc': 'Зареєструйтесь і створіть свій професійний профіль, висвітлюючи свої навички та досвід.',
     'findOpportunities': 'Знайдіть можливості',
     'findOpportunitiesDesc': 'Переглядайте доступні проєкти або надсилайте пропозиції для робіт, які відповідають вашому досвіду.',
-    'getPaid': 'Отримуйте оплату',
-    'getPaidDesc': 'Виконуйте свою роботу і отримуйте оплату безпосередньо через нашу безпечну платформу.',
+    'getPaid': 'Виконуйте завдання',
+    'getPaidDesc': 'Працюйте над проектами та виконуйте завдання безпосередньо через нашу платформу.',
 
     'testimonials': 'Відгуки',
     'whatUsersSay': 'Що кажуть наші користувачі',
@@ -190,8 +189,22 @@ export default {
     'highContrast': 'Висока контрастність',
     'reducedMotion': 'Зменшення руху',
     'highlightLinks': 'Підсвічування посилань',
+    notifications: 'Сповіщення',
+    sendARequest: 'Надіслати запит',
+    readingGuide: 'Указка для читання',
+    NOTIFICATION_APPLICATION_RECEIVED_TITLE: 'Отримано заявку',
+    NOTIFICATION_APPLICATION_RECEIVED_MSG: 'Ви отримали нову заявку на ваше завдання: {{taskTitle}}',
+    NOTIFICATION_APPLICATION_ACCEPTED_TITLE: 'Заявку прийнято',
+    NOTIFICATION_APPLICATION_ACCEPTED_MSG: 'Вашу заявку на завдання "{{taskTitle}}" прийнято',
+    NOTIFICATION_APPLICATION_DECLINED_TITLE: 'Заявку відхилено',
+    NOTIFICATION_APPLICATION_DECLINED_MSG: 'Вашу заявку на завдання "{{taskTitle}}" відхилено',
+    NOTIFICATION_REQUEST_RECEIVED_TITLE: 'Отримано запит',
+    NOTIFICATION_REQUEST_RECEIVED_MSG: 'Ви отримали новий запит на завдання: {{taskTitle}}',
+    NOTIFICATION_REQUEST_ACCEPTED_TITLE: 'Запит прийнято',
+    NOTIFICATION_REQUEST_ACCEPTED_MSG: '{{freelancerName}} прийняв ваш запит на завдання: {{taskTitle}}',
+    NOTIFICATION_REQUEST_REJECTED_TITLE: 'Запит відхилено',
+    NOTIFICATION_REQUEST_REJECTED_MSG: '{{freelancerName}} відхилив ваш запит на завдання: {{taskTitle}}',
     'bigCursor': 'Великий курсор',
-    'readingGuide': 'Посібник для читання',
     'invertColors': 'Інвертувати кольори',
     'fontSize': 'Розмір шрифту',
     'saturation': 'Насиченість',
@@ -313,6 +326,13 @@ export default {
     'skillsRequired': 'Необхідні навички',
     'yourCoverLetter': 'Ваш супровідний лист',
     'findMoreProjects': 'Знайти більше проєктів',
+
+    // Application Details Modal
+    'applicationDetails': 'Деталі заявки',
+    'applicant': 'Кандидат:',
+    'assignToTask': 'Призначити на завдання',
+    'reject': 'Відхилити',
+    'close': 'Закрити',
 
     // Requests Page
     'taskRequestsTitle': 'Запити на завдання',

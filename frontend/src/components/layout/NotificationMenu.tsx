@@ -84,14 +84,24 @@ const NotificationMenu: React.FC<NotificationMenuProps> = ({ mobile = false }) =
                                     >
                                         <div className="flex justify-between items-start">
                                             <p className={`text-sm ${!notification.isRead ? isDark ? 'font-semibold text-white' : 'font-semibold text-gray-900' : isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                                                {notification.title}
+                                                {t(notification.title, notification.title)}
                                             </p>
                                             <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} whitespace-nowrap ml-2`}>
                                                 {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
                                             </span>
                                         </div>
                                         <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'} mt-1 line-clamp-2`}>
-                                            {notification.message}
+                                            {(() => {
+                                                try {
+                                                    const parsed = JSON.parse(notification.message);
+                                                    if (parsed && typeof parsed === 'object' && parsed.key) {
+                                                        return t(parsed.key, parsed.params) as string;
+                                                    }
+                                                    return notification.message;
+                                                } catch (e) {
+                                                    return notification.message;
+                                                }
+                                            })()}
                                         </p>
                                     </div>
                                     <button

@@ -9,7 +9,7 @@ export class NotificationsController {
 
     @Get()
     async getNotifications(@Request() req) {
-        return this.notificationsService.getUserNotifications(req.user.userId);
+        return this.notificationsService.getUserNotifications(req.user.sub);
     }
 
     @Patch(':id/read')

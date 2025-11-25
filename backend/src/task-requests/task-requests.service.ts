@@ -99,8 +99,11 @@ export class TaskRequestsService {
         await this.notificationsService.createNotification(
             freelancerId,
             'REQUEST_RECEIVED',
-            'New Task Request',
-            `You have received a new request for task: ${task.title}`,
+            'NOTIFICATION_REQUEST_RECEIVED_TITLE',
+            JSON.stringify({
+                key: 'NOTIFICATION_REQUEST_RECEIVED_MSG',
+                params: { taskTitle: task.title }
+            }),
             request.id,
         );
 
@@ -191,8 +194,14 @@ export class TaskRequestsService {
         await this.notificationsService.createNotification(
             request.clientId,
             'REQUEST_ACCEPTED',
-            'Request Accepted',
-            `${request.freelancer.fullName} has accepted your request for task: ${request.task.title}`,
+            'NOTIFICATION_REQUEST_ACCEPTED_TITLE',
+            JSON.stringify({
+                key: 'NOTIFICATION_REQUEST_ACCEPTED_MSG',
+                params: {
+                    freelancerName: request.freelancer.fullName,
+                    taskTitle: request.task.title
+                }
+            }),
             request.id,
         );
 

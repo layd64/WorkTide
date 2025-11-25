@@ -37,7 +37,7 @@ const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
 const normalizeAttachments = (attachments: any): Attachment[] => {
     if (!attachments) return [];
-    
+
     if (typeof attachments === 'string') {
         try {
             attachments = JSON.parse(attachments);
@@ -45,11 +45,11 @@ const normalizeAttachments = (attachments: any): Attachment[] => {
             return [];
         }
     }
-    
+
     if (!Array.isArray(attachments)) {
         return [];
     }
-    
+
     return attachments.map((att: any) => ({
         url: att.url || '',
         type: att.type || '',
@@ -74,7 +74,7 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if (user?.id && token) {
             const socketUrl = API_BASE_URL.replace('/api', '');
             const newSocket = io(socketUrl, {
-                query: { userId: user.id },
+                auth: { token },
             });
 
             setSocket(newSocket);
@@ -99,8 +99,12 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             return () => {
                 newSocket.close();
             };
+        } else if (!user && !token) {
+            setMessages([]);
+            setActiveChat(null);
+            setSocket(null);
         }
-    }, [user?.id, token]);
+    }, [user, token]);
 
     const sendMessage = React.useCallback((receiverId: string, content: string, attachments?: Attachment[]) => {
         if (socket && user) {

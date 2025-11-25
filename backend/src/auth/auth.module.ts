@@ -21,6 +21,6 @@ import { LoggingModule } from '../logging/logging.module';
   ],
   providers: [AuthService, JwtStrategy, LoginAttemptsGuard, PrismaService],
   controllers: [AuthController],
-  exports: [AuthService],
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule { } 
